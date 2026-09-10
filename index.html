@@ -12,11 +12,121 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="flex justify-center pb-24">
+<body class="flex justify-center min-h-screen">
 
   <canvas id="glow-spotlight-canvas"></canvas>
 
-  <div class="relative z-10 w-full max-w-[1600px] flex flex-col gap-6">
+  <!-- ======================================================== -->
+  <!-- 1. AUTH GATEWAY VIEW (Shown by default on first visit)   -->
+  <!-- ======================================================== -->
+  <main id="auth-view" class="relative z-20 w-full max-w-md my-auto px-4 py-8 flex flex-col items-center">
+    
+    <!-- Branding Header -->
+    <div class="text-center mb-6 space-y-2">
+      <div class="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 items-center justify-center font-black text-white text-xl shadow-lg shadow-purple-500/20">✕</div>
+      <h1 class="text-2xl font-extrabold theme-text-title tracking-tight">Align-X Academy</h1>
+      <p class="text-xs theme-text-sub max-w-xs">Adaptive academic career architecture for students from any educational background.</p>
+    </div>
+
+    <!-- Auth Container Box -->
+    <div class="w-full study-card rounded-3xl p-6 shadow-2xl space-y-5">
+      
+      <!-- Tab Switcher -->
+      <div class="grid grid-cols-2 p-1 rounded-2xl theme-card-inner text-xs font-bold">
+        <button type="button" id="tab-btn-signin" onclick="switchAuthTab('signin')" class="py-2 rounded-xl transition btn-brand shadow-sm">Sign In</button>
+        <button type="button" id="tab-btn-register" onclick="switchAuthTab('register')" class="py-2 rounded-xl transition theme-text-sub hover:opacity-100">Register</button>
+      </div>
+
+      <!-- Sign In Form -->
+      <form id="form-signin" onsubmit="handleSignIn(event)" class="space-y-4 text-xs">
+        <div>
+          <label class="block theme-text-title mb-1.5 font-semibold">Registered Email</label>
+          <input type="email" id="signin-email" required placeholder="aditya@joyuniversity.edu.in" class="w-full theme-card-inner rounded-xl px-3.5 py-2.5 theme-text-title focus:outline-none">
+        </div>
+        <div>
+          <label class="block theme-text-title mb-1.5 font-semibold">Password</label>
+          <input type="password" id="signin-password" required value="password123" class="w-full theme-card-inner rounded-xl px-3.5 py-2.5 theme-text-title focus:outline-none">
+        </div>
+        <button type="submit" id="btn-submit-signin" class="btn-brand w-full py-3 rounded-xl font-bold text-xs shadow-md">
+          Enter Academic Dashboard →
+        </button>
+      </form>
+
+      <!-- Register Form (Any Educational Field & Dream Job) -->
+      <form id="form-register" onsubmit="handleRegister(event)" class="hidden space-y-3.5 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block theme-text-title mb-1 font-semibold">Full Name</label>
+            <input type="text" id="reg-name" required placeholder="Aditya Pandey" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none">
+          </div>
+          <div>
+            <label class="block theme-text-title mb-1 font-semibold">Education / Semester</label>
+            <input type="text" id="reg-academic-level" required placeholder="e.g. Semester 6 • B.Tech CSE" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block theme-text-title mb-1 font-semibold">Email</label>
+          <input type="email" id="reg-email" required placeholder="aditya@joyuniversity.edu.in" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block theme-text-title mb-1 font-semibold">Dream Job / Target Goal</label>
+          <input type="text" id="reg-career-goal" required placeholder="e.g. Full-Stack Engineer, Biotech Analyst, Quant" class="w-full theme-card-inner rounded-xl px-3 py-2 font-bold dynamic-accent-text focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block theme-text-title mb-1 font-semibold">Current Knowledge (Describe in your own words)</label>
+          <textarea id="reg-current-knowledge" required rows="2" placeholder="e.g. Proficient with Python, basic statistics, but need system design and caching architectures." class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block theme-text-title mb-1 font-semibold">Sprint Timeline</label>
+            <select id="reg-tenure" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none">
+              <option value="3 Months" selected>3 Months Sprint</option>
+              <option value="6 Months">6 Months Semester</option>
+              <option value="12 Months">12 Months</option>
+            </select>
+          </div>
+          <div>
+            <label class="block theme-text-title mb-1 font-semibold">GitHub (Optional)</label>
+            <input type="text" id="reg-github" placeholder="adityarp2008" class="w-full theme-card-inner rounded-xl px-3 py-2 font-mono theme-text-title focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block theme-text-title mb-1 font-semibold">Password</label>
+          <input type="password" id="reg-password" required value="password123" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none">
+        </div>
+
+        <button type="submit" id="btn-submit-register" class="btn-brand w-full py-3 rounded-xl font-bold text-xs shadow-md flex items-center justify-center gap-2">
+          <span>✨ Synthesize Architecture with Gemini →</span>
+        </button>
+      </form>
+
+      <!-- Feedback Banner -->
+      <div id="auth-status-msg" class="hidden p-3 rounded-xl text-center text-xs font-semibold"></div>
+
+      <!-- Theme Switcher Pill inside Auth Box -->
+      <div class="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] theme-text-sub">
+        <span>Accent Palette:</span>
+        <div class="flex items-center gap-1.5">
+          <button onclick="setAccentTheme('purple')" class="w-4 h-4 rounded-full bg-[#C084FC]"></button>
+          <button onclick="setAccentTheme('emerald')" class="w-4 h-4 rounded-full bg-[#34D399]"></button>
+          <button onclick="setAccentTheme('amber')" class="w-4 h-4 rounded-full bg-[#FBBF24]"></button>
+          <button onclick="setAccentTheme('cyan')" class="w-4 h-4 rounded-full bg-[#38BDF8]"></button>
+          <button onclick="setAccentTheme('white')" class="w-4 h-4 rounded-full bg-[#FFFFFF] border border-slate-500"></button>
+          <button onclick="setAccentTheme('light')" class="w-4 h-4 rounded-full bg-[#7C3AED]"></button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- 2. MAIN DASHBOARD VIEW (Shown only after login/register) -->
+  <!-- ======================================================== -->
+  <div id="app-view" class="hidden relative z-10 w-full max-w-[1600px] flex flex-col gap-6 pb-24 px-4 pt-4">
 
     <!-- Top Navigation Bar -->
     <header class="w-full study-card px-4 lg:px-6 py-3 rounded-2xl flex items-center justify-between gap-4">
@@ -33,15 +143,15 @@
         <div class="relative pl-2" id="dropdown-track-wrapper">
           <button type="button" onclick="toggleMenu('menu-tracks', event)" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-white/10 text-xs font-medium theme-card-inner transition">
             <span class="theme-text-sub">Target Goal:</span>
-            <span id="nav-current-role" class="dynamic-accent-text font-bold">Configure Goal</span>
+            <span id="nav-current-role" class="dynamic-accent-text font-bold">Full-Stack Engineer</span>
             <svg class="w-3.5 h-3.5 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </button>
           
           <div id="menu-tracks" class="hidden absolute left-0 top-full mt-2 w-64 rounded-xl dropdown-menu-pane p-1.5 text-xs space-y-1">
-            <button type="button" onclick="openOnboardingModal()" class="w-full text-left px-3 py-2 rounded-lg dropdown-item-btn font-semibold text-purple-400">✨ Set Target Role & Background</button>
-            <button type="button" onclick="quickSwitchGoal('Full-Stack Software Engineer')" class="w-full text-left px-3 py-2 rounded-lg dropdown-item-btn">Full-Stack Software Engineer</button>
-            <button type="button" onclick="quickSwitchGoal('Bioinformatics Scientist')" class="w-full text-left px-3 py-2 rounded-lg dropdown-item-btn">Bioinformatics Scientist</button>
-            <button type="button" onclick="quickSwitchGoal('Quantitative Financial Analyst')" class="w-full text-left px-3 py-2 rounded-lg dropdown-item-btn">Quantitative Financial Analyst</button>
+            <button type="button" onclick="openRoadmapModal()" class="w-full text-left px-3 py-2 rounded-lg dropdown-item-btn font-semibold dynamic-accent-text">✨ View Full Phased Curriculum</button>
+            <button type="button" onclick="quickSwitchGoal('Full-Stack Engineer')" class="w-full text-left px-3 py-2 rounded-lg dropdown-item-btn">Full-Stack Engineer</button>
+            <button type="button" onclick="quickSwitchGoal('AI & ML Systems Engineer')" class="w-full text-left px-3 py-2 rounded-lg dropdown-item-btn">AI & ML Systems Engineer</button>
+            <button type="button" onclick="quickSwitchGoal('Cloud & DevOps Engineer')" class="w-full text-left px-3 py-2 rounded-lg dropdown-item-btn">Cloud & DevOps Engineer</button>
           </div>
         </div>
       </div>
@@ -83,25 +193,25 @@
         </div>
       </div>
 
-      <!-- GitHub & Profile Telemetry -->
+      <!-- GitHub, Avatar, & Logout -->
       <div class="flex items-center gap-3">
         <button type="button" onclick="openModal('modal-github')" class="px-3 py-1.5 rounded-xl border border-white/10 text-xs font-mono flex items-center gap-2 theme-card-inner transition">
           <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
           <span id="nav-github-label">@student</span>
         </button>
 
-        <button type="button" onclick="openAuthModal()" id="btn-auth-action" class="btn-brand px-3.5 py-1.5 rounded-xl text-xs shadow-sm">
-          Sign In / Register
+        <button type="button" onclick="handleLogout()" class="px-3 py-1.5 rounded-xl border border-rose-500/30 text-rose-400 hover:bg-rose-500/10 text-xs font-bold transition">
+          Logout
         </button>
 
-        <div class="flex items-center gap-2.5 p-1 rounded-xl theme-card-inner border border-white/10 cursor-pointer" onclick="openOnboardingModal()">
+        <div class="flex items-center gap-2.5 p-1 rounded-xl theme-card-inner border border-white/10">
           <div class="relative">
-            <div class="w-7 h-7 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center font-bold text-xs dynamic-accent-text" id="nav-avatar-initials">AX</div>
-            <span class="absolute -bottom-1 -right-1 px-1 py-0.2 bg-amber-500 text-black font-extrabold text-[7px] rounded-full" id="nav-level-badge">L1</span>
+            <div class="w-7 h-7 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center font-bold text-xs dynamic-accent-text" id="nav-avatar-initials">AP</div>
+            <span class="absolute -bottom-1 -right-1 px-1 py-0.2 bg-amber-500 text-black font-extrabold text-[7px] rounded-full" id="nav-level-badge">L2</span>
           </div>
           <div class="hidden sm:block text-left pr-2">
-            <div class="text-xs font-semibold theme-text-title" id="nav-user-name">Guest Scholar</div>
-            <div class="text-[9px] theme-text-sub" id="nav-academic-term">Set Education Profile</div>
+            <div class="text-xs font-semibold theme-text-title" id="nav-user-name">Aditya Pandey</div>
+            <div class="text-[9px] theme-text-sub" id="nav-academic-term">Semester 6 • B.Tech Computer Science</div>
           </div>
         </div>
       </div>
@@ -117,48 +227,48 @@
             <span class="text-[9px] theme-text-sub font-mono">• auto-refreshes</span>
           </div>
           <p id="cs-fun-fact-text" class="theme-text-title text-xs mt-0.5 font-medium">
-            Personalized academic architectures reduce career transition time by up to 65%.
+            Relational databases use B+ Trees because wide fanouts match physical storage disk page sizes.
           </p>
         </div>
       </div>
-      <button type="button" onclick="cycleFunFact()" class="shrink-0 text-xs px-3 py-1.5 rounded-lg border border-white/10 theme-text-title font-mono hover:bg-white/5 transition">↻ Next Insight</button>
+      <button type="button" onclick="cycleFunFact()" class="shrink-0 text-xs px-3 py-1.5 rounded-lg border border-white/10 theme-text-title font-mono hover:bg-white/5 transition">↻ Next Fact</button>
     </section>
 
-    <!-- 4 Adaptive Telemetry Dials -->
+    <!-- 4 Telemetry Dials -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
       <div class="study-card p-5 rounded-2xl flex items-center justify-between">
         <div>
           <div class="text-[10px] font-mono theme-text-sub font-bold mb-1">CURRICULUM MASTERY</div>
-          <div class="text-3xl font-extrabold font-mono theme-text-title" id="meter-current-val">0% <span class="text-xs font-normal theme-text-sub">/100%</span></div>
-          <div class="text-[11px] theme-text-sub mt-1" id="meter-current-sub">0 of 0 units verified</div>
+          <div class="text-3xl font-extrabold font-mono theme-text-title" id="meter-current-val">60% <span class="text-xs font-normal theme-text-sub">/100%</span></div>
+          <div class="text-[11px] theme-text-sub mt-1">Verified competencies</div>
         </div>
         <div class="relative w-14 h-14 flex items-center justify-center">
-          <svg class="w-14 h-14 transform -rotate-90" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" stroke="var(--meter-bg-track)" stroke-width="5" fill="none"/><circle id="dial-ring-1" cx="32" cy="32" r="26" stroke="var(--accent-main)" stroke-width="5" fill="none" stroke-dasharray="163.36" stroke-dashoffset="163.36"/></svg>
-          <span class="absolute text-[10px] font-mono font-bold dynamic-accent-text" id="label-ring-1">0%</span>
+          <svg class="w-14 h-14 transform -rotate-90" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" stroke="var(--meter-bg-track)" stroke-width="5" fill="none"/><circle id="dial-ring-1" cx="32" cy="32" r="26" stroke="var(--accent-main)" stroke-width="5" fill="none" stroke-dasharray="163.36" stroke-dashoffset="65.34"/></svg>
+          <span class="absolute text-[10px] font-mono font-bold dynamic-accent-text" id="label-ring-1">60%</span>
         </div>
       </div>
 
       <div class="study-card p-5 rounded-2xl flex items-center justify-between">
         <div>
           <div class="text-[10px] font-mono text-red-500 font-bold mb-1">CONCEPT DEFICITS</div>
-          <div class="text-3xl font-extrabold font-mono text-red-500" id="meter-gap-val">100% <span class="text-xs font-normal theme-text-sub">untested</span></div>
-          <div class="text-[11px] theme-text-sub mt-1" id="meter-gap-sub">Syllabus unmapped</div>
+          <div class="text-3xl font-extrabold font-mono text-red-500" id="meter-gap-val">40% <span class="text-xs font-normal theme-text-sub">untested</span></div>
+          <div class="text-[11px] theme-text-sub mt-1">Syllabus topics left</div>
         </div>
         <div class="relative w-14 h-14 flex items-center justify-center">
-          <svg class="w-14 h-14 transform -rotate-90" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" stroke="var(--meter-bg-track)" stroke-width="5" fill="none"/><circle id="dial-ring-2" cx="32" cy="32" r="26" stroke="#EF4444" stroke-width="5" fill="none" stroke-dasharray="163.36" stroke-dashoffset="0"/></svg>
-          <span class="absolute text-[10px] font-mono font-bold text-red-500" id="label-ring-2">100%</span>
+          <svg class="w-14 h-14 transform -rotate-90" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" stroke="var(--meter-bg-track)" stroke-width="5" fill="none"/><circle id="dial-ring-2" cx="32" cy="32" r="26" stroke="#EF4444" stroke-width="5" fill="none" stroke-dasharray="163.36" stroke-dashoffset="98.01"/></svg>
+          <span class="absolute text-[10px] font-mono font-bold text-red-500" id="label-ring-2">40%</span>
         </div>
       </div>
 
       <div class="study-card p-5 rounded-2xl flex items-center justify-between">
         <div>
           <div class="text-[10px] font-mono theme-text-sub font-bold mb-1">CAREER READINESS</div>
-          <div class="text-3xl font-extrabold font-mono theme-text-title" id="meter-readiness-val">0% <span class="text-xs font-normal theme-text-sub">score</span></div>
+          <div class="text-3xl font-extrabold font-mono theme-text-title" id="meter-readiness-val">68% <span class="text-xs font-normal theme-text-sub">score</span></div>
           <div class="text-[11px] theme-text-sub mt-1">Hiring benchmark</div>
         </div>
         <div class="relative w-14 h-14 flex items-center justify-center">
-          <svg class="w-14 h-14 transform -rotate-90" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" stroke="var(--meter-bg-track)" stroke-width="5" fill="none"/><circle id="dial-ring-3" cx="32" cy="32" r="26" stroke="var(--accent-main)" stroke-width="5" fill="none" stroke-dasharray="163.36" stroke-dashoffset="163.36"/></svg>
-          <span class="absolute text-[10px] font-mono font-bold dynamic-accent-text" id="label-ring-3">0%</span>
+          <svg class="w-14 h-14 transform -rotate-90" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" stroke="var(--meter-bg-track)" stroke-width="5" fill="none"/><circle id="dial-ring-3" cx="32" cy="32" r="26" stroke="var(--accent-main)" stroke-width="5" fill="none" stroke-dasharray="163.36" stroke-dashoffset="52.27"/></svg>
+          <span class="absolute text-[10px] font-mono font-bold dynamic-accent-text" id="label-ring-3">68%</span>
         </div>
       </div>
 
@@ -178,14 +288,14 @@
     <!-- Main 2-Column Core: Left = Study Plan, Right = Quick Actions -->
     <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch relative z-10">
       
-      <!-- Left Column: Study Plan with Phased Weeks -->
+      <!-- Left Column: Study Plan -->
       <div class="lg:col-span-6 study-card p-6 rounded-3xl flex flex-col justify-between space-y-4">
         <div class="flex items-center justify-between pb-3 border-b border-white/10">
           <div class="flex items-center gap-2.5">
             <span class="text-lg">🗓️</span>
             <div>
               <h3 class="text-sm font-bold theme-text-title tracking-wide">Study Plan</h3>
-              <p class="text-[11px] theme-text-sub">Interactive milestones generated for your target role.</p>
+              <p class="text-[11px] theme-text-sub">Follow your milestones step-by-step to achieve your goals.</p>
             </div>
           </div>
 
@@ -194,7 +304,7 @@
               <span id="active-week-label">Phase 1</span>
               <svg class="w-3 h-3 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </button>
-            <div id="menu-weeks" class="hidden absolute right-0 top-full mt-2 w-40 rounded-xl dropdown-menu-pane p-1.5 text-xs space-y-1">
+            <div id="menu-weeks" class="hidden absolute right-0 top-full mt-2 w-44 rounded-xl dropdown-menu-pane p-1.5 text-xs space-y-1">
               <button onclick="changeStudyPlanPhase(0)" class="w-full text-left px-2.5 py-1.5 rounded-lg dropdown-item-btn">Phase 1: Foundations</button>
               <button onclick="changeStudyPlanPhase(1)" class="w-full text-left px-2.5 py-1.5 rounded-lg dropdown-item-btn">Phase 2: Core Domain</button>
               <button onclick="changeStudyPlanPhase(2)" class="w-full text-left px-2.5 py-1.5 rounded-lg dropdown-item-btn">Phase 3: Production</button>
@@ -217,7 +327,7 @@
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-            <div onclick="openModal('modal-roadmap')" class="action-card action-card-blue">
+            <div onclick="openRoadmapModal()" class="action-card action-card-blue">
               <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
               <span class="text-xs font-bold tracking-wide">Start Learning</span>
             </div>
@@ -254,15 +364,15 @@
 
         <div class="achievement-outline-card space-y-2 text-left theme-card-inner mt-2">
           <div class="flex items-center justify-between text-xs">
-            <span class="font-bold text-amber-500" id="xp-level-title">⚡ Level 1: Apprentice Scholar</span>
-            <span class="font-mono theme-text-sub" id="xp-progress-label">0 / 1000 XP</span>
+            <span class="font-bold text-amber-500" id="xp-level-title">⚡ Level 2: Apprentice Architect</span>
+            <span class="font-mono theme-text-sub" id="xp-progress-label">800 / 1000 XP</span>
           </div>
           <div class="w-full bg-slate-500/20 h-2 rounded-full overflow-hidden">
-            <div id="xp-progress-bar" class="bg-gradient-to-r from-[var(--accent-main)] to-amber-500 h-full transition-all duration-500" style="width: 0%;"></div>
+            <div id="xp-progress-bar" class="bg-gradient-to-r from-[var(--accent-main)] to-amber-500 h-full transition-all duration-500" style="width: 80%;"></div>
           </div>
           <div class="flex items-center justify-between text-[11px] theme-text-sub pt-0.5">
-            <span>Complete curriculum milestones to boost readiness & telemetry</span>
-            <button type="button" onclick="openModal('modal-achievements')" class="text-amber-500 underline font-bold">Badges</button>
+            <span>Solve quizzes or sync GitHub repos to earn XP</span>
+            <button type="button" onclick="openModal('modal-achievements')" class="text-amber-500 underline font-bold">Achievements (3)</button>
           </div>
         </div>
       </div>
@@ -272,19 +382,19 @@
   </div>
 
   <!-- Bottom Center Sprint Button -->
-  <button type="button" onclick="openModal('modal-roadmap')" class="floating-center-btn" title="Open Career Sprint Roadmap">
+  <button type="button" id="btn-floating-center" onclick="openRoadmapModal()" class="hidden floating-center-btn" title="Open Career Sprint Roadmap">
     <span>🚀</span>
     <span>Career Readiness Sprint</span>
     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
   </button>
 
   <!-- Bottom Right AI Tutor Button -->
-  <button type="button" onclick="toggleTutorChat()" class="floating-tutor-btn" title="Open AI Study Tutor">
+  <button type="button" id="btn-floating-tutor" onclick="toggleTutorChat()" class="hidden floating-tutor-btn" title="Open AI Study Tutor">
     <span class="text-base">🤖</span>
     <span>AI Tutor</span>
   </button>
 
-  <!-- Left Sliding Drawer -->
+  <!-- Navigation Drawer -->
   <aside id="nav-drawer" class="fixed inset-y-0 left-0 w-80 max-w-[85vw] dropdown-menu-pane border-r backdrop-blur-2xl z-[120] transform -translate-x-full transition-transform duration-300 flex flex-col justify-between p-6 shadow-2xl">
     <div class="space-y-6">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
@@ -296,7 +406,7 @@
       </div>
 
       <nav class="space-y-2 text-xs font-semibold">
-        <button type="button" onclick="openModal('modal-roadmap'); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl theme-card-inner dynamic-accent-text transition">
+        <button type="button" onclick="openRoadmapModal(); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl theme-card-inner dynamic-accent-text transition">
           <span class="flex items-center gap-2.5"><span>📚</span> <span>Personalized Career Roadmap</span></span>
           <span class="text-[10px] font-mono dynamic-accent-text font-bold">Phased</span>
         </button>
@@ -329,93 +439,18 @@
     </div>
 
     <div class="p-4 rounded-2xl theme-card-inner space-y-1.5 text-xs">
-      <div class="font-bold theme-text-title" id="drawer-user-name">Guest Scholar</div>
-      <div class="text-[11px] theme-text-sub" id="drawer-user-goal">Target Unset</div>
+      <div class="font-bold theme-text-title" id="drawer-user-name">Aditya Pandey</div>
+      <div class="text-[11px] theme-text-sub" id="drawer-user-goal">Full-Stack Engineer</div>
     </div>
   </aside>
 
-  <!-- ONBOARDING MODAL (Background & Dream Job from ANY Educational Field) -->
-  <div id="modal-onboarding" class="fixed inset-0 z-[160] hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="study-card rounded-3xl max-w-xl w-full p-6 md:p-8 space-y-5 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-white/10 pb-3">
-        <div>
-          <h3 class="text-base font-bold theme-text-title">Academic & Career Telemetry Profiler</h3>
-          <p class="text-xs theme-text-sub">Engineered for candidates from ANY educational field</p>
-        </div>
-        <button onclick="closeModal('modal-onboarding')" class="theme-text-sub hover:text-white">✕</button>
-      </div>
-
-      <form onsubmit="handleOnboardingSubmit(event)" class="space-y-3.5 text-xs">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block theme-text-title mb-1 font-semibold">Full Name</label>
-            <input type="text" id="in-name" required placeholder="e.g. Pariveda Manish Goud" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title">
-          </div>
-          <div>
-            <label class="block theme-text-title mb-1 font-semibold">Current Education Level</label>
-            <input type="text" id="in-academic-level" required placeholder="e.g. 3rd Year B.Com / M.Sc Bio / Self-Taught" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title">
-          </div>
-        </div>
-
-        <div>
-          <label class="block theme-text-title mb-1 font-semibold">Dream Job / Target Role (Any field)</label>
-          <input type="text" id="in-career-goal" required placeholder="e.g. Full-Stack Engineer, Biotech Analyst, Quantitative Trader" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title font-semibold text-purple-400">
-        </div>
-
-        <div>
-          <label class="block theme-text-title mb-1 font-semibold">Current Knowledge & Background (Describe in your own words)</label>
-          <textarea id="in-current-knowledge" required rows="3" placeholder="e.g. I have basic knowledge of Python and statistics from my biology courses, but zero system design experience. Looking to break into healthtech AI." class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title"></textarea>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block theme-text-title mb-1 font-semibold">Timeline / Tenure Left</label>
-            <select id="in-tenure" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title">
-              <option value="3 Months" selected>3 Months Sprint</option>
-              <option value="6 Months">6 Months Semester</option>
-              <option value="12 Months">12 Months Comprehensive</option>
-            </select>
-          </div>
-          <div>
-            <label class="block theme-text-title mb-1 font-semibold">GitHub Username (Optional)</label>
-            <input type="text" id="in-github" placeholder="e.g. adityarp2008" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title font-mono">
-          </div>
-        </div>
-
-        <div class="pt-2 flex justify-end">
-          <button type="submit" id="btn-generate-roadmap" class="btn-brand px-6 py-2.5 rounded-xl font-bold flex items-center gap-2">
-            <span>✨ Synthesize Custom Roadmap via Gemini</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- AUTH PORTAL MODAL -->
-  <div id="modal-auth" class="fixed inset-0 z-[150] hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="study-card rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-      <div class="flex items-center justify-between pb-3 border-b border-white/10">
-        <h3 class="text-base font-bold theme-text-title">Student Access Portal</h3>
-        <button onclick="closeModal('modal-auth')" class="theme-text-sub hover:text-white">✕</button>
-      </div>
-      <form onsubmit="handleAuthSubmit(event)" class="space-y-3 text-xs">
-        <div>
-          <label class="block theme-text-title mb-1 font-semibold">University or Personal Email</label>
-          <input type="email" id="auth-email" required placeholder="student@university.edu" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title">
-        </div>
-        <p class="text-[11px] theme-text-sub leading-relaxed">If your email exists in Supabase, your progress and roadmap load automatically. If new, you'll be directed to configure your background.</p>
-        <button type="submit" class="btn-brand w-full py-2.5 rounded-xl font-bold">Continue →</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL: STUDENT CAPABILITIES (Matrix) -->
+  <!-- MODALS -->
   <div id="modal-capabilities" class="fixed inset-0 z-[150] hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="study-card rounded-3xl max-w-2xl w-full p-6 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
         <div>
           <h3 class="text-sm font-bold theme-text-title flex items-center gap-2"><span>🎯</span> <span>Student Capabilities & Domain Matrix</span></h3>
-          <p class="text-xs theme-text-sub">Competency depth across target role domains (Student vs Benchmark)</p>
+          <p class="text-xs theme-text-sub">Conceptual depth across Core CS Domains (Student vs Benchmark)</p>
         </div>
         <button onclick="closeModal('modal-capabilities')" class="theme-text-sub hover:text-white">✕</button>
       </div>
@@ -425,13 +460,12 @@
     </div>
   </div>
 
-  <!-- MODAL: PERSONALIZED PHASED ROADMAP -->
   <div id="modal-roadmap" class="fixed inset-0 z-[150] hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="study-card rounded-3xl max-w-3xl w-full p-6 md:p-8 space-y-5 shadow-2xl max-h-[85vh] flex flex-col">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
         <div>
           <h3 class="text-base font-bold theme-text-title flex items-center gap-2"><span>📚</span> <span>Personalized Phased Career Roadmap</span></h3>
-          <p class="text-xs theme-text-sub">Target milestones for <span id="roadmap-track-name" class="dynamic-accent-text font-bold">Selected Goal</span></p>
+          <p class="text-xs theme-text-sub">Target milestones for <span id="roadmap-track-name" class="dynamic-accent-text font-bold">Full-Stack Engineer</span></p>
         </div>
         <button onclick="closeModal('modal-roadmap')" class="theme-text-sub hover:text-white">✕</button>
       </div>
@@ -439,7 +473,6 @@
     </div>
   </div>
 
-  <!-- MODAL: ENDLESS ADAPTIVE MCQ STUDIO -->
   <div id="modal-mcq" class="fixed inset-0 z-[150] hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="study-card rounded-3xl max-w-2xl w-full p-6 space-y-5 shadow-2xl relative">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
@@ -473,7 +506,6 @@
     </div>
   </div>
 
-  <!-- MODAL: SCORECARD -->
   <div id="modal-scorecard" class="fixed inset-0 z-[160] hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
     <div class="study-card rounded-3xl max-w-2xl w-full p-6 space-y-4 shadow-2xl max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
@@ -492,7 +524,6 @@
     </div>
   </div>
 
-  <!-- MODAL: GITHUB API TELEMETRY -->
   <div id="modal-github" class="fixed inset-0 z-[150] hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="study-card rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
@@ -503,14 +534,13 @@
         <button onclick="closeModal('modal-github')" class="theme-text-sub hover:text-white">✕</button>
       </div>
       <div class="flex gap-2">
-        <input type="text" id="in-github-scan" placeholder="GitHub username" class="flex-1 theme-card-inner rounded-xl px-3 py-2 text-xs theme-text-title font-mono focus:outline-none">
+        <input type="text" id="in-github-scan" placeholder="GitHub username" value="adityarp2008" class="flex-1 theme-card-inner rounded-xl px-3 py-2 text-xs theme-text-title font-mono focus:outline-none">
         <button type="button" onclick="fetchGitHubRepos()" class="btn-brand px-4 py-2 rounded-xl text-xs font-bold">Scan</button>
       </div>
       <div id="github-repos-container" class="max-h-64 overflow-y-auto space-y-2 text-xs pr-1"></div>
     </div>
   </div>
 
-  <!-- MODAL: NOTES -->
   <div id="modal-notes" class="fixed inset-0 z-[150] hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="study-card rounded-3xl max-w-2xl w-full p-6 space-y-4 shadow-2xl max-h-[85vh] flex flex-col">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
@@ -524,7 +554,6 @@
     </div>
   </div>
 
-  <!-- MODAL: RIDDLE -->
   <div id="modal-puzzle" class="fixed inset-0 z-[150] hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="study-card rounded-3xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
@@ -539,7 +568,6 @@
     </div>
   </div>
 
-  <!-- MODAL: ACHIEVEMENTS -->
   <div id="modal-achievements" class="fixed inset-0 z-[150] hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="study-card rounded-3xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
@@ -554,11 +582,11 @@
     </div>
   </div>
 
-  <!-- AI TUTOR DRAWER -->
+  <!-- AI Tutor Drawer -->
   <div id="drawer-ai-tutor" class="fixed right-0 top-0 bottom-0 w-full sm:w-[400px] dropdown-menu-pane border-l backdrop-blur-2xl z-[130] transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
     <div class="p-4 border-b border-white/10 flex items-center justify-between bg-purple-500/10">
       <h3 class="text-xs font-bold theme-text-title flex items-center gap-2">
-        <span>🤖 Align-X AI Tutor (Gemini)</span>
+        <span>🤖 Align-X AI Tutor</span>
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
       </h3>
       <button onclick="toggleTutorChat()" class="theme-text-sub hover:text-white">✕</button>
