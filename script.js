@@ -1,6 +1,6 @@
 /**
  * Align-X Academic Engine
- * Reliable Tab Switching + Direct Data Collection Onboarding + Live Telemetry
+ * Guaranteed Global Handler Binding + Gemini Synthesis + Supabase Persistence
  */
 
 const SUPABASE_URL = "https://eydgvjsgkqjyqjkkedi.supabase.co";
@@ -11,7 +11,7 @@ if (window.supabase && typeof window.supabase.createClient === 'function') {
   try {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   } catch (e) {
-    console.warn("Supabase local fallback mode.");
+    console.warn("Supabase running local mode.");
   }
 }
 
@@ -104,50 +104,9 @@ const endlessMCQBank = [
 let mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [] };
 
 // ==========================================
-// DOM READY & EVENT ATTACHMENTS
+// WINDOW BINDINGS (Guaranteed Event Routing)
 // ==========================================
-window.addEventListener('DOMContentLoaded', () => {
-  const savedTheme = localStorage.getItem('alignx_accent') || 'purple';
-  setAccentTheme(savedTheme);
-  initPointerGlow();
-
-  // Attach explicit click handlers to Auth Tabs
-  const btnIn = document.getElementById('tab-btn-signin');
-  const btnReg = document.getElementById('tab-btn-register');
-  if (btnIn) btnIn.addEventListener('click', () => switchAuthTab('signin'));
-  if (btnReg) btnReg.addEventListener('click', () => switchAuthTab('register'));
-
-  const formIn = document.getElementById('form-signin');
-  const formReg = document.getElementById('form-register');
-  if (formIn) formIn.addEventListener('submit', handleSignIn);
-  if (formReg) formReg.addEventListener('submit', handleRegisterStep1);
-
-  // Check existing session
-  const savedSession = localStorage.getItem('alignx_student_active');
-  if (savedSession) {
-    try {
-      currentStudent = JSON.parse(savedSession);
-      enterDashboard();
-    } catch (e) {
-      showAuthGateway();
-    }
-  } else {
-    showAuthGateway();
-  }
-
-  setInterval(cycleFunFact, 8000);
-  window.addEventListener('resize', renderRadar);
-
-  // Global click to dismiss dropdowns
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('#dropdown-track-wrapper')) closeMenu('menu-tracks');
-    if (!e.target.closest('#dropdown-theme-wrapper')) closeMenu('menu-themes');
-    if (!e.target.closest('#dropdown-week-wrapper')) closeMenu('menu-weeks');
-  });
-});
-
-// TAB SWITCHING
-function switchAuthTab(tab) {
+window.switchAuthTab = function(tab) {
   const formIn = document.getElementById('form-signin');
   const formReg = document.getElementById('form-register');
   const btnIn = document.getElementById('tab-btn-signin');
@@ -155,39 +114,28 @@ function switchAuthTab(tab) {
   hideAuthMsg();
 
   if (tab === 'signin') {
-    formIn.classList.remove('hidden');
-    formReg.classList.add('hidden');
-    btnIn.className = "py-2.5 rounded-xl transition btn-brand shadow-sm";
-    btnReg.className = "py-2.5 rounded-xl transition theme-text-sub hover:opacity-100";
+    if (formIn) formIn.classList.remove('hidden');
+    if (formReg) formReg.classList.add('hidden');
+    if (btnIn) btnIn.className = "py-2.5 rounded-xl transition btn-brand shadow-sm";
+    if (btnReg) btnReg.className = "py-2.5 rounded-xl transition theme-text-sub hover:opacity-100";
   } else {
-    formIn.classList.add('hidden');
-    formReg.classList.remove('hidden');
-    btnReg.className = "py-2.5 rounded-xl transition btn-brand shadow-sm";
-    btnIn.className = "py-2.5 rounded-xl transition theme-text-sub hover:opacity-100";
+    if (formIn) formIn.classList.add('hidden');
+    if (formReg) formReg.classList.remove('hidden');
+    if (btnReg) btnReg.className = "py-2.5 rounded-xl transition btn-brand shadow-sm";
+    if (btnIn) btnIn.className = "py-2.5 rounded-xl transition theme-text-sub hover:opacity-100";
   }
-}
+};
 
-function showAuthMsg(msg, isError = false) {
-  const el = document.getElementById('auth-status-msg');
-  if (!el) return;
-  el.textContent = msg;
-  el.className = isError 
-    ? "p-3 rounded-xl text-center text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30" 
-    : "p-3 rounded-xl text-center text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
-  el.classList.remove('hidden');
-}
-
-function hideAuthMsg() {
-  document.getElementById('auth-status-msg')?.classList.add('hidden');
-}
-
-// SIGN IN FLOW
-async function handleSignIn(e) {
-  e.preventDefault();
-  const email = document.getElementById('signin-email').value.trim();
+window.handleSignIn = async function(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const emailInput = document.getElementById('signin-email');
+  const email = emailInput ? emailInput.value.trim() : "aditya@joyuniversity.edu.in";
   const btn = document.getElementById('btn-submit-signin');
-  btn.disabled = true;
-  btn.textContent = "Authenticating...";
+  
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Checking Profile...";
+  }
 
   // 1. Check Supabase
   if (supabase) {
@@ -196,53 +144,52 @@ async function handleSignIn(e) {
       if (data && !error) {
         currentStudent = data;
         localStorage.setItem('alignx_student_active', JSON.stringify(currentStudent));
-        btn.disabled = false;
-        btn.textContent = "Sign In →";
+        if (btn) { btn.disabled = false; btn.textContent = "Sign In →"; }
         enterDashboard();
         return;
       }
     } catch (err) {
-      console.warn("Supabase lookup offline:", err.message);
+      console.warn("Supabase check offline:", err.message);
     }
   }
 
-  // 2. Check LocalStorage
+  // 2. Check localStorage
   const localData = localStorage.getItem('alignx_student_active');
   if (localData) {
     try {
       const parsed = JSON.parse(localData);
-      if (parsed.email && parsed.email.toLowerCase() === email.toLowerCase()) {
+      if (parsed.email && parsed.email.toLowerCase() === email.toLowerCase() && parsed.career_goal) {
         currentStudent = parsed;
-        btn.disabled = false;
-        btn.textContent = "Sign In →";
+        if (btn) { btn.disabled = false; btn.textContent = "Sign In →"; }
         enterDashboard();
         return;
       }
-    } catch (e) {}
+    } catch (err) {}
   }
 
-  // 3. If no existing roadmap found, open Data Collection Questionnaire
-  btn.disabled = false;
-  btn.textContent = "Sign In →";
+  // 3. No existing telemetry profile? Pop open the profiler immediately!
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = "Sign In →";
+  }
   pendingRegistrationEmail = email;
   openOnboardingModal();
-  showAuthMsg(`Account loaded. Please complete your academic telemetry profile.`, false);
-}
+};
 
-// REGISTER FLOW (STEP 1 -> OPENS DATA COLLECTION)
-function handleRegisterStep1(e) {
-  e.preventDefault();
-  const email = document.getElementById('reg-email').value.trim();
-  pendingRegistrationEmail = email;
+window.handleRegisterStep1 = function(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const emailInput = document.getElementById('reg-email');
+  pendingRegistrationEmail = emailInput ? emailInput.value.trim() : "";
   openOnboardingModal();
-}
+};
 
-// DATA COLLECTION SUBMISSION (CALLS GEMINI VIA /api/roadmap)
-async function handleProfilerSubmit(e) {
-  e.preventDefault();
+window.handleProfilerSubmit = async function(e) {
+  if (e && e.preventDefault) e.preventDefault();
   const btn = document.getElementById('btn-synthesize-roadmap');
-  btn.disabled = true;
-  btn.innerHTML = `<span class="animate-spin">↻</span> Gemini is architecting your roadmap...`;
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<span class="animate-spin">↻</span> Synthesizing with Gemini...`;
+  }
 
   const payload = {
     email: pendingRegistrationEmail || currentStudent?.email || document.getElementById('prof-name').value.trim().toLowerCase().replace(/\s+/g, '') + "@alignx.edu",
@@ -282,13 +229,10 @@ async function handleProfilerSubmit(e) {
       level: 1
     };
 
-    // Save to Supabase
     if (supabase) {
       try {
         await supabase.from('students').upsert(currentStudent, { onConflict: 'email' });
-      } catch (err) {
-        console.warn("Supabase upsert:", err);
-      }
+      } catch (err) {}
     }
 
     localStorage.setItem('alignx_student_active', JSON.stringify(currentStudent));
@@ -296,7 +240,6 @@ async function handleProfilerSubmit(e) {
     enterDashboard();
   } catch (err) {
     console.warn("Gemini offline fallback triggered:", err.message);
-    // Create adaptive custom local profile so student is never blocked
     currentStudent = {
       ...defaultBlueprint,
       email: payload.email,
@@ -312,17 +255,92 @@ async function handleProfilerSubmit(e) {
     closeModal('modal-onboarding');
     enterDashboard();
   } finally {
-    btn.disabled = false;
-    btn.innerHTML = `<span>✨ Synthesize Architecture via Gemini</span>`;
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<span>✨ Synthesize Architecture via Gemini</span>`;
+    }
   }
-}
+};
 
-// LOGOUT
-function handleLogout() {
+window.openOnboardingModal = function() {
+  const nameEl = document.getElementById('prof-name');
+  const levelEl = document.getElementById('prof-academic-level');
+  const goalEl = document.getElementById('prof-career-goal');
+  const knowEl = document.getElementById('prof-current-knowledge');
+  const ghEl = document.getElementById('prof-github');
+
+  if (nameEl) nameEl.value = currentStudent?.name || '';
+  if (levelEl) levelEl.value = currentStudent?.academic_level || '';
+  if (goalEl) goalEl.value = currentStudent?.career_goal || '';
+  if (knowEl) knowEl.value = currentStudent?.current_knowledge || '';
+  if (ghEl) ghEl.value = currentStudent?.github || '';
+
+  openModal('modal-onboarding');
+};
+
+window.openModal = function(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('hidden');
+  if (id === 'modal-capabilities') setTimeout(renderRadar, 50);
+};
+
+window.closeModal = function(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.add('hidden');
+};
+
+window.toggleMenu = function(id, e) {
+  if (e) e.stopPropagation();
+  document.getElementById(id)?.classList.toggle('hidden');
+};
+
+window.closeMenu = function(id) {
+  document.getElementById(id)?.classList.add('hidden');
+};
+
+window.toggleNavSidebar = function() {
+  document.getElementById('nav-drawer')?.classList.toggle('-translate-x-full');
+};
+
+window.toggleTutorChat = function() {
+  document.getElementById('drawer-ai-tutor')?.classList.toggle('translate-x-full');
+};
+
+window.handleLogout = function() {
   localStorage.removeItem('alignx_student_active');
   currentStudent = null;
   showAuthGateway();
-}
+};
+
+// ==========================================
+// APP LIFECYCLE
+// ==========================================
+window.addEventListener('DOMContentLoaded', () => {
+  const savedTheme = localStorage.getItem('alignx_accent') || 'purple';
+  setAccentTheme(savedTheme);
+  initPointerGlow();
+
+  const savedSession = localStorage.getItem('alignx_student_active');
+  if (savedSession) {
+    try {
+      currentStudent = JSON.parse(savedSession);
+      enterDashboard();
+    } catch (e) {
+      showAuthGateway();
+    }
+  } else {
+    showAuthGateway();
+  }
+
+  setInterval(cycleFunFact, 8000);
+  window.addEventListener('resize', renderRadar);
+
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#dropdown-track-wrapper')) closeMenu('menu-tracks');
+    if (!e.target.closest('#dropdown-theme-wrapper')) closeMenu('menu-themes');
+    if (!e.target.closest('#dropdown-week-wrapper')) closeMenu('menu-weeks');
+  });
+});
 
 function showAuthGateway() {
   document.getElementById('auth-view')?.classList.remove('hidden');
@@ -339,13 +357,18 @@ function enterDashboard() {
   updateDashboardUI();
 }
 
-function openOnboardingModal() {
-  document.getElementById('prof-name').value = currentStudent?.name || '';
-  document.getElementById('prof-academic-level').value = currentStudent?.academic_level || '';
-  document.getElementById('prof-career-goal').value = currentStudent?.career_goal || '';
-  document.getElementById('prof-current-knowledge').value = currentStudent?.current_knowledge || '';
-  document.getElementById('prof-github').value = currentStudent?.github || '';
-  openModal('modal-onboarding');
+function showAuthMsg(msg, isError = false) {
+  const el = document.getElementById('auth-status-msg');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = isError 
+    ? "p-3 rounded-xl text-center text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30" 
+    : "p-3 rounded-xl text-center text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+  el.classList.remove('hidden');
+}
+
+function hideAuthMsg() {
+  document.getElementById('auth-status-msg')?.classList.add('hidden');
 }
 
 // DASHBOARD UI UPDATES
@@ -398,12 +421,12 @@ function updateRadialMeter(circleId, percentage) {
 }
 
 // STUDY PLAN MODULES
-function changeStudyPlanPhase(phaseIdx) {
+window.changeStudyPlanPhase = function(phaseIdx) {
   activePhaseIdx = phaseIdx;
   document.getElementById('active-week-label').textContent = `Phase ${phaseIdx + 1}`;
   closeMenu('menu-weeks');
   renderStudyPlanModules();
-}
+};
 
 function renderStudyPlanModules() {
   const container = document.getElementById('study-plan-modules-container');
@@ -442,10 +465,10 @@ function renderStudyPlanModules() {
 }
 
 // ROADMAP MODAL
-function openRoadmapModal() {
+window.openRoadmapModal = function() {
   renderRoadmapModal();
   openModal('modal-roadmap');
-}
+};
 
 function renderRoadmapModal() {
   const container = document.getElementById('roadmap-phases-container');
@@ -486,7 +509,7 @@ function renderRoadmapModal() {
   });
 }
 
-// COURSE COMPLETION TELEMETRY
+// PROGRESS CALCULATION
 async function toggleMilestoneState(mId) {
   let total = 0, completed = 0;
 
@@ -606,11 +629,11 @@ function renderRadar() {
 }
 
 // AI TUTOR HANDLER
-async function handleTutorSend(e) {
-  e.preventDefault();
+window.handleTutorSend = async function(e) {
+  if (e && e.preventDefault) e.preventDefault();
   const inEl = document.getElementById('tutor-input');
   const box = document.getElementById('tutor-chat-messages');
-  const msg = inEl.value.trim();
+  const msg = inEl ? inEl.value.trim() : '';
   if (!msg) return;
 
   box.innerHTML += `<div class="p-2.5 rounded-xl bg-purple-600/20 text-purple-700 dark:text-purple-200 ml-6 text-right font-medium">${msg}</div>`;
@@ -636,10 +659,10 @@ async function handleTutorSend(e) {
     box.innerHTML += `<div class="p-2.5 rounded-xl theme-card-inner theme-text-title"><strong>Tutor:</strong> Focus on your active phase milestones for ${currentStudent?.career_goal || 'your target goal'}!</div>`;
   }
   box.scrollTop = box.scrollHeight;
-}
+};
 
 // THEME SWITCHER
-function setAccentTheme(themeName) {
+window.setAccentTheme = function(themeName) {
   document.documentElement.setAttribute('data-theme', themeName);
   localStorage.setItem('alignx_accent', themeName);
 
@@ -668,19 +691,19 @@ function setAccentTheme(themeName) {
 
   renderStudyPlanModules();
   renderRadar();
-}
+};
 
 // MCQ STUDIO
-function startEndlessMCQSession() {
+window.startEndlessMCQSession = function() {
   mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [] };
   document.getElementById('mcq-correct-counter').textContent = '0';
   document.getElementById('mcq-wrong-counter').textContent = '0';
   document.getElementById('mcq-badge-track').textContent = currentStudent?.career_goal || 'General Track';
   openModal('modal-mcq');
   generateNextMCQ();
-}
+};
 
-function generateNextMCQ() {
+window.generateNextMCQ = function() {
   mcqSession.answeredCurrent = false;
   document.getElementById('btn-next-mcq').classList.add('hidden');
   document.getElementById('mcq-instant-feedback').classList.add('hidden');
@@ -701,7 +724,7 @@ function generateNextMCQ() {
     btn.onclick = () => handleMCQChoice(idx, qObj);
     container.appendChild(btn);
   });
-}
+};
 
 function handleMCQChoice(selectedIdx, qObj) {
   if (mcqSession.answeredCurrent) return;
@@ -746,7 +769,7 @@ function handleMCQChoice(selectedIdx, qObj) {
   document.getElementById('btn-next-mcq').classList.remove('hidden');
 }
 
-function finishMCQSession() {
+window.finishMCQSession = function() {
   closeModal('modal-mcq');
   document.getElementById('scorecard-total').textContent = mcqSession.total;
   document.getElementById('scorecard-correct').textContent = mcqSession.correct;
@@ -769,10 +792,10 @@ function finishMCQSession() {
     });
   }
   openModal('modal-scorecard');
-}
+};
 
 // GITHUB TELEMETRY
-async function fetchGitHubRepos() {
+window.fetchGitHubRepos = async function() {
   const u = (document.getElementById('in-github-scan').value || currentStudent?.github || 'adityarp2008').trim();
   const c = document.getElementById('github-repos-container');
   if (!u) return;
@@ -808,20 +831,9 @@ async function fetchGitHubRepos() {
   } catch(e) {
     c.innerHTML = '<div class="text-rose-500 p-3">Error connecting to GitHub API.</div>';
   }
-}
+};
 
-// UTILITIES
-function toggleNavSidebar() { document.getElementById('nav-drawer')?.classList.toggle('-translate-x-full'); }
-function toggleTutorChat() { document.getElementById('drawer-ai-tutor')?.classList.toggle('translate-x-full'); }
-function toggleMenu(id, e) { if (e) e.stopPropagation(); document.getElementById(id)?.classList.toggle('hidden'); }
-function closeMenu(id) { document.getElementById(id)?.classList.add('hidden'); }
-function openModal(id) {
-  document.getElementById(id)?.classList.remove('hidden');
-  if (id === 'modal-capabilities') setTimeout(renderRadar, 50);
-}
-function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
-
-function openNotesModal() {
+window.openNotesModal = function() {
   document.getElementById('notes-modal-title').textContent = `${currentStudent?.career_goal || 'Engineering'} - Architecture Blueprint`;
   const container = document.getElementById('notes-container');
   container.innerHTML = `
@@ -834,7 +846,7 @@ function openNotesModal() {
     </div>
   `;
   openModal('modal-notes');
-}
+};
 
 function cycleFunFact() {
   const facts = [
