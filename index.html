@@ -17,9 +17,9 @@
   <canvas id="glow-spotlight-canvas"></canvas>
 
   <!-- ======================================================== -->
-  <!-- 1. AUTH GATEWAY VIEW                                     -->
+  <!-- 1. AUTH GATEWAY VIEW (Initial Landing Screen)            -->
   <!-- ======================================================== -->
-  <main id="auth-view" class="relative z-30 w-full max-w-md my-auto px-4 py-8 flex flex-col items-center">
+  <main id="auth-view" class="relative z-50 w-full max-w-md my-auto px-4 py-8 flex flex-col items-center">
     
     <div class="text-center mb-6 space-y-2">
       <div class="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 items-center justify-center font-black text-white text-xl shadow-lg shadow-purple-500/20">✕</div>
@@ -29,14 +29,14 @@
 
     <div class="w-full study-card rounded-3xl p-6 shadow-2xl space-y-5">
       
-      <!-- Tab Switcher -->
+      <!-- Tab Controls with direct inline triggers -->
       <div class="grid grid-cols-2 p-1 rounded-2xl theme-card-inner text-xs font-bold gap-1">
-        <button type="button" id="tab-btn-signin" onclick="switchAuthTab('signin')" class="py-2.5 rounded-xl transition btn-brand shadow-sm">Sign In</button>
-        <button type="button" id="tab-btn-register" onclick="switchAuthTab('register')" class="py-2.5 rounded-xl transition theme-text-sub hover:opacity-100">Register</button>
+        <button type="button" id="tab-btn-signin" onclick="showAuthTab('signin')" class="py-2.5 rounded-xl transition btn-brand shadow-sm cursor-pointer">Sign In</button>
+        <button type="button" id="tab-btn-register" onclick="showAuthTab('register')" class="py-2.5 rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer">Register</button>
       </div>
 
-      <!-- Tab 1: Sign In -->
-      <form id="form-signin" onsubmit="event.preventDefault(); handleSignIn(event); return false;" class="space-y-4 text-xs">
+      <!-- Tab 1: Sign In Form -->
+      <form id="form-signin" onsubmit="event.preventDefault(); triggerSignIn(); return false;" class="space-y-4 text-xs">
         <div>
           <label class="block theme-text-title mb-1.5 font-semibold">Registered Email</label>
           <input type="email" id="signin-email" required value="aditya@joyuniversity.edu.in" placeholder="aditya@joyuniversity.edu.in" class="w-full theme-card-inner rounded-xl px-3.5 py-2.5 theme-text-title focus:outline-none">
@@ -45,13 +45,13 @@
           <label class="block theme-text-title mb-1.5 font-semibold">Password</label>
           <input type="password" id="signin-password" required value="password123" class="w-full theme-card-inner rounded-xl px-3.5 py-2.5 theme-text-title focus:outline-none">
         </div>
-        <button type="submit" id="btn-submit-signin" class="btn-brand w-full py-3 rounded-xl font-bold text-xs shadow-md">
+        <button type="submit" id="btn-submit-signin" class="btn-brand w-full py-3 rounded-xl font-bold text-xs shadow-md cursor-pointer">
           Sign In →
         </button>
       </form>
 
-      <!-- Tab 2: Register -->
-      <form id="form-register" onsubmit="event.preventDefault(); handleRegisterStep1(event); return false;" class="hidden space-y-4 text-xs">
+      <!-- Tab 2: Register Form -->
+      <form id="form-register" onsubmit="event.preventDefault(); triggerRegister(); return false;" style="display: none;" class="space-y-4 text-xs">
         <div>
           <label class="block theme-text-title mb-1.5 font-semibold">Your University / Personal Email</label>
           <input type="email" id="reg-email" required placeholder="aditya@joyuniversity.edu.in" class="w-full theme-card-inner rounded-xl px-3.5 py-2.5 theme-text-title focus:outline-none">
@@ -61,31 +61,31 @@
           <input type="password" id="reg-password" required value="password123" class="w-full theme-card-inner rounded-xl px-3.5 py-2.5 theme-text-title focus:outline-none">
         </div>
         <p class="text-[11px] theme-text-sub leading-relaxed">Next, you will configure your educational background and target dream role for AI roadmap synthesis.</p>
-        <button type="submit" id="btn-submit-register" class="btn-brand w-full py-3 rounded-xl font-bold text-xs shadow-md">
+        <button type="submit" id="btn-submit-register" class="btn-brand w-full py-3 rounded-xl font-bold text-xs shadow-md cursor-pointer">
           Continue to Telemetry Profiler →
         </button>
       </form>
 
-      <!-- Status Feedback -->
-      <div id="auth-status-msg" class="hidden p-3 rounded-xl text-center text-xs font-semibold"></div>
+      <!-- Feedback Status -->
+      <div id="auth-status-msg" style="display: none;" class="p-3 rounded-xl text-center text-xs font-semibold"></div>
 
-      <!-- Accent Theme Bar -->
+      <!-- Accent Theme Palette -->
       <div class="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] theme-text-sub">
         <span>Accent Theme:</span>
         <div class="flex items-center gap-1.5">
-          <button type="button" onclick="setAccentTheme('purple')" class="w-4 h-4 rounded-full bg-[#C084FC]"></button>
-          <button type="button" onclick="setAccentTheme('emerald')" class="w-4 h-4 rounded-full bg-[#34D399]"></button>
-          <button type="button" onclick="setAccentTheme('amber')" class="w-4 h-4 rounded-full bg-[#FBBF24]"></button>
-          <button type="button" onclick="setAccentTheme('cyan')" class="w-4 h-4 rounded-full bg-[#38BDF8]"></button>
-          <button type="button" onclick="setAccentTheme('white')" class="w-4 h-4 rounded-full bg-[#FFFFFF] border border-slate-500"></button>
-          <button type="button" onclick="setAccentTheme('light')" class="w-4 h-4 rounded-full bg-[#7C3AED]"></button>
+          <button type="button" onclick="setAccentTheme('purple')" class="w-4 h-4 rounded-full bg-[#C084FC] cursor-pointer" title="Cyber Purple"></button>
+          <button type="button" onclick="setAccentTheme('emerald')" class="w-4 h-4 rounded-full bg-[#34D399] cursor-pointer" title="Emerald Matrix"></button>
+          <button type="button" onclick="setAccentTheme('amber')" class="w-4 h-4 rounded-full bg-[#FBBF24] cursor-pointer" title="Solar Amber"></button>
+          <button type="button" onclick="setAccentTheme('cyan')" class="w-4 h-4 rounded-full bg-[#38BDF8] cursor-pointer" title="Ocean Cyan"></button>
+          <button type="button" onclick="setAccentTheme('white')" class="w-4 h-4 rounded-full bg-[#FFFFFF] border border-slate-500 cursor-pointer" title="Pure White"></button>
+          <button type="button" onclick="setAccentTheme('light')" class="w-4 h-4 rounded-full bg-[#7C3AED] cursor-pointer" title="Light Theme"></button>
         </div>
       </div>
     </div>
   </main>
 
   <!-- ======================================================== -->
-  <!-- 2. DATA COLLECTION MODAL (Background & Dream Job)        -->
+  <!-- 2. DATA COLLECTION MODAL (Educational Field & Dream Job)  -->
   <!-- ======================================================== -->
   <div id="modal-onboarding" class="fixed inset-0 z-[160] hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
     <div class="study-card rounded-3xl max-w-xl w-full p-6 md:p-8 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
@@ -96,7 +96,7 @@
           </h3>
           <p class="text-xs theme-text-sub">Tailored for candidates from ANY educational field</p>
         </div>
-        <button type="button" onclick="closeModal('modal-onboarding')" class="theme-text-sub hover:text-white text-base">✕</button>
+        <button type="button" onclick="closeModal('modal-onboarding')" class="theme-text-sub hover:text-white text-base cursor-pointer">✕</button>
       </div>
 
       <form id="form-profiler" onsubmit="event.preventDefault(); handleProfilerSubmit(event); return false;" class="space-y-3.5 text-xs">
@@ -137,7 +137,7 @@
         </div>
 
         <div class="pt-3 flex justify-end gap-2">
-          <button type="submit" id="btn-synthesize-roadmap" class="btn-brand px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-md">
+          <button type="submit" id="btn-synthesize-roadmap" class="btn-brand px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-md cursor-pointer">
             <span>✨ Synthesize Architecture via Gemini</span>
           </button>
         </div>
@@ -153,7 +153,7 @@
     <!-- Top Navigation Bar -->
     <header class="w-full study-card px-4 lg:px-6 py-3 rounded-2xl flex items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <button type="button" onclick="toggleNavSidebar()" class="text-slate-400 hover:text-white p-1 rounded-lg transition" title="Open Drawer Menu">
+        <button type="button" onclick="toggleNavSidebar()" class="text-slate-400 hover:text-white p-1 rounded-lg transition cursor-pointer" title="Open Drawer Menu">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
 
@@ -163,7 +163,7 @@
         </div>
 
         <div class="relative pl-2" id="dropdown-track-wrapper">
-          <button type="button" onclick="toggleMenu('menu-tracks', event)" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-white/10 text-xs font-medium theme-card-inner transition">
+          <button type="button" onclick="toggleMenu('menu-tracks', event)" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-white/10 text-xs font-medium theme-card-inner transition cursor-pointer">
             <span class="theme-text-sub">Target Goal:</span>
             <span id="nav-current-role" class="dynamic-accent-text font-bold">Full-Stack Engineer</span>
             <svg class="w-3.5 h-3.5 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
@@ -178,7 +178,7 @@
 
       <!-- Theme Dropdown Menu -->
       <div class="relative" id="dropdown-theme-wrapper">
-        <button type="button" onclick="toggleMenu('menu-themes', event)" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-white/10 text-xs font-medium theme-card-inner transition">
+        <button type="button" onclick="toggleMenu('menu-themes', event)" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-white/10 text-xs font-medium theme-card-inner transition cursor-pointer">
           <span class="w-2.5 h-2.5 rounded-full" id="active-theme-dot" style="background-color: var(--accent-main);"></span>
           <span class="theme-text-sub">Theme:</span>
           <span id="active-theme-label" class="font-bold dynamic-accent-text">Cyber Purple</span>
@@ -215,12 +215,12 @@
 
       <!-- User Profile & Logout -->
       <div class="flex items-center gap-3">
-        <button type="button" onclick="openModal('modal-github')" class="px-3 py-1.5 rounded-xl border border-white/10 text-xs font-mono flex items-center gap-2 theme-card-inner transition">
+        <button type="button" onclick="openModal('modal-github')" class="px-3 py-1.5 rounded-xl border border-white/10 text-xs font-mono flex items-center gap-2 theme-card-inner transition cursor-pointer">
           <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
           <span id="nav-github-label">@student</span>
         </button>
 
-        <button type="button" onclick="handleLogout()" class="px-3 py-1.5 rounded-xl border border-rose-500/30 text-rose-400 hover:bg-rose-500/10 text-xs font-bold transition">
+        <button type="button" onclick="handleLogout()" class="px-3 py-1.5 rounded-xl border border-rose-500/30 text-rose-400 hover:bg-rose-500/10 text-xs font-bold transition cursor-pointer">
           Logout
         </button>
 
@@ -251,7 +251,7 @@
           </p>
         </div>
       </div>
-      <button type="button" onclick="cycleFunFact()" class="shrink-0 text-xs px-3 py-1.5 rounded-lg border border-white/10 theme-text-title font-mono hover:bg-white/5 transition">↻ Next Fact</button>
+      <button type="button" onclick="cycleFunFact()" class="shrink-0 text-xs px-3 py-1.5 rounded-lg border border-white/10 theme-text-title font-mono hover:bg-white/5 transition cursor-pointer">↻ Next Fact</button>
     </section>
 
     <!-- 4 Telemetry Dials -->
@@ -320,7 +320,7 @@
           </div>
 
           <div class="relative" id="dropdown-week-wrapper">
-            <button type="button" onclick="toggleMenu('menu-weeks', event)" class="px-3 py-1.5 rounded-xl theme-card-inner border border-white/10 text-xs font-mono theme-text-title flex items-center gap-2 transition">
+            <button type="button" onclick="toggleMenu('menu-weeks', event)" class="px-3 py-1.5 rounded-xl theme-card-inner border border-white/10 text-xs font-mono theme-text-title flex items-center gap-2 transition cursor-pointer">
               <span id="active-week-label">Phase 1</span>
               <svg class="w-3 h-3 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </button>
@@ -392,7 +392,7 @@
           </div>
           <div class="flex items-center justify-between text-[11px] theme-text-sub pt-0.5">
             <span>Solve quizzes or complete roadmap modules to earn XP</span>
-            <button type="button" onclick="openModal('modal-achievements')" class="text-amber-500 underline font-bold">Achievements</button>
+            <button type="button" onclick="openModal('modal-achievements')" class="text-amber-500 underline font-bold cursor-pointer">Achievements</button>
           </div>
         </div>
       </div>
@@ -421,36 +421,36 @@
           <div class="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-base">🎓</div>
           <span class="font-extrabold text-sm theme-text-title">Align-X Menu</span>
         </div>
-        <button type="button" onclick="toggleNavSidebar()" class="theme-text-sub hover:text-white p-1 text-sm">✕</button>
+        <button type="button" onclick="toggleNavSidebar()" class="theme-text-sub hover:text-white p-1 text-sm cursor-pointer">✕</button>
       </div>
 
       <nav class="space-y-2 text-xs font-semibold">
-        <button type="button" onclick="openOnboardingModal(); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 dynamic-accent-text transition">
+        <button type="button" onclick="openOnboardingModal(); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 dynamic-accent-text transition cursor-pointer">
           <span class="flex items-center gap-2.5"><span>✨</span> <span>Configure Goal & Background</span></span>
           <span class="text-[10px] font-mono dynamic-accent-text font-bold">Profiler</span>
         </button>
 
-        <button type="button" onclick="openRoadmapModal(); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl theme-card-inner dynamic-accent-text transition">
+        <button type="button" onclick="openRoadmapModal(); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl theme-card-inner dynamic-accent-text transition cursor-pointer">
           <span class="flex items-center gap-2.5"><span>📚</span> <span>Personalized Career Roadmap</span></span>
           <span class="text-[10px] font-mono dynamic-accent-text font-bold">Phased</span>
         </button>
 
-        <button type="button" onclick="openModal('modal-capabilities'); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white/5 theme-text-title transition">
+        <button type="button" onclick="openModal('modal-capabilities'); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white/5 theme-text-title transition cursor-pointer">
           <span class="flex items-center gap-2.5"><span>🎯</span> <span>Student Capabilities</span></span>
           <span class="text-[10px] font-mono dynamic-accent-text font-bold">Matrix</span>
         </button>
 
-        <button type="button" onclick="startEndlessMCQSession(); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white/5 theme-text-title transition">
+        <button type="button" onclick="startEndlessMCQSession(); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white/5 theme-text-title transition cursor-pointer">
           <span class="flex items-center gap-2.5"><span>📝</span> <span>Endless Adaptive MCQ Studio</span></span>
           <span class="text-[10px] font-mono text-emerald-500 font-bold">Continuous</span>
         </button>
 
-        <button type="button" onclick="openModal('modal-puzzle'); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white/5 theme-text-title transition">
+        <button type="button" onclick="openModal('modal-puzzle'); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white/5 theme-text-title transition cursor-pointer">
           <span class="flex items-center gap-2.5"><span>🧩</span> <span>Mind Activation Riddle</span></span>
           <span class="text-[10px] font-mono dynamic-accent-text font-bold">Puzzle</span>
         </button>
 
-        <button type="button" onclick="openModal('modal-github'); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white/5 theme-text-title transition">
+        <button type="button" onclick="openModal('modal-github'); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white/5 theme-text-title transition cursor-pointer">
           <span class="flex items-center gap-2.5"><span>🐙</span> <span>GitHub Repos Telemetry</span></span>
           <span class="text-[10px] font-mono text-cyan-500 font-bold">API</span>
         </button>
@@ -471,7 +471,7 @@
           <h3 class="text-sm font-bold theme-text-title flex items-center gap-2"><span>🎯</span> <span>Student Capabilities & Domain Matrix</span></h3>
           <p class="text-xs theme-text-sub">Conceptual depth across Core Domains (Student vs Benchmark)</p>
         </div>
-        <button type="button" onclick="closeModal('modal-capabilities')" class="theme-text-sub hover:text-white">✕</button>
+        <button type="button" onclick="closeModal('modal-capabilities')" class="theme-text-sub hover:text-white cursor-pointer">✕</button>
       </div>
       <div class="relative w-full h-[320px] flex items-center justify-center">
         <canvas id="competency-radar-canvas" width="420" height="300"></canvas>
@@ -486,7 +486,7 @@
           <h3 class="text-base font-bold theme-text-title flex items-center gap-2"><span>📚</span> <span>Personalized Phased Career Roadmap</span></h3>
           <p class="text-xs theme-text-sub">Target milestones for <span id="roadmap-track-name" class="dynamic-accent-text font-bold">Target Goal</span></p>
         </div>
-        <button type="button" onclick="closeModal('modal-roadmap')" class="theme-text-sub hover:text-white">✕</button>
+        <button type="button" onclick="closeModal('modal-roadmap')" class="theme-text-sub hover:text-white cursor-pointer">✕</button>
       </div>
       <div class="flex-1 overflow-y-auto space-y-4 pr-1" id="roadmap-phases-container"></div>
     </div>
@@ -506,7 +506,7 @@
         <div class="flex items-center gap-3 font-mono text-xs font-bold">
           <div class="text-emerald-500">✓ <span id="mcq-correct-counter">0</span></div>
           <div class="text-rose-500">✕ <span id="mcq-wrong-counter">0</span></div>
-          <button type="button" onclick="finishMCQSession()" class="theme-text-sub hover:text-white ml-2 text-sm">✕</button>
+          <button type="button" onclick="finishMCQSession()" class="theme-text-sub hover:text-white ml-2 text-sm cursor-pointer">✕</button>
         </div>
       </div>
       <div class="space-y-4">
@@ -518,8 +518,8 @@
         <div id="mcq-choices-container" class="space-y-2.5 pt-1"></div>
         <div id="mcq-instant-feedback" class="hidden p-3.5 rounded-xl text-xs leading-relaxed font-medium"></div>
         <div class="pt-2 flex items-center justify-between">
-          <button type="button" onclick="finishMCQSession()" class="px-3.5 py-1.5 rounded-xl border border-white/10 theme-text-sub hover:text-white text-xs font-semibold">Finish & Review</button>
-          <button type="button" id="btn-next-mcq" onclick="generateNextMCQ()" class="btn-brand px-5 py-2 rounded-xl text-xs font-bold hidden">Next Challenge →</button>
+          <button type="button" onclick="finishMCQSession()" class="px-3.5 py-1.5 rounded-xl border border-white/10 theme-text-sub hover:text-white text-xs font-semibold cursor-pointer">Finish & Review</button>
+          <button type="button" id="btn-next-mcq" onclick="generateNextMCQ()" class="btn-brand px-5 py-2 rounded-xl text-xs font-bold hidden cursor-pointer">Next Challenge →</button>
         </div>
       </div>
     </div>
@@ -529,7 +529,7 @@
     <div class="study-card rounded-3xl max-w-2xl w-full p-6 space-y-4 shadow-2xl max-h-[90vh] flex flex-col">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
         <h3 class="text-base font-bold theme-text-title">Performance Scorecard</h3>
-        <button type="button" onclick="closeModal('modal-scorecard')" class="theme-text-sub hover:text-white">✕</button>
+        <button type="button" onclick="closeModal('modal-scorecard')" class="theme-text-sub hover:text-white cursor-pointer">✕</button>
       </div>
       <div class="grid grid-cols-3 gap-3 text-center text-xs">
         <div class="p-3 rounded-xl theme-card-inner"><div class="text-[10px] theme-text-sub">Total</div><div id="scorecard-total" class="text-xl font-bold font-mono theme-text-title">0</div></div>
@@ -538,7 +538,7 @@
       </div>
       <div class="flex-1 overflow-y-auto space-y-3 pr-1" id="scorecard-breakdown-list"></div>
       <div class="flex justify-end pt-2">
-        <button type="button" onclick="closeModal('modal-scorecard')" class="btn-brand px-5 py-2 rounded-xl text-xs font-bold">Return to Dashboard</button>
+        <button type="button" onclick="closeModal('modal-scorecard')" class="btn-brand px-5 py-2 rounded-xl text-xs font-bold cursor-pointer">Return to Dashboard</button>
       </div>
     </div>
   </div>
@@ -550,11 +550,11 @@
           <span class="text-lg">🐙</span>
           <h3 class="text-sm font-bold theme-text-title">GitHub Repository Telemetry</h3>
         </div>
-        <button type="button" onclick="closeModal('modal-github')" class="theme-text-sub hover:text-white">✕</button>
+        <button type="button" onclick="closeModal('modal-github')" class="theme-text-sub hover:text-white cursor-pointer">✕</button>
       </div>
       <div class="flex gap-2">
         <input type="text" id="in-github-scan" placeholder="GitHub username" value="adityarp2008" class="flex-1 theme-card-inner rounded-xl px-3 py-2 text-xs theme-text-title font-mono focus:outline-none">
-        <button type="button" onclick="fetchGitHubRepos()" class="btn-brand px-4 py-2 rounded-xl text-xs font-bold">Scan</button>
+        <button type="button" onclick="fetchGitHubRepos()" class="btn-brand px-4 py-2 rounded-xl text-xs font-bold cursor-pointer">Scan</button>
       </div>
       <div id="github-repos-container" class="max-h-64 overflow-y-auto space-y-2 text-xs pr-1"></div>
     </div>
@@ -567,7 +567,7 @@
           <h3 class="text-sm font-bold theme-text-title flex items-center gap-2"><span>📖</span> <span id="notes-modal-title">Study Notes & Specifications</span></h3>
           <p class="text-xs theme-text-sub">Curriculum blueprints and applied specifications</p>
         </div>
-        <button type="button" onclick="closeModal('modal-notes')" class="theme-text-sub hover:text-white">✕</button>
+        <button type="button" onclick="closeModal('modal-notes')" class="theme-text-sub hover:text-white cursor-pointer">✕</button>
       </div>
       <div class="flex-1 overflow-y-auto space-y-3 text-xs" id="notes-container"></div>
     </div>
@@ -577,12 +577,12 @@
     <div class="study-card rounded-3xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
         <h3 class="text-sm font-bold theme-text-title">Engineering Logic Riddle</h3>
-        <button type="button" onclick="closeModal('modal-puzzle')" class="theme-text-sub hover:text-white">✕</button>
+        <button type="button" onclick="closeModal('modal-puzzle')" class="theme-text-sub hover:text-white cursor-pointer">✕</button>
       </div>
       <p class="text-xs theme-text-title">A network partition isolates Node C in a 3-node cluster. Under Strong Consistency (CP), what must Node C do?</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-        <button type="button" onclick="alert('Incorrect! Split-brain risk.')" class="p-3 rounded-xl theme-card-inner text-left hover:opacity-80">1. Accept write (200 OK)</button>
-        <button type="button" onclick="alert('Correct! Cannot form majority quorum.')" class="p-3 rounded-xl theme-card-inner text-left hover:opacity-80">2. Reject write (Error)</button>
+        <button type="button" onclick="alert('Incorrect! Split-brain risk.')" class="p-3 rounded-xl theme-card-inner text-left hover:opacity-80 cursor-pointer">1. Accept write (200 OK)</button>
+        <button type="button" onclick="alert('Correct! Cannot form majority quorum.')" class="p-3 rounded-xl theme-card-inner text-left hover:opacity-80 cursor-pointer">2. Reject write (Error)</button>
       </div>
     </div>
   </div>
@@ -591,7 +591,7 @@
     <div class="study-card rounded-3xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
         <h3 class="text-sm font-bold theme-text-title">Academic Achievements</h3>
-        <button type="button" onclick="closeModal('modal-achievements')" class="theme-text-sub hover:text-white">✕</button>
+        <button type="button" onclick="closeModal('modal-achievements')" class="theme-text-sub hover:text-white cursor-pointer">✕</button>
       </div>
       <div class="grid grid-cols-3 gap-3 text-center text-xs">
         <div class="p-3 rounded-xl border border-white/20 theme-card-inner"><div class="text-2xl mb-1">🌱</div><div class="font-bold text-amber-500">First Step</div><div class="text-[9px] text-emerald-500 mt-1">UNLOCKED</div></div>
@@ -608,18 +608,56 @@
         <span>🤖 Align-X AI Tutor (Gemini)</span>
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
       </h3>
-      <button type="button" onclick="toggleTutorChat()" class="theme-text-sub hover:text-white">✕</button>
+      <button type="button" onclick="toggleTutorChat()" class="theme-text-sub hover:text-white cursor-pointer">✕</button>
     </div>
     <div id="tutor-chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 text-xs">
       <div class="p-3 rounded-xl theme-card-inner theme-text-title">
         🎓 Hello! I am your Align-X AI Tutor, powered by Google Gemini. Ask me anything about your roadmap, career goals, or technical concepts.
       </div>
     </div>
-    <form onsubmit="handleTutorSend(event)" class="p-3 border-t border-white/10 flex gap-2 theme-card-inner">
+    <form onsubmit="event.preventDefault(); handleTutorSend(event); return false;" class="p-3 border-t border-white/10 flex gap-2 theme-card-inner">
       <input type="text" id="tutor-input" placeholder="Ask AI tutor..." required class="flex-1 bg-transparent border border-white/10 rounded-xl px-3 py-2 text-xs theme-text-title focus:outline-none">
-      <button type="submit" class="btn-brand px-4 py-2 rounded-xl text-xs font-bold">Send</button>
+      <button type="submit" class="btn-brand px-4 py-2 rounded-xl text-xs font-bold cursor-pointer">Send</button>
     </form>
   </div>
+
+  <script>
+    // Inline failsafe for immediate button responsiveness
+    function showAuthTab(tab) {
+      var fIn = document.getElementById('form-signin');
+      var fReg = document.getElementById('form-register');
+      var bIn = document.getElementById('tab-btn-signin');
+      var bReg = document.getElementById('tab-btn-register');
+      
+      if (tab === 'signin') {
+        fIn.style.display = 'block';
+        fReg.style.display = 'none';
+        bIn.className = 'py-2.5 rounded-xl transition btn-brand shadow-sm cursor-pointer';
+        bReg.className = 'py-2.5 rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer';
+      } else {
+        fIn.style.display = 'none';
+        fReg.style.display = 'block';
+        bReg.className = 'py-2.5 rounded-xl transition btn-brand shadow-sm cursor-pointer';
+        bIn.className = 'py-2.5 rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer';
+      }
+    }
+
+    function triggerSignIn() {
+      if (window.handleSignIn) {
+        window.handleSignIn();
+      } else {
+        openOnboardingModal();
+      }
+    }
+
+    function triggerRegister() {
+      if (window.handleRegisterStep1) {
+        window.handleRegisterStep1();
+      } else {
+        openOnboardingModal();
+      }
+    }
+  </script>
 
   <script src="script.js"></script>
 </body>
