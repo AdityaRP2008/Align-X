@@ -1,50 +1,154 @@
 :root {
-  --bg-dark: #07090D;
-  --panel-bg: rgba(16, 20, 30, 0.65);
+  --bg-page: #F8FAFC;
+  --panel-bg: rgba(255, 255, 255, 0.96);
+  --panel-border: #E2E8F0;
+  --card-bg: #FFFFFF;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+
+  --accent-primary: #EA580C;
+  --accent-primary-hover: #C2410C;
+  --accent-primary-glow: rgba(234, 88, 12, 0.2);
+  --accent-deficit: #9333EA;
+  --accent-deficit-glow: rgba(147, 51, 234, 0.25);
+}
+
+html.dark {
+  --bg-page: #0B0E17;
+  --panel-bg: rgba(16, 22, 36, 0.92);
   --panel-border: rgba(255, 255, 255, 0.08);
-  --panel-hover-border: rgba(96, 214, 115, 0.35);
-  --accent-mint: #60D673;
-  --mint-glow: rgba(96, 214, 115, 0.18);
+  --card-bg: rgba(22, 30, 49, 0.72);
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+
+  --accent-primary: #C084FC;
+  --accent-primary-hover: #A855F7;
+  --accent-primary-glow: rgba(192, 132, 252, 0.25);
+  --accent-deficit: #C084FC;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
-  background-color: var(--bg-dark);
+  background-color: var(--bg-page);
+  color: var(--text-primary);
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  overflow-x: hidden;
 }
 
-.glass-card {
-  background: var(--panel-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
-  transition: border-color 0.2s ease, transform 0.2s ease;
+#glow-spotlight-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none !important;
+  user-select: none !important;
+  z-index: 0;
 }
 
-.glass-card:hover {
-  border-color: var(--panel-hover-border);
+.study-card {
+  background: var(--card-bg);
+  border: 1px solid var(--panel-border);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.active-nav-link {
-  background-color: rgba(96, 214, 115, 0.12);
-  border: 1px solid rgba(96, 214, 115, 0.3);
-  color: #60D673 !important;
+.study-card:hover {
+  border-color: var(--accent-primary);
+  box-shadow: 0 8px 24px -6px var(--accent-primary-glow);
 }
 
-.shadow-glow-mint {
-  box-shadow: 0 0 20px -3px rgba(96, 214, 115, 0.25);
+.btn-brand {
+  background-color: var(--accent-primary);
+  color: #07090E;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+html.light .btn-brand {
+  color: #FFFFFF;
+}
+
+.btn-brand:hover {
+  background-color: var(--accent-primary-hover);
+}
+
+.shadow-glow-primary {
+  box-shadow: 0 0 20px -3px var(--accent-primary-glow);
+}
+
+.deficit-chip {
+  background-color: rgba(147, 51, 234, 0.12);
+  border: 1.5px solid rgba(147, 51, 234, 0.45);
+  color: #7E22CE;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.45rem 0.8rem;
+  border-radius: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+html.dark .deficit-chip {
+  background-color: rgba(192, 132, 252, 0.15);
+  border: 1.5px solid rgba(192, 132, 252, 0.45);
+  color: #E9D5FF;
+}
+
+.deficit-chip:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.competency-chip {
+  background-color: rgba(234, 88, 12, 0.1);
+  border: 1px solid rgba(234, 88, 12, 0.35);
+  color: #C2410C;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.45rem 0.8rem;
+  border-radius: 0.75rem;
+}
+
+html.dark .competency-chip {
+  background-color: rgba(192, 132, 252, 0.12);
+  border: 1px solid rgba(192, 132, 252, 0.35);
+  color: #D8B4FE;
+}
+
+.achievement-outline-card {
+  background: transparent !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.75) !important;
+  border-radius: 1.25rem;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.25s ease;
+}
+
+html.light .achievement-outline-card {
+  border: 1.5px solid rgba(15, 23, 42, 0.25) !important;
+}
+
+.achievement-outline-card:hover {
+  border-color: #F59E0B !important;
+  box-shadow: 0 0 16px -2px rgba(245, 158, 11, 0.35);
+  transform: translateY(-2px);
+}
+
+.badge-locked {
+  filter: grayscale(1);
+  opacity: 0.4;
 }
 
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
 }
-::-webkit-scrollbar-track {
-  background: var(--bg-dark);
-}
 ::-webkit-scrollbar-thumb {
-  background: #1A2230;
+  background: rgba(148, 163, 184, 0.25);
   border-radius: 9999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #2D3A50;
 }
