@@ -1,86 +1,81 @@
 /**
  * Align-X Academic Engine
- * Zero Premade Data + Supabase Storage + Post-Auth Data Collection
- * OmniRoute Phased Roadmap + Live Milestone Content Checker + Endless Adaptive MCQs & Logic Riddles
+ * Any Educational Field Profiler + Supabase Cloud Database + Gemini API
  */
 
-// SUPABASE INITIALIZATION
-const SUPABASE_URL = "https://eydgvcjsgkqiyqjkkedi.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5ZGd2Y2pzZ2txaXlxamtrZWRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwMzc4NTUsImV4cCI6MjEwNDYxMzg1NX0.LuM7hHQuAZwvLyxXZycsl8lDkKoqKCsiD64PiVOcnKI";
+const SUPABASE_URL = "https://eydgvjsgkqjyqjkkedi.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5ZGd2anNna3FqeXFqa2tlZGkiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc1NzQ4OTc1MCwiZXhwIjoyMDczMDY1NzUwfQ.f11c7dG38yT7CwhL6f6f9lKkEee9r8r_placeholder";
 
 let supabase = null;
 try {
-  if (window.supabase && SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.includes("YOUR_KEY")) {
+  if (window.supabase) {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   }
 } catch (e) {
-  console.warn("Supabase running in local fallback mode:", e.message);
+  console.warn("Supabase init local:", e.message);
 }
 
-const csFunFacts = [
-  "Apollo 11's lunar guidance computer had only 4 kilobytes of RAM and operated at roughly 1 MHz clock speed.",
-  "The first computer bug was an actual moth trapped inside the Harvard Mark II relay computer in 1947 by Grace Hopper.",
-  "Git was written by Linus Torvalds in roughly 10 days to maintain the Linux kernel codebase.",
-  "JavaScript was engineered in just 10 days in May 1995 by Brendan Eich while working at Netscape.",
-  "Relational databases use B+ Trees because wide fanouts match physical storage disk page sizes."
-];
-let currentFactIdx = 0;
+let activePhaseIdx = 0;
 
-// EMPTY INITIAL STATE: NO PRE-MADE PROFILE OR ROADMAP
-let currentStudent = null;
-
-// Endless Puzzle Bank
-const endlessPuzzleBank = [
-  {
-    title: "The Partitioned Consensus Dilemma",
-    topic: "Distributed Systems & Raft",
-    scenario: "You have 3 distributed nodes (A, B, C) coordinating writes under the Raft consensus algorithm. A network partition splits Node C onto an isolated subnet, while Nodes A and B communicate normally. A client issues a write request to Node C. Under Strong Consistency (CP), how must Node C respond?",
-    options: [
-      "Accept write (200 OK) and store it in an ephemeral buffer.",
-      "Refuse the write / return Error (Cannot reach majority quorum of 2/3)."
-    ],
-    correct: 1,
-    explanation: "In CP systems, a node cannot commit a write unless it reaches a majority quorum (N/2 + 1). Node C is isolated (1 of 3), so accepting a write would cause a fatal split-brain anomaly when the partition heals."
+let currentStudent = {
+  email: "guest@alignx.edu",
+  name: "Aditya Pandey",
+  academic_level: "Semester 6 • B.Tech Computer Science",
+  career_goal: "Full-Stack Engineer",
+  current_knowledge: "Solid understanding of JavaScript and React. Needs containerization, B+ tree disk structures, and Redis concurrency.",
+  tenure: "3 Months",
+  github: "adityarp2008",
+  readiness: 68,
+  curriculum_mastery: 60,
+  concept_deficits: 40,
+  target_pace: 75,
+  xp: 800,
+  level: 2,
+  radar: {
+    categories: ["Frontend", "Backend APIs", "System Design", "Databases", "DevOps", "Testing"],
+    candidate: [85, 78, 42, 70, 35, 60],
+    benchmark: [90, 85, 80, 85, 75, 75]
   },
-  {
-    title: "Cache Stampede & Thundering Herd",
-    topic: "Backend & Low-Latency Systems",
-    scenario: "A hot cache key in Redis expires while your web app receives 50,000 requests/second. All 50,000 concurrent requests miss the cache and hammer the PostgreSQL database simultaneously, crashing the primary replica. Which pattern prevents this thundering herd?",
-    options: [
-      "Deploy a distributed lock with a single worker cache-refresh mutex (or probabilistic early expiration).",
-      "Increase the PostgreSQL max_connections setting to 100,000."
-    ],
-    correct: 0,
-    explanation: "Using an atomic distributed lock (or XFetch probabilistic early recomputation) ensures only 1 worker process queries the database to warm the cache while other requests either wait or receive slightly stale cached data, protecting the database."
-  },
-  {
-    title: "Database Deadlock in Concurrent Transfers",
-    topic: "Database Concurrency",
-    scenario: "Transaction 1 transfers $50 from Account A to Account B (locks A, waits for B). Transaction 2 concurrently transfers $50 from Account B to Account A (locks B, waits for A). Both transactions freeze indefinitely. How do you permanently eliminate this cycle at the application design level?",
-    options: [
-      "Acquire row locks in a strict global deterministic order (e.g., always lock the smaller account_id first).",
-      "Remove foreign keys from the database schema."
-    ],
-    correct: 0,
-    explanation: "Deadlocks occur when transactions request resources in circular conflicting orders. Forcing all transactions to acquire locks in a deterministic order (e.g., sort IDs: lock min(A,B), then max(A,B)) makes circular wait conditions mathematically impossible."
-  }
-];
+  phases: [
+    {
+      phaseTitle: "Phase 1: Foundations & Systems Architecture",
+      milestones: [
+        { id: "p1-1", title: "Implement B+ Tree Indexing in PostgreSQL", hours: "6 hrs", desc: "Reduce random disk block reads.", completed: true, xp: 120 },
+        { id: "p1-2", title: "Configure High-Performance Nginx Reverse Proxy", hours: "4 hrs", desc: "Isolate application runtime.", completed: true, xp: 90 }
+      ]
+    },
+    {
+      phaseTitle: "Phase 2: Concurrency & Distributed Storage",
+      milestones: [
+        { id: "p2-1", title: "Deploy Redis Atomic Lua Token Bucket Rate Limiter", hours: "8 hrs", desc: "Eliminate pod race conditions.", completed: false, xp: 200 },
+        { id: "p2-2", title: "Design Multi-Region Event Pub/Sub with Kafka", hours: "10 hrs", desc: "Event ordering across brokers.", completed: false, xp: 250 }
+      ]
+    },
+    {
+      phaseTitle: "Phase 3: Production Hardening & Cloud Native",
+      milestones: [
+        { id: "p3-1", title: "Multi-Stage Docker Compose Containerization", hours: "6 hrs", desc: "Secure production containers.", completed: false, xp: 150 },
+        { id: "p3-2", title: "Automate Integration & Stress Testing (Pytest/k6)", hours: "8 hrs", desc: "Load test concurrent scenarios.", completed: false, xp: 180 }
+      ]
+    }
+  ]
+};
 
-// Endless Adaptive MCQ Bank
-const adaptiveMCQBank = [
+// Continuous MCQ Bank
+const endlessMCQBank = [
   {
     q: "Why do relational database engines (PostgreSQL, InnoDB) prefer B+ Trees over standard Red-Black Binary Trees for disk index storage?",
     topic: "Database Internals",
     options: [
       "Red-Black trees require non-volatile encryption keys on physical sectors.",
-      "High fanout matches physical disk page block sizes, drastically reducing expensive random I/O seeks.",
+      "High fanout matches physical disk page block sizes, drastically reducing random I/O seeks.",
       "Binary trees cannot store variable-width VARCHAR columns."
     ],
     correct: 1,
-    explanation: "Disks read and write in block pages (4KB-8KB). B+ Trees have huge fanouts (100+ children/node), keeping tree depth to 3 or 4 levels and requiring only 3-4 disk seeks. Binary trees require dozens of pointer jumps across arbitrary disk sectors."
+    explanation: "Disks read and write in block pages (4KB-8KB). Because B+ Trees have huge fanouts, tree depth stays at 3-4 levels, requiring only 3-4 disk block seeks."
   },
   {
-    q: "When implementing an atomic rate limiter across multiple auto-scaled Node.js instances, which architecture guarantees zero race conditions without table locks?",
+    q: "When implementing an atomic rate limiter across multiple auto-scaled Node.js instances, which architecture guarantees zero race conditions?",
     topic: "Distributed Systems",
     options: [
       "Using Redis running an atomic Lua script (Token Bucket algorithm).",
@@ -88,1023 +83,436 @@ const adaptiveMCQBank = [
       "Executing a SQL query: SELECT COUNT(*) WHERE created_at > NOW() - INTERVAL '1 minute'."
     ],
     correct: 0,
-    explanation: "Redis executes Lua scripts atomically within a single event loop tick without context switching. Because all application instances query the same Redis cluster, the token bucket decrements linearly with zero race conditions."
+    explanation: "Redis executes Lua scripts atomically in a single event loop iteration without distributed lock contention across multiple pods."
   },
   {
     q: "In the JavaScript V8 engine event loop, what executes first immediately following the current synchronous call stack?",
     topic: "JavaScript Runtime",
     options: [
-      "Macro-tasks scheduled via setTimeout(..., 0).",
+      "Macro-tasks scheduled via setTimeout.",
       "Micro-task queue jobs (Promise.then, queueMicrotask).",
       "I/O polling callbacks."
     ],
     correct: 1,
-    explanation: "The microtask queue is completely drained immediately after the synchronous execution stack empties, BEFORE the event loop picks the next macrotask (such as setTimeout) from the task queue."
+    explanation: "The microtask queue is completely drained immediately after the synchronous execution stack empties, BEFORE macrotasks run."
   }
 ];
 
-// MCQ Session State
-let mcqSession = {
-  active: false,
-  questionIdx: 0,
-  totalAnswered: 0,
-  correctCount: 0,
-  wrongCount: 0,
-  secondsElapsed: 0,
-  timerInterval: null,
-  answeredCurrent: false,
-  incorrectReview: []
-};
-
-// Puzzle Session State
-let puzzleSession = {
-  idx: 0,
-  solvedCount: 0,
-  answeredCurrent: false
-};
-
-let authMode = 'signup';
+let mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [] };
 
 window.addEventListener('DOMContentLoaded', () => {
-  if (localStorage.getItem('theme') === 'light') {
-    document.documentElement.classList.remove('dark');
-    document.documentElement.classList.add('light');
+  const savedTheme = localStorage.getItem('alignx_accent') || 'purple';
+  setAccentTheme(savedTheme);
+
+  const localSaved = localStorage.getItem('alignx_student_active');
+  if (localSaved) {
+    try {
+      currentStudent = JSON.parse(localSaved);
+    } catch (e) {
+      console.warn("Using default session state");
+    }
   }
 
+  updateDashboardUI();
   initPointerGlow();
   setInterval(cycleFunFact, 8000);
   window.addEventListener('resize', renderRadar);
 
-  // Check Local Session Storage for authenticated student
-  const savedStudent = localStorage.getItem('alignx_student');
-  if (savedStudent) {
-    try {
-      currentStudent = JSON.parse(savedStudent);
-      renderAuthenticatedUI();
-    } catch (e) {
-      console.warn("Session restore error:", e);
-    }
-  }
-
   document.addEventListener('click', (e) => {
-    if (!e.target.closest('#profile-dropdown-wrapper')) closeMenu('menu-profile');
+    if (!e.target.closest('#dropdown-track-wrapper')) closeMenu('menu-tracks');
+    if (!e.target.closest('#dropdown-theme-wrapper')) closeMenu('menu-themes');
+    if (!e.target.closest('#dropdown-week-wrapper')) closeMenu('menu-weeks');
   });
 });
 
-function toggleNavSidebar() {
-  const drawer = document.getElementById('nav-drawer');
-  if (drawer) drawer.classList.toggle('-translate-x-full');
-}
+// SYNC & UI UPDATES
+function updateDashboardUI() {
+  const s = currentStudent;
+  document.getElementById('nav-current-role').textContent = s.career_goal || 'Custom Track';
+  document.getElementById('nav-github-label').textContent = s.github ? `@${s.github}` : '@student';
+  document.getElementById('nav-user-name').textContent = s.name || 'Student Scholar';
+  document.getElementById('drawer-user-name').textContent = s.name || 'Student Scholar';
+  document.getElementById('nav-academic-term').textContent = s.academic_level || 'Active Candidate';
+  document.getElementById('drawer-user-goal').textContent = s.career_goal || 'Goal Unset';
+  
+  const initials = (s.name || 'AX').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  document.getElementById('nav-avatar-initials').textContent = initials;
+  document.getElementById('nav-level-badge').textContent = `L${s.level || 1}`;
 
-function cycleFunFact() {
-  const el = document.getElementById('cs-fun-fact-text');
-  if (!el) return;
-  el.style.opacity = '0';
-  setTimeout(() => {
-    currentFactIdx = (currentFactIdx + 1) % csFunFacts.length;
-    el.textContent = csFunFacts[currentFactIdx];
-    el.style.opacity = '1';
-  }, 200);
-}
+  // Telemetry Dials
+  document.getElementById('meter-current-val').innerHTML = `${s.curriculum_mastery}% <span class="text-xs font-normal theme-text-sub">/100%</span>`;
+  document.getElementById('meter-gap-val').innerHTML = `${s.concept_deficits}% <span class="text-xs font-normal theme-text-sub">untested</span>`;
+  document.getElementById('meter-readiness-val').innerHTML = `${s.readiness}% <span class="text-xs font-normal theme-text-sub">score</span>`;
+  document.getElementById('meter-time-val').innerHTML = `${s.target_pace || 75}% <span class="text-xs font-normal theme-text-sub">pace</span>`;
 
-function toggleTheme() {
-  const html = document.documentElement;
-  const isDark = html.classList.toggle('dark');
-  if (isDark) {
-    html.classList.remove('light');
-    localStorage.setItem('theme', 'dark');
-  } else {
-    html.classList.add('light');
-    localStorage.setItem('theme', 'light');
-  }
-  if (currentStudent) {
-    renderDashboard();
-    renderRadar();
-  }
-}
+  document.getElementById('label-ring-1').textContent = `${s.curriculum_mastery}%`;
+  document.getElementById('label-ring-2').textContent = `${s.concept_deficits}%`;
+  document.getElementById('label-ring-3').textContent = `${s.readiness}%`;
+  document.getElementById('label-ring-4').textContent = `${s.target_pace || 75}%`;
 
-function toggleMenu(id, e) {
-  if (e) e.stopPropagation();
-  const el = document.getElementById(id);
-  if (el) el.classList.toggle('hidden');
-}
+  updateRadialMeter('dial-ring-1', s.curriculum_mastery);
+  updateRadialMeter('dial-ring-2', s.concept_deficits);
+  updateRadialMeter('dial-ring-3', s.readiness);
+  updateRadialMeter('dial-ring-4', s.target_pace || 75);
 
-function closeMenu(id) {
-  const el = document.getElementById(id);
-  if (el) el.classList.add('hidden');
-}
+  // XP & Level
+  document.getElementById('xp-level-title').textContent = `⚡ Level ${s.level || 1}: Apprentice Architect`;
+  document.getElementById('xp-progress-label').textContent = `${s.xp || 0} / 1000 XP`;
+  document.getElementById('xp-progress-bar').style.width = `${Math.min(100, ((s.xp || 0) % 1000) / 10)}%`;
 
-function openModal(id) { document.getElementById(id)?.classList.remove('hidden'); }
-function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
-
-// ==========================================
-// AUTHENTICATION (LOGIN & REGISTRATION)
-// ==========================================
-
-function openAuthModal(mode) {
-  setAuthMode(mode);
-  openModal('modal-auth');
-}
-
-function setAuthMode(mode) {
-  authMode = mode;
-  const isLogin = mode === 'login';
-  const title = document.getElementById('auth-modal-title');
-  const btnLogin = document.getElementById('btn-auth-mode-login');
-  const btnSignup = document.getElementById('btn-auth-mode-signup');
-  const btnSubmit = document.getElementById('btn-auth-submit');
-
-  if (title) title.textContent = isLogin ? 'Student Login' : 'Enroll Student Account';
-  if (btnSubmit) btnSubmit.textContent = isLogin ? 'Log In to Academic Dashboard →' : 'Register Student Profile →';
-
-  if (isLogin) {
-    btnLogin.className = "w-1/2 py-2 rounded-lg font-bold btn-brand shadow-sm transition";
-    btnSignup.className = "w-1/2 py-2 rounded-lg font-bold text-slate-500 transition";
-  } else {
-    btnSignup.className = "w-1/2 py-2 rounded-lg font-bold btn-brand shadow-sm transition";
-    btnLogin.className = "w-1/2 py-2 rounded-lg font-bold text-slate-500 transition";
-  }
-}
-
-async function handleAuthSubmit(e) {
-  e.preventDefault();
-  const emailVal = document.getElementById('auth-email').value.trim();
-
-  closeModal('modal-auth');
-
-  // Check Supabase if user exists
-  if (supabase) {
-    try {
-      const { data, error } = await supabase
-        .from('students')
-        .select('*')
-        .eq('email', emailVal)
-        .single();
-
-      if (data && !error) {
-        currentStudent = {
-          ...data,
-          academicLevel: data.academic_level,
-          careerGoal: data.role || data.career_goal,
-          matchedSkills: data.matched_skills || [],
-          missingSkills: data.missing_skills || [],
-          phases: data.phases || []
-        };
-        localStorage.setItem('alignx_student', JSON.stringify(currentStudent));
-        renderAuthenticatedUI();
-        return;
-      }
-    } catch (err) {
-      console.warn("Supabase auth lookup:", err.message);
-    }
-  }
-
-  // If new user or profile incomplete, prompt for student data collection
-  currentStudent = {
-    email: emailVal,
-    name: "",
-    academicLevel: "",
-    careerGoal: "",
-    tenure: "",
-    github: "",
-    readiness: 0,
-    curriculumMastery: 0,
-    conceptDeficits: 100,
-    xp: 0,
-    level: 1,
-    matchedSkills: [],
-    missingSkills: [],
-    radar: {
-      categories: ["Frontend", "Backend APIs", "System Design", "Databases", "DevOps", "Testing"],
-      candidate: [0, 0, 0, 0, 0, 0],
-      benchmark: [90, 85, 80, 85, 75, 75]
-    },
-    phases: []
-  };
-
-  openModal('modal-onboarding');
-}
-
-// GITHUB USERNAME PRE-VERIFICATION
-async function verifyAndInspectGitHubInput() {
-  const input = document.getElementById('in-github');
-  const note = document.getElementById('github-verify-note');
-  const username = input.value.trim();
-  if (!username) return;
-
-  note.textContent = `Connecting to GitHub API for @${username}...`;
-  note.className = "text-[11px] text-purple-400 mt-1";
-
-  try {
-    const res = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=6`);
-    if (!res.ok) throw new Error("GitHub username not found");
-    const repos = await res.json();
-    const languages = [...new Set(repos.map(r => r.language).filter(Boolean))];
-    note.textContent = `Verified ✓ Found ${repos.length} public repos. Detected stacks: ${languages.join(', ')}`;
-    note.className = "text-[11px] text-emerald-500 mt-1 font-semibold";
-  } catch (err) {
-    note.textContent = `Warning: Could not verify @${username} (${err.message}).`;
-    note.className = "text-[11px] text-rose-500 mt-1";
-  }
-}
-
-// ==========================================
-// DATA COLLECTION & OMNIROUTE ROADMAP SYNTHESIS
-// ==========================================
-
-async function handleOnboardingSubmit(e) {
-  e.preventDefault();
-  const btn = document.getElementById('btn-save-onboarding');
-  btn.textContent = "Synthesizing Roadmap via OmniRoute...";
-  btn.disabled = true;
-
-  const name = document.getElementById('in-name').value.trim();
-  const academicLevel = document.getElementById('in-academic-level').value;
-  const careerGoal = document.getElementById('in-career-goal').value;
-  const tenure = document.getElementById('in-tenure').value;
-  const github = document.getElementById('in-github').value.trim();
-
-  // Scan public repositories for languages
-  let detectedLanguages = [];
-  try {
-    const ghRes = await fetch(`https://api.github.com/users/${github}/repos?sort=updated&per_page=8`);
-    if (ghRes.ok) {
-      const ghRepos = await ghRes.json();
-      detectedLanguages = [...new Set(ghRepos.map(r => r.language).filter(Boolean))];
-    }
-  } catch (e) {
-    console.warn("GitHub inspection skipped:", e.message);
-  }
-
-  try {
-    // Invoke OmniRoute Roadmap generator
-    const aiRes = await fetch('/api/roadmap', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name,
-        academicLevel,
-        careerGoal,
-        tenure,
-        github,
-        detectedSkills: detectedLanguages
-      })
-    });
-
-    if (!aiRes.ok) throw new Error("OmniRoute Gateway error");
-    const aiData = await aiRes.json();
-
-    currentStudent = {
-      ...currentStudent,
-      name,
-      academicLevel,
-      careerGoal,
-      tenure,
-      github,
-      readiness: aiData.readiness || 35,
-      curriculumMastery: aiData.curriculumMastery || 30,
-      conceptDeficits: aiData.conceptDeficits || 70,
-      matchedSkills: aiData.matchedSkills || detectedLanguages,
-      missingSkills: aiData.missingSkills || [],
-      radar: aiData.radar || currentStudent.radar,
-      phases: aiData.phases || [],
-      xp: 200, // Onboarding bonus
-      level: 1
-    };
-
-    // Save profile to Supabase
-    await syncStudentToSupabase();
-
-    localStorage.setItem('alignx_student', JSON.stringify(currentStudent));
-    closeModal('modal-onboarding');
-    renderAuthenticatedUI();
-  } catch (err) {
-    alert(`Notice: Failed to synthesize roadmap via API (${err.message}). Generating standard baseline.`);
-    currentStudent = {
-      ...currentStudent,
-      name,
-      academicLevel,
-      careerGoal,
-      tenure,
-      github,
-      readiness: 40,
-      curriculumMastery: 35,
-      conceptDeficits: 65,
-      matchedSkills: detectedLanguages.length ? detectedLanguages : ["Core Fundamentals"],
-      missingSkills: [
-        { name: "Distributed Caching (Redis)", tag: "Critical Void", capstoneTitle: "Redis Rate Limiter", capstoneDesc: "Deploy an atomic token bucket in Redis using Lua scripts." }
-      ],
-      radar: {
-        categories: ["Frontend", "Backend APIs", "System Design", "Databases", "DevOps", "Testing"],
-        candidate: [50, 45, 30, 40, 20, 30],
-        benchmark: [90, 85, 80, 85, 75, 75]
-      },
-      phases: [
-        {
-          phaseTitle: "Phase 1: Foundational Systems & Tooling",
-          milestones: [
-            { id: "m1", title: "Containerize multi-stage runtime with Docker Compose", hours: "8 hrs", resource: "Docker Multi-stage Builds", completed: false, xp: 100 }
-          ]
-        }
-      ],
-      xp: 150,
-      level: 1
-    };
-    await syncStudentToSupabase();
-    localStorage.setItem('alignx_student', JSON.stringify(currentStudent));
-    closeModal('modal-onboarding');
-    renderAuthenticatedUI();
-  } finally {
-    btn.textContent = "Generate Roadmap with OmniRoute →";
-    btn.disabled = false;
-  }
-}
-
-// PERSISTENCE SYNC TO SUPABASE
-async function syncStudentToSupabase() {
-  if (!supabase || !currentStudent) return;
-  try {
-    await supabase.from('students').upsert({
-      email: currentStudent.email,
-      name: currentStudent.name,
-      academic_level: currentStudent.academicLevel,
-      career_goal: currentStudent.careerGoal,
-      tenure: currentStudent.tenure,
-      github: currentStudent.github,
-      readiness: currentStudent.readiness,
-      curriculum_mastery: currentStudent.curriculumMastery,
-      concept_deficits: currentStudent.conceptDeficits,
-      matched_skills: currentStudent.matchedSkills,
-      missing_skills: currentStudent.missingSkills,
-      radar: currentStudent.radar,
-      phases: currentStudent.phases,
-      xp: currentStudent.xp,
-      level: currentStudent.level
-    }, { onConflict: 'email' });
-  } catch (err) {
-    console.warn("Supabase background sync:", err.message);
-  }
-}
-
-function logoutStudent() {
-  currentStudent = null;
-  localStorage.removeItem('alignx_student');
-  location.reload();
-}
-
-// ==========================================
-// UI RENDERING & TELEMETRY
-// ==========================================
-
-function renderAuthenticatedUI() {
-  if (!currentStudent || !currentStudent.careerGoal) return;
-
-  // Reveal telemetry and hide empty onboarding prompt
-  document.getElementById('onboarding-callout')?.classList.add('hidden');
-  document.getElementById('telemetry-dials-section')?.classList.remove('hidden');
-  document.getElementById('dashboard-core-section')?.classList.remove('hidden');
-  document.getElementById('profile-dropdown-wrapper')?.classList.remove('hidden');
-  document.getElementById('btn-auth-trigger')?.classList.add('hidden');
-  document.getElementById('btn-nav-github')?.classList.remove('hidden');
-
-  document.getElementById('nav-current-role').textContent = currentStudent.careerGoal;
-  document.getElementById('nav-user-name').textContent = currentStudent.name;
-  document.getElementById('nav-user-term').textContent = `${currentStudent.academicLevel} • ${currentStudent.tenure}`;
-  document.getElementById('drawer-student-name').textContent = currentStudent.name;
-  document.getElementById('drawer-student-meta').textContent = `${currentStudent.academicLevel} • ${currentStudent.careerGoal}`;
-  document.getElementById('nav-avatar-initials').textContent = currentStudent.name.split(' ').map(n=>n[0]).join('').substring(0,2);
-  document.getElementById('nav-github-label').textContent = `@${currentStudent.github}`;
-
-  renderDashboard();
+  renderStudyPlanModules();
+  renderRoadmapModal();
   renderRadar();
 }
 
-function updateRadialMeter(circleId, labelId, percentage, strokeColor) {
+function updateRadialMeter(circleId, percentage) {
   const circle = document.getElementById(circleId);
-  const label = document.getElementById(labelId);
+  if (!circle) return;
   const clamped = Math.max(0, Math.min(100, percentage));
-  const circumference = 2 * Math.PI * 26; // ~163.36
-  
-  if (circle) {
-    circle.style.strokeDasharray = `${circumference}`;
-    circle.style.strokeDashoffset = circumference - (clamped / 100) * circumference;
-    if (strokeColor) circle.setAttribute('stroke', strokeColor);
-  }
-  if (label) {
-    label.textContent = `${clamped}%`;
-  }
+  const circumference = 2 * Math.PI * 26; // r = 26
+  circle.style.strokeDasharray = `${circumference}`;
+  circle.style.strokeDashoffset = circumference - (clamped / 100) * circumference;
 }
 
-function renderDashboard() {
-  if (!currentStudent) return;
-  const isDark = document.documentElement.classList.contains('dark');
-  const primaryColor = isDark ? '#C084FC' : '#EA580C';
-  const purpleColor = isDark ? '#C084FC' : '#9333EA';
-
-  const setTxt = (id, val) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = val;
-  };
-
-  const total = (currentStudent.matchedSkills?.length || 0) + (currentStudent.missingSkills?.length || 0);
-
-  // 1. Curriculum Mastery
-  setTxt('meter-current-val', `${currentStudent.curriculumMastery}%`);
-  setTxt('meter-current-sub', `${currentStudent.matchedSkills?.length || 0} of ${total} verified units`);
-  updateRadialMeter('circle-current-skill', 'circle-current-label', currentStudent.curriculumMastery, primaryColor);
-
-  // 2. Concept Deficits
-  setTxt('meter-gap-val', `${currentStudent.conceptDeficits}%`);
-  setTxt('meter-gap-sub', `${currentStudent.missingSkills?.length || 0} critical voids to bridge`);
-  updateRadialMeter('circle-skill-gap', 'circle-gap-label', currentStudent.conceptDeficits, purpleColor);
-
-  // 3. Career Readiness
-  setTxt('meter-readiness-val', `${currentStudent.readiness}%`);
-  setTxt('meter-readiness-sub', `Target: ${currentStudent.careerGoal}`);
-  updateRadialMeter('circle-career-readiness', 'circle-readiness-label', currentStudent.readiness, primaryColor);
-
-  // 4. Target Tenure Pace
-  const pace = Math.min(100, Math.round((currentStudent.readiness / 75) * 100));
-  setTxt('meter-time-val', `${pace}%`);
-  setTxt('meter-tenure-sub', `Urgency: ${currentStudent.tenure}`);
-  updateRadialMeter('circle-time-goal', 'circle-time-label', pace, primaryColor);
-
-  // Gamification Level
-  setTxt('player-level-badge', `L${currentStudent.level}`);
-  setTxt('xp-level-title', `Level ${currentStudent.level}: Candidate`);
-  setTxt('xp-progress-label', `${currentStudent.xp} / 1000 XP`);
-  setTxt('menu-profile-xp', `XP: ${currentStudent.xp} / 1000 (Level ${currentStudent.level})`);
-
-  const xpPct = Math.min(100, Math.round((currentStudent.xp / 1000) * 100));
-  const bar = document.getElementById('xp-progress-bar');
-  if (bar) bar.style.width = `${xpPct}%`;
-
-  // Missing Skills Chips
-  const missingBox = document.getElementById('chips-missing-critical');
-  if (missingBox) {
-    missingBox.innerHTML = '';
-    (currentStudent.missingSkills || []).forEach(skill => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.onclick = () => openCapstone(skill.capstoneTitle || skill.name, skill.capstoneDesc);
-      btn.className = "deficit-chip flex items-center gap-2";
-      btn.innerHTML = `<span>${skill.name}</span><span class="text-[10px] font-mono uppercase px-2 py-0.5 bg-purple-500/20 text-purple-700 dark:text-purple-200 rounded-md font-extrabold tracking-wider">Lab Spec</span>`;
-      missingBox.appendChild(btn);
-    });
-  }
-
-  // Matched Competency Chips
-  const matchedBox = document.getElementById('chips-matched-skills');
-  if (matchedBox) {
-    matchedBox.innerHTML = '';
-    (currentStudent.matchedSkills || []).forEach(skill => {
-      const span = document.createElement('span');
-      span.className = "competency-chip flex items-center gap-1.5";
-      span.innerHTML = `<span>✓</span> <span>${skill}</span>`;
-      matchedBox.appendChild(span);
-    });
-  }
+// INTERACTIVE STUDY PLAN RENDERER
+function changeStudyPlanPhase(phaseIdx) {
+  activePhaseIdx = phaseIdx;
+  document.getElementById('active-week-label').textContent = `Phase ${phaseIdx + 1}`;
+  closeMenu('menu-weeks');
+  renderStudyPlanModules();
 }
 
-// ==========================================
-// ROADMAP CONTENT VIEWER & LIVE COMPLETION CHECKER
-// ==========================================
+function renderStudyPlanModules() {
+  const container = document.getElementById('study-plan-modules-container');
+  if (!container) return;
+  container.innerHTML = '';
 
-function openPersonalizedRoadmap() {
-  if (!currentStudent || !currentStudent.phases || currentStudent.phases.length === 0) {
-    alert("Please sign in and set up your student profile to view your synthesized roadmap.");
-    openModal('modal-onboarding');
+  const phases = currentStudent.phases || [];
+  const currentPhase = phases[activePhaseIdx] || phases[0];
+
+  if (!currentPhase || !currentPhase.milestones || currentPhase.milestones.length === 0) {
+    container.innerHTML = `
+      <div class="p-6 text-center theme-card-inner rounded-2xl space-y-2">
+        <p class="theme-text-sub">No milestones generated yet.</p>
+        <button onclick="openOnboardingModal()" class="btn-brand px-4 py-1.5 rounded-xl text-xs">✨ Generate with Gemini</button>
+      </div>
+    `;
     return;
   }
 
-  renderRoadmapPhases();
-  openModal('modal-roadmap');
+  currentPhase.milestones.forEach((m, idx) => {
+    const item = document.createElement('div');
+    item.className = "p-3.5 rounded-2xl study-module-card flex items-center justify-between gap-3 transition cursor-pointer";
+    const statusClass = m.completed ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30' : 'bg-slate-500/10 text-slate-500 border border-slate-500/20';
+
+    item.innerHTML = `
+      <div class="flex items-center gap-3">
+        <span class="w-6 h-6 rounded-full bg-white/10 dynamic-accent-text font-bold flex items-center justify-center text-xs shrink-0">${idx + 1}</span>
+        <div>
+          <div class="study-module-title text-xs leading-snug ${m.completed ? 'line-through opacity-60' : ''}">${m.title}</div>
+          <div class="study-module-desc text-[11px] mt-0.5">${m.desc || `${m.hours} focused exercise`}</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <span class="px-2.5 py-1 rounded-full ${statusClass} font-bold text-[10px]">${m.completed ? 'Completed ✓' : 'In Progress'}</span>
+        <span class="theme-text-sub text-xs">›</span>
+      </div>
+    `;
+    item.onclick = () => toggleMilestoneState(m.id);
+    container.appendChild(item);
+  });
 }
 
-function renderRoadmapPhases() {
+// ROADMAP MODAL BUILDER
+function renderRoadmapModal() {
   const container = document.getElementById('roadmap-phases-container');
   if (!container) return;
   container.innerHTML = '';
 
-  currentStudent.phases.forEach((phase, pIdx) => {
-    const phaseBox = document.createElement('div');
-    phaseBox.className = "p-5 rounded-2xl bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 space-y-3";
+  document.getElementById('roadmap-track-name').textContent = currentStudent.career_goal || 'Selected Target Role';
+  const phases = currentStudent.phases || [];
 
-    const header = `
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <span class="w-6 h-6 rounded-md bg-purple-500/20 text-purple-600 dark:text-purple-400 font-mono font-bold text-xs flex items-center justify-center">${pIdx + 1}</span>
-          <h4 class="text-xs font-bold text-slate-900 dark:text-white">${phase.phaseTitle}</h4>
-        </div>
-        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/10 text-purple-600 dark:text-purple-400 font-semibold">Active Sprint</span>
-      </div>
-    `;
-
-    let milestonesHtml = `<div class="space-y-2 pt-1">`;
+  phases.forEach((phase, pIdx) => {
+    const box = document.createElement('div');
+    box.className = "p-4 rounded-2xl theme-card-inner space-y-3";
+    
+    let html = '';
     phase.milestones.forEach(m => {
-      milestonesHtml += `
-        <div class="p-3.5 rounded-xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 flex items-start justify-between gap-3 text-xs">
-          <div class="flex items-start gap-3">
-            <input type="checkbox" id="${m.id}" ${m.completed ? 'checked' : ''} onchange="toggleRoadmapMilestone('${m.id}')"
-                   class="mt-0.5 w-4 h-4 rounded text-purple-600 focus:ring-0 cursor-pointer">
+      html += `
+        <div class="p-3 rounded-xl theme-card-inner flex items-center justify-between gap-3">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" ${m.completed ? 'checked' : ''} onchange="toggleMilestoneState('${m.id}')" class="w-4 h-4 rounded text-purple-600 focus:ring-0 cursor-pointer">
             <div>
-              <label for="${m.id}" class="font-medium cursor-pointer ${m.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-200'}">
-                ${m.title}
-              </label>
-              <div class="text-[11px] text-slate-500 mt-1">${m.hours} • <span class="text-purple-600 dark:text-purple-400 font-semibold">${m.resource}</span></div>
+              <div class="font-bold text-xs theme-text-title ${m.completed ? 'line-through opacity-50' : ''}">${m.title}</div>
+              <div class="text-[10px] theme-text-sub">${m.hours} • ${m.desc || 'Milestone goal'}</div>
             </div>
-          </div>
-          <span class="shrink-0 text-[10px] font-mono px-2 py-1 rounded bg-amber-500/10 text-amber-500 font-bold">+${m.xp || 100} XP</span>
+          </label>
+          <span class="font-mono text-amber-500 font-bold text-xs shrink-0">+${m.xp || 100} XP</span>
         </div>
       `;
     });
-    milestonesHtml += `</div>`;
 
-    phaseBox.innerHTML = header + milestonesHtml;
-    container.appendChild(phaseBox);
+    box.innerHTML = `
+      <div class="flex items-center justify-between pb-1">
+        <h4 class="text-xs font-extrabold uppercase tracking-wider dynamic-accent-text">${phase.phaseTitle || `Phase ${pIdx + 1}`}</h4>
+        <span class="text-[10px] font-mono theme-text-sub">Phase ${pIdx + 1}</span>
+      </div>
+      <div class="space-y-2">${html}</div>
+    `;
+    container.appendChild(box);
   });
 }
 
-// LIVE MILESTONE CHECKER: ACCURATELY ADJUSTS TELEMETRY & RE-SYNCS
-async function toggleRoadmapMilestone(mId) {
-  let totalCount = 0;
-  let completedCount = 0;
+// DYNAMIC TELEMETRY CALCULATION ON COURSE COMPLETION
+async function toggleMilestoneState(mId) {
+  let totalMilestones = 0;
+  let completedMilestones = 0;
 
-  currentStudent.phases.forEach(p => {
-    p.milestones.forEach(m => {
+  currentStudent.phases.forEach(phase => {
+    phase.milestones.forEach(m => {
+      totalMilestones++;
       if (m.id === mId) {
         m.completed = !m.completed;
+        const deltaXP = m.xp || 100;
         if (m.completed) {
-          currentStudent.xp += (m.xp || 100);
+          currentStudent.xp = (currentStudent.xp || 0) + deltaXP;
         } else {
-          currentStudent.xp = Math.max(0, currentStudent.xp - (m.xp || 100));
+          currentStudent.xp = Math.max(0, (currentStudent.xp || 0) - deltaXP);
         }
       }
-      totalCount++;
-      if (m.completed) completedCount++;
+      if (m.completed) completedMilestones++;
     });
   });
 
-  // Dynamically calculate telemetry adjustments
-  const completionRatio = completedCount / (totalCount || 1);
-  const baseReadiness = 35;
-  currentStudent.readiness = Math.min(100, Math.round(baseReadiness + completionRatio * (100 - baseReadiness)));
-  currentStudent.curriculumMastery = Math.min(100, Math.round(30 + completionRatio * 70));
-  currentStudent.conceptDeficits = Math.max(0, 100 - currentStudent.curriculumMastery);
+  const completionRatio = completedMilestones / (totalMilestones || 1);
+  const mastery = Math.round(completionRatio * 100);
+  currentStudent.curriculum_mastery = mastery;
+  currentStudent.concept_deficits = Math.max(0, 100 - mastery);
+  currentStudent.readiness = Math.min(100, Math.round(20 + completionRatio * 80));
+  currentStudent.level = Math.floor((currentStudent.xp || 0) / 1000) + 1;
 
-  // Check Level Progression
-  if (currentStudent.xp >= 1000) {
-    currentStudent.level = Math.floor(currentStudent.xp / 1000) + 1;
-  }
-
-  // Update Radar scores
-  currentStudent.radar.candidate = currentStudent.radar.candidate.map(score => Math.min(95, score + 4));
-
-  renderRoadmapPhases();
-  renderDashboard();
-  renderRadar();
-
-  // Instant persistence to Supabase
-  await syncStudentToSupabase();
-  localStorage.setItem('alignx_student', JSON.stringify(currentStudent));
-}
-
-// ==========================================
-// ENDLESS ADAPTIVE MCQ STUDIO
-// ==========================================
-
-function startAdaptiveMCQSession() {
-  mcqSession.active = true;
-  mcqSession.questionIdx = 0;
-  mcqSession.totalAnswered = 0;
-  mcqSession.correctCount = 0;
-  mcqSession.wrongCount = 0;
-  mcqSession.secondsElapsed = 0;
-  mcqSession.incorrectReview = [];
-  mcqSession.answeredCurrent = false;
-
-  document.getElementById('mcq-badge-track').textContent = currentStudent?.careerGoal || "Technical Assessment";
-  document.getElementById('mcq-correct-counter').textContent = '0';
-  document.getElementById('mcq-wrong-counter').textContent = '0';
-  document.getElementById('mcq-session-timer').textContent = '00:00';
-
-  clearInterval(mcqSession.timerInterval);
-  mcqSession.timerInterval = setInterval(() => {
-    mcqSession.secondsElapsed++;
-    const mins = String(Math.floor(mcqSession.secondsElapsed / 60)).padStart(2, '0');
-    const secs = String(mcqSession.secondsElapsed % 60).padStart(2, '0');
-    document.getElementById('mcq-session-timer').textContent = `${mins}:${secs}`;
-  }, 1000);
-
-  openModal('modal-mcq');
-  generateNextMCQ();
-}
-
-function generateNextMCQ() {
-  mcqSession.answeredCurrent = false;
-  document.getElementById('btn-next-mcq').classList.add('hidden');
-  const fb = document.getElementById('mcq-instant-feedback');
-  fb.classList.add('hidden');
-
-  const qObj = adaptiveMCQBank[mcqSession.questionIdx % adaptiveMCQBank.length];
-
-  document.getElementById('mcq-question-number').textContent = `Question #${mcqSession.totalAnswered + 1}`;
-  document.getElementById('mcq-topic-tag').textContent = qObj.topic;
-  document.getElementById('mcq-question-text').textContent = qObj.q;
-
-  const container = document.getElementById('mcq-choices-container');
-  container.innerHTML = '';
-
-  qObj.options.forEach((optText, optIdx) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = "mcq-choice-btn w-full text-left p-3.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.03] text-xs hover:bg-slate-100 dark:hover:bg-white/10 transition font-medium flex items-start gap-2.5";
-    btn.innerHTML = `<span class="font-mono text-purple-500 font-bold">${String.fromCharCode(65 + optIdx)}.</span> <span>${optText}</span>`;
-    btn.onclick = () => handleMCQSubmission(optIdx, qObj);
-    container.appendChild(btn);
-  });
-}
-
-function handleMCQSubmission(selectedIdx, qObj) {
-  if (mcqSession.answeredCurrent) return;
-  mcqSession.answeredCurrent = true;
-  mcqSession.totalAnswered++;
-
-  const isCorrect = (selectedIdx === qObj.correct);
-  const fb = document.getElementById('mcq-instant-feedback');
-  const allBtns = document.querySelectorAll('.mcq-choice-btn');
-
-  allBtns.forEach((b, idx) => {
-    b.disabled = true;
-    if (idx === qObj.correct) {
-      b.classList.add('bg-emerald-500/20', 'border-emerald-500', 'text-emerald-700', 'dark:text-emerald-300');
-    } else if (idx === selectedIdx && !isCorrect) {
-      b.classList.add('bg-rose-500/20', 'border-rose-500', 'text-rose-700', 'dark:text-rose-300');
-    }
-  });
-
-  fb.classList.remove('hidden');
-
-  if (isCorrect) {
-    mcqSession.correctCount++;
-    document.getElementById('mcq-correct-counter').textContent = mcqSession.correctCount;
-    fb.className = "p-3.5 rounded-xl bg-emerald-100 dark:bg-emerald-950/40 border border-emerald-300 text-emerald-800 dark:text-emerald-300 text-xs";
-    fb.innerHTML = `<strong>✓ Correct:</strong> ${qObj.explanation}`;
-    if (currentStudent) {
-      currentStudent.xp += 50;
-      renderDashboard();
-    }
-  } else {
-    mcqSession.wrongCount++;
-    document.getElementById('mcq-wrong-counter').textContent = mcqSession.wrongCount;
-    fb.className = "p-3.5 rounded-xl bg-rose-100 dark:bg-rose-950/40 border border-rose-300 text-rose-800 dark:text-rose-300 text-xs";
-    fb.innerHTML = `<strong>✕ Incorrect:</strong> ${qObj.explanation}`;
-    mcqSession.incorrectReview.push({
-      question: qObj.q,
-      userAnswer: qObj.options[selectedIdx],
-      correctAnswer: qObj.options[qObj.correct],
-      explanation: qObj.explanation,
-      topic: qObj.topic
+  // Dynamically push student polygon outward on radar
+  if (currentStudent.radar && currentStudent.radar.candidate) {
+    currentStudent.radar.candidate = currentStudent.radar.candidate.map((val, idx) => {
+      const target = currentStudent.radar.benchmark ? currentStudent.radar.benchmark[idx] : 85;
+      return Math.min(target, Math.round(30 + completionRatio * 60));
     });
   }
 
-  mcqSession.questionIdx++;
-  document.getElementById('btn-next-mcq').classList.remove('hidden');
+  saveStudentState();
+  updateDashboardUI();
 }
 
-function finishMCQSession() {
-  clearInterval(mcqSession.timerInterval);
-  closeModal('modal-mcq');
+// SAVE STATE TO SUPABASE & LOCAL STORAGE
+async function saveStudentState() {
+  localStorage.setItem('alignx_student_active', JSON.stringify(currentStudent));
 
-  const total = mcqSession.totalAnswered;
-  const correct = mcqSession.correctCount;
-  const wrong = mcqSession.wrongCount;
-  const accuracy = total > 0 ? Math.round((correct / total) * 100) : 0;
-  const avgPace = total > 0 ? Math.round(mcqSession.secondsElapsed / total) : 0;
-
-  document.getElementById('scorecard-total').textContent = total;
-  document.getElementById('scorecard-correct').textContent = correct;
-  document.getElementById('scorecard-wrong').textContent = wrong;
-  document.getElementById('scorecard-accuracy').textContent = `${accuracy}% (${avgPace}s/q)`;
-
-  const listContainer = document.getElementById('scorecard-breakdown-list');
-  listContainer.innerHTML = '';
-
-  if (mcqSession.incorrectReview.length === 0) {
-    listContainer.innerHTML = `
-      <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-300 text-center">
-        🏆 Flawless performance! Zero concept gaps identified in this sprint.
-      </div>
-    `;
-  } else {
-    mcqSession.incorrectReview.forEach(item => {
-      const box = document.createElement('div');
-      box.className = "p-4 rounded-2xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/10 space-y-2";
-      box.innerHTML = `
-        <div class="flex items-center justify-between text-[11px] font-mono">
-          <span class="font-bold text-purple-500">${item.topic}</span>
-          <span class="text-rose-500 font-semibold">Missed Void</span>
-        </div>
-        <p class="font-bold text-slate-800 dark:text-slate-200 text-xs">${item.question}</p>
-        <div class="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-700 dark:text-rose-300 text-xs">
-          <strong>Your Answer:</strong> ${item.userAnswer}
-        </div>
-        <div class="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs">
-          <strong>Correct Concept:</strong> ${item.correctAnswer}
-        </div>
-        <p class="text-slate-600 dark:text-slate-400 text-xs pt-1 leading-relaxed">
-          <strong>Explanation:</strong> ${item.explanation}
-        </p>
-      `;
-      listContainer.appendChild(box);
-    });
-  }
-
-  openModal('modal-scorecard');
-}
-
-// ==========================================
-// ENDLESS LOGIC RIDDLE STUDIO
-// ==========================================
-
-function startEndlessPuzzleSession() {
-  puzzleSession.idx = 0;
-  puzzleSession.solvedCount = 0;
-  document.getElementById('puzzle-solved-counter').textContent = '0';
-  openModal('modal-puzzle');
-  generateNextPuzzle();
-}
-
-function generateNextPuzzle() {
-  puzzleSession.answeredCurrent = false;
-  document.getElementById('btn-next-puzzle').classList.add('hidden');
-  const fb = document.getElementById('puzzle-instant-feedback');
-  fb.classList.add('hidden');
-
-  const pObj = endlessPuzzleBank[puzzleSession.idx % endlessPuzzleBank.length];
-
-  document.getElementById('puzzle-title-number').textContent = `Riddle #${puzzleSession.idx + 1}`;
-  document.getElementById('puzzle-topic-tag').textContent = pObj.topic;
-  document.getElementById('puzzle-scenario-text').textContent = pObj.scenario;
-
-  const container = document.getElementById('puzzle-choices-container');
-  container.innerHTML = '';
-
-  pObj.options.forEach((optText, optIdx) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = "puzzle-btn p-3.5 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.03] text-xs hover:bg-slate-100 dark:hover:bg-white/10 transition text-left font-medium";
-    btn.textContent = `${optIdx + 1}. ${optText}`;
-    btn.onclick = () => handlePuzzleSubmission(optIdx, pObj);
-    container.appendChild(btn);
-  });
-}
-
-function handlePuzzleSubmission(selectedIdx, pObj) {
-  if (puzzleSession.answeredCurrent) return;
-  puzzleSession.answeredCurrent = true;
-
-  const isCorrect = (selectedIdx === pObj.correct);
-  const fb = document.getElementById('puzzle-instant-feedback');
-  fb.classList.remove('hidden');
-
-  if (isCorrect) {
-    puzzleSession.solvedCount++;
-    document.getElementById('puzzle-solved-counter').textContent = puzzleSession.solvedCount;
-    fb.className = "p-3.5 rounded-xl bg-emerald-100 dark:bg-emerald-950/40 border border-emerald-300 text-emerald-800 dark:text-emerald-300 text-xs";
-    fb.innerHTML = `<strong>🎯 Verified:</strong> ${pObj.explanation}`;
-    if (currentStudent) {
-      currentStudent.xp += 100;
-      renderDashboard();
+  if (supabase && currentStudent.email && !currentStudent.email.includes("guest@")) {
+    try {
+      await supabase.from('students').upsert({
+        email: currentStudent.email,
+        name: currentStudent.name,
+        academic_level: currentStudent.academic_level,
+        career_goal: currentStudent.career_goal,
+        current_knowledge: currentStudent.current_knowledge,
+        tenure: currentStudent.tenure,
+        github: currentStudent.github,
+        readiness: currentStudent.readiness,
+        curriculum_mastery: currentStudent.curriculum_mastery,
+        concept_deficits: currentStudent.concept_deficits,
+        target_pace: currentStudent.target_pace,
+        radar: currentStudent.radar,
+        phases: currentStudent.phases,
+        xp: currentStudent.xp,
+        level: currentStudent.level
+      }, { onConflict: 'email' });
+    } catch (err) {
+      console.warn("Supabase upsert error:", err.message);
     }
-  } else {
-    fb.className = "p-3.5 rounded-xl bg-rose-100 dark:bg-rose-950/40 border border-rose-300 text-rose-800 dark:text-rose-300 text-xs";
-    fb.innerHTML = `<strong>✕ Hazard Detected:</strong> ${pObj.explanation}`;
   }
-
-  puzzleSession.idx++;
-  document.getElementById('btn-next-puzzle').classList.remove('hidden');
 }
 
-// ==========================================
-// RADAR CHART & GITHUB INSPECTOR
-// ==========================================
+// ONBOARDING SUBMISSION (GOOGLE GEMINI POWERED)
+async function handleOnboardingSubmit(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn-generate-roadmap');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="animate-spin">↻</span> Generating Architecture with Gemini...`;
 
+  const payload = {
+    name: document.getElementById('in-name').value.trim(),
+    academicLevel: document.getElementById('in-academic-level').value.trim(),
+    careerGoal: document.getElementById('in-career-goal').value.trim(),
+    currentKnowledge: document.getElementById('in-current-knowledge').value.trim(),
+    tenure: document.getElementById('in-tenure').value,
+    github: document.getElementById('in-github').value.trim()
+  };
+
+  try {
+    const res = await fetch('/api/roadmap', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const aiData = await res.json();
+
+    if (aiData.error) throw new Error(aiData.error);
+
+    currentStudent = {
+      ...currentStudent,
+      name: payload.name,
+      academic_level: payload.academicLevel,
+      career_goal: payload.careerGoal,
+      current_knowledge: payload.currentKnowledge,
+      tenure: payload.tenure,
+      github: payload.github,
+      readiness: aiData.readiness || 25,
+      curriculum_mastery: aiData.curriculumMastery || 20,
+      concept_deficits: aiData.conceptDeficits || 80,
+      target_pace: aiData.targetPace || 75,
+      radar: aiData.radar || currentStudent.radar,
+      phases: aiData.phases || currentStudent.phases
+    };
+
+    await saveStudentState();
+    closeModal('modal-onboarding');
+    updateDashboardUI();
+    alert(`Personalized roadmap for "${payload.careerGoal}" generated successfully!`);
+  } catch (err) {
+    alert("Could not reach Gemini backend: " + err.message + ". Check GEMINI_API_KEY in Vercel.");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<span>✨ Synthesize Custom Roadmap via Gemini</span>`;
+  }
+}
+
+// AUTHENTICATION MODAL SUBMIT
+async function handleAuthSubmit(e) {
+  e.preventDefault();
+  const email = document.getElementById('auth-email').value.trim();
+  closeModal('modal-auth');
+
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.from('students').select('*').eq('email', email).single();
+      if (data && !error) {
+        currentStudent = data;
+        saveStudentState();
+        updateDashboardUI();
+        alert(`Welcome back, ${data.name}! Synchronized profile from Supabase.`);
+        return;
+      }
+    } catch (err) {
+      console.warn("Supabase fetch failed:", err);
+    }
+  }
+
+  // If new user, set email and prompt for custom background
+  currentStudent.email = email;
+  openOnboardingModal();
+}
+
+function openOnboardingModal() {
+  document.getElementById('in-name').value = currentStudent.name || '';
+  document.getElementById('in-academic-level').value = currentStudent.academic_level || '';
+  document.getElementById('in-career-goal').value = currentStudent.career_goal || '';
+  document.getElementById('in-current-knowledge').value = currentStudent.current_knowledge || '';
+  document.getElementById('in-github').value = currentStudent.github || '';
+  openModal('modal-onboarding');
+}
+
+function openAuthModal() {
+  openModal('modal-auth');
+}
+
+function quickSwitchGoal(goalName) {
+  currentStudent.career_goal = goalName;
+  closeMenu('menu-tracks');
+  openOnboardingModal();
+}
+
+// RADAR MATRIX VISUALIZER
 function renderRadar() {
   const canvas = document.getElementById('competency-radar-canvas');
-  if (!canvas || !currentStudent) return;
-
-  const isDark = document.documentElement.classList.contains('dark');
-  const parent = canvas.parentElement;
-  const dpr = window.devicePixelRatio || 1;
-
-  const width = parent.clientWidth || 420;
-  const height = parent.clientHeight || 320;
-
-  canvas.width = width * dpr;
-  canvas.height = height * dpr;
-  canvas.style.width = `${width}px`;
-  canvas.style.height = `${height}px`;
-
+  if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-  ctx.clearRect(0, 0, width, height);
+  const w = canvas.width, h = canvas.height;
+  const cx = w / 2, cy = h / 2, radius = 95;
 
-  const cx = width / 2;
-  const cy = height / 2;
-  const radius = Math.min(cx, cy) * 0.68;
-  const labels = currentStudent.radar.categories;
-  const cand = currentStudent.radar.candidate;
-  const bench = currentStudent.radar.benchmark;
-  const n = labels.length;
+  const cats = currentStudent.radar?.categories || ["Domain 1", "Domain 2", "Domain 3", "Domain 4", "Domain 5", "Domain 6"];
+  const vals = currentStudent.radar?.candidate || [30, 30, 30, 30, 30, 30];
+  const bench = currentStudent.radar?.benchmark || [85, 85, 80, 90, 75, 80];
+  const n = cats.length;
 
+  ctx.clearRect(0, 0, w, h);
+  const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-main').trim() || '#C084FC';
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+
+  // Concentric Web
   for (let l = 1; l <= 4; l++) {
     const r = (radius / 4) * l;
     ctx.beginPath();
     for (let i = 0; i < n; i++) {
       const a = (Math.PI * 2 / n) * i - Math.PI / 2;
-      const x = cx + r * Math.cos(a);
-      const y = cy + r * Math.sin(a);
+      const x = cx + r * Math.cos(a), y = cy + r * Math.sin(a);
       if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     }
     ctx.closePath();
-    ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.08)";
+    ctx.strokeStyle = isLight ? "rgba(15, 23, 42, 0.08)" : "rgba(255, 255, 255, 0.08)";
     ctx.stroke();
   }
 
+  // Spokes & Labels
   for (let i = 0; i < n; i++) {
     const a = (Math.PI * 2 / n) * i - Math.PI / 2;
-    const x = cx + radius * Math.cos(a);
-    const y = cy + radius * Math.sin(a);
     ctx.beginPath();
     ctx.moveTo(cx, cy);
-    ctx.lineTo(x, y);
-    ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.08)";
+    ctx.lineTo(cx + radius * Math.cos(a), cy + radius * Math.sin(a));
+    ctx.strokeStyle = isLight ? "rgba(15, 23, 42, 0.08)" : "rgba(255, 255, 255, 0.08)";
     ctx.stroke();
-
-    ctx.fillStyle = isDark ? "#94A3B8" : "#475569";
+    ctx.fillStyle = isLight ? "#475569" : "#94A3B8";
     ctx.font = "11px sans-serif";
     ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(labels[i], cx + (radius + 24) * Math.cos(a), cy + (radius + 14) * Math.sin(a));
+    ctx.fillText(cats[i], cx + (radius + 26) * Math.cos(a), cy + (radius + 12) * Math.sin(a));
   }
 
-  // Benchmark
+  // Industry Benchmark Polygon (Dashed)
   ctx.beginPath();
   for (let i = 0; i < n; i++) {
     const a = (Math.PI * 2 / n) * i - Math.PI / 2;
     const d = (bench[i] / 100) * radius;
-    const x = cx + d * Math.cos(a);
-    const y = cy + d * Math.sin(a);
+    const x = cx + d * Math.cos(a), y = cy + d * Math.sin(a);
     if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   }
   ctx.closePath();
   ctx.setLineDash([3, 3]);
-  ctx.strokeStyle = isDark ? "rgba(148, 163, 184, 0.5)" : "rgba(100, 116, 139, 0.6)";
-  ctx.lineWidth = 1.8;
+  ctx.strokeStyle = isLight ? "rgba(71, 85, 105, 0.4)" : "rgba(148, 163, 184, 0.5)";
+  ctx.lineWidth = 1.5;
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // Candidate
-  const strokeColor = isDark ? "#C084FC" : "#EA580C";
-  const fillColor = isDark ? "rgba(192, 132, 252, 0.22)" : "rgba(234, 88, 12, 0.18)";
-
+  // Candidate Polygon
   ctx.beginPath();
   for (let i = 0; i < n; i++) {
     const a = (Math.PI * 2 / n) * i - Math.PI / 2;
-    const d = (cand[i] / 100) * radius;
-    const x = cx + d * Math.cos(a);
-    const y = cy + d * Math.sin(a);
+    const d = (vals[i] / 100) * radius;
+    const x = cx + d * Math.cos(a), y = cy + d * Math.sin(a);
     if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   }
   ctx.closePath();
-  ctx.strokeStyle = strokeColor;
+  ctx.strokeStyle = accentColor;
   ctx.lineWidth = 2.2;
   ctx.stroke();
-  ctx.fillStyle = fillColor;
+
+  ctx.fillStyle = accentColor === '#34D399' ? 'rgba(52, 211, 153, 0.22)' : 
+                  accentColor === '#FBBF24' ? 'rgba(251, 191, 36, 0.22)' : 
+                  accentColor === '#38BDF8' ? 'rgba(56, 189, 248, 0.22)' : 
+                  accentColor === '#FFFFFF' ? 'rgba(255, 255, 255, 0.2)' : 
+                  accentColor === '#7C3AED' ? 'rgba(124, 58, 237, 0.2)' : 'rgba(192, 132, 252, 0.22)';
   ctx.fill();
-
-  for (let i = 0; i < n; i++) {
-    const a = (Math.PI * 2 / n) * i - Math.PI / 2;
-    const d = (cand[i] / 100) * radius;
-    ctx.beginPath();
-    ctx.arc(cx + d * Math.cos(a), cy + d * Math.sin(a), 3, 0, Math.PI * 2);
-    ctx.fillStyle = strokeColor;
-    ctx.fill();
-  }
 }
 
-async function fetchGitHubRepos() {
-  const username = (document.getElementById('in-github-scan')?.value || currentStudent?.github || '').trim();
-  const container = document.getElementById('github-repos-container');
-  if (!username) return;
-
-  container.innerHTML = `<div class="p-4 text-center text-purple-400 font-mono">Querying api.github.com/users/${username}/repos...</div>`;
-
-  try {
-    const res = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=6`);
-    if (!res.ok) throw new Error("GitHub user not found or rate limit reached");
-    const repos = await res.json();
-
-    container.innerHTML = '';
-    repos.forEach(repo => {
-      const card = document.createElement('div');
-      card.className = "p-3 rounded-2xl bg-slate-50 dark:bg-black/30 border border-slate-200 dark:border-white/10 flex items-center justify-between gap-2 hover:border-purple-400 transition";
-      card.innerHTML = `
-        <div class="truncate">
-          <a href="${repo.html_url}" target="_blank" class="font-bold text-slate-900 dark:text-white hover:text-purple-400 flex items-center gap-1.5">
-            <span>📦</span> <span>${repo.name}</span>
-          </a>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">${repo.description || 'No description'}</p>
-          <div class="flex items-center gap-3 mt-1 text-[9px] font-mono text-slate-400">
-            <span class="text-purple-500 font-bold">${repo.language || 'Code'}</span>
-            <span>⭐ ${repo.stargazers_count}</span>
-            <span>🍴 ${repo.forks_count}</span>
-          </div>
-        </div>
-        <a href="${repo.html_url}" target="_blank" class="shrink-0 px-2 py-1 rounded-lg bg-slate-200 dark:bg-white/5 text-[10px] font-mono">View ↗</a>
-      `;
-      container.appendChild(card);
-    });
-  } catch (err) {
-    container.innerHTML = `<div class="p-3 rounded-xl bg-rose-100 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 font-semibold">${err.message}</div>`;
-  }
-}
-
-// Background Pointer Spotlight Canvas
-function initPointerGlow() {
-  const canvas = document.getElementById('glow-spotlight-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let width, height;
-  let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-  let currentPos = { x: mouse.x, y: mouse.y };
-
-  function resize() {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-  }
-  window.addEventListener('resize', resize);
-  resize();
-
-  window.addEventListener('mousemove', (e) => {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-  });
-
-  function renderGlow() {
-    currentPos.x += (mouse.x - currentPos.x) * 0.12;
-    currentPos.y += (mouse.y - currentPos.y) * 0.12;
-
-    ctx.clearRect(0, 0, width, height);
-    const isDark = document.documentElement.classList.contains('dark');
-    const step = 44;
-
-    ctx.strokeStyle = isDark ? "rgba(255, 255, 255, 0.02)" : "rgba(0, 0, 0, 0.03)";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    for (let x = 0; x < width; x += step) {
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, height);
-    }
-    for (let y = 0; y < height; y += step) {
-      ctx.moveTo(0, y);
-      ctx.lineTo(width, y);
-    }
-    ctx.stroke();
-
-    const radius = 380;
-    const gradient = ctx.createRadialGradient(currentPos.x, currentPos.y, 0, currentPos.x, currentPos.y, radius);
-
-    if (isDark) {
-      gradient.addColorStop(0, 'rgba(192, 132, 252, 0.14)');
-      gradient.addColorStop(0.5, 'rgba(147, 51, 234, 0.04)');
-      gradient.addColorStop(1, 'transparent');
-    } else {
-      gradient.addColorStop(0, 'rgba(234, 88, 12, 0.12)');
-      gradient.addColorStop(0.5, 'rgba(234, 88, 12, 0.03)');
-      gradient.addColorStop(1, 'transparent');
-    }
-
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width, height);
-
-    requestAnimationFrame(renderGlow);
-  }
-
-  renderGlow();
-}
-
-function openCapstone(title, desc) {
-  document.getElementById('capstone-title').textContent = title;
-  document.getElementById('capstone-desc').textContent = desc;
-  openModal('modal-capstone');
-}
-
-function toggleTutorChat() {
-  document.getElementById('drawer-ai-tutor')?.classList.toggle('translate-x-full');
-}
-
+// AI TUTOR HANDLER (CALLS /api/chat)
 async function handleTutorSend(e) {
   e.preventDefault();
   const inEl = document.getElementById('tutor-input');
@@ -1112,15 +520,12 @@ async function handleTutorSend(e) {
   const msg = inEl.value.trim();
   if (!msg) return;
 
-  const uBubble = document.createElement('div');
-  uBubble.className = "p-2.5 rounded-xl bg-purple-950/50 text-purple-200 ml-6 text-right font-medium";
-  uBubble.textContent = msg;
-  box.appendChild(uBubble);
+  box.innerHTML += `<div class="p-2.5 rounded-xl bg-purple-600/20 text-purple-700 dark:text-purple-200 ml-6 text-right font-medium">${msg}</div>`;
   inEl.value = '';
 
   const typing = document.createElement('div');
-  typing.className = "p-2.5 rounded-xl bg-slate-100 dark:bg-white/[0.03] text-slate-400";
-  typing.textContent = "AI Tutor is evaluating curriculum concepts...";
+  typing.className = "p-2.5 rounded-xl theme-card-inner theme-text-sub italic";
+  typing.textContent = "Gemini is analyzing your syllabus...";
   box.appendChild(typing);
   box.scrollTop = box.scrollHeight;
 
@@ -1128,20 +533,236 @@ async function handleTutorSend(e) {
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: msg, context: currentStudent })
+      body: JSON.stringify({ message: msg, studentContext: currentStudent })
     });
     const data = await res.json();
     typing.remove();
-    const bot = document.createElement('div');
-    bot.className = "p-2.5 rounded-xl bg-slate-100 dark:bg-white/[0.03] text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-white/5";
-    bot.innerHTML = (data.reply || 'Concept verified.').replace(/\n/g, '<br/>');
-    box.appendChild(bot);
-  } catch {
+    box.innerHTML += `<div class="p-2.5 rounded-xl theme-card-inner theme-text-title leading-relaxed">${(data.reply || 'Insight verified.').replace(/\n/g, '<br/>')}</div>`;
+  } catch (err) {
     typing.remove();
-    const bot = document.createElement('div');
-    bot.className = "p-2.5 rounded-xl bg-slate-100 dark:bg-white/[0.03] text-slate-800 dark:text-slate-200";
-    bot.innerHTML = `<strong>Tutor Note:</strong> For <em>${msg}</em>, check your public repositories for containerization & concurrency patterns.`;
-    box.appendChild(bot);
+    box.innerHTML += `<div class="p-2.5 rounded-xl theme-card-inner theme-text-title"><strong>Tutor:</strong> Make sure your GEMINI_API_KEY is configured in Vercel. For ${currentStudent.career_goal}, prioritize your Phase 1 foundational milestones!</div>`;
   }
   box.scrollTop = box.scrollHeight;
+}
+
+// ADAPTIVE THEME SWITCHER
+function setAccentTheme(themeName) {
+  document.documentElement.setAttribute('data-theme', themeName);
+  localStorage.setItem('alignx_accent', themeName);
+
+  const themeLabels = {
+    purple: "Cyber Purple",
+    emerald: "Emerald Matrix",
+    amber: "Solar Amber",
+    cyan: "Ocean Cyan",
+    white: "Pure White",
+    light: "Light Theme"
+  };
+
+  const themeColors = {
+    purple: "#C084FC",
+    emerald: "#34D399",
+    amber: "#FBBF24",
+    cyan: "#38BDF8",
+    white: "#FFFFFF",
+    light: "#7C3AED"
+  };
+
+  document.getElementById('active-theme-label').textContent = themeLabels[themeName] || "Cyber Purple";
+  document.getElementById('active-theme-dot').style.backgroundColor = themeColors[themeName] || "#C084FC";
+
+  renderStudyPlanModules();
+  renderRadar();
+}
+
+// ENDLESS MCQ STUDIO
+function startEndlessMCQSession() {
+  mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [] };
+  document.getElementById('mcq-correct-counter').textContent = '0';
+  document.getElementById('mcq-wrong-counter').textContent = '0';
+  document.getElementById('mcq-badge-track').textContent = currentStudent.career_goal || 'General Track';
+  openModal('modal-mcq');
+  generateNextMCQ();
+}
+
+function generateNextMCQ() {
+  mcqSession.answeredCurrent = false;
+  document.getElementById('btn-next-mcq').classList.add('hidden');
+  document.getElementById('mcq-instant-feedback').classList.add('hidden');
+
+  const qObj = endlessMCQBank[mcqSession.total % endlessMCQBank.length];
+  document.getElementById('mcq-question-number').textContent = `Challenge #${mcqSession.total + 1}`;
+  document.getElementById('mcq-topic-tag').textContent = qObj.topic;
+  document.getElementById('mcq-question-text').textContent = qObj.q;
+
+  const container = document.getElementById('mcq-choices-container');
+  container.innerHTML = '';
+
+  qObj.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = "mcq-choice-btn w-full text-left p-3.5 rounded-xl theme-card-inner text-xs theme-text-title font-medium transition flex items-start gap-2.5";
+    btn.innerHTML = `<span class="font-mono dynamic-accent-text font-bold">${String.fromCharCode(65 + idx)}.</span> <span>${opt}</span>`;
+    btn.onclick = () => handleMCQChoice(idx, qObj);
+    container.appendChild(btn);
+  });
+}
+
+function handleMCQChoice(selectedIdx, qObj) {
+  if (mcqSession.answeredCurrent) return;
+  mcqSession.answeredCurrent = true;
+  mcqSession.total++;
+
+  const isCorrect = (selectedIdx === qObj.correct);
+  const fb = document.getElementById('mcq-instant-feedback');
+  const allBtns = document.querySelectorAll('.mcq-choice-btn');
+
+  allBtns.forEach((btn, idx) => {
+    btn.disabled = true;
+    if (idx === qObj.correct) {
+      btn.className = "mcq-choice-btn w-full text-left p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex items-start gap-2.5 shadow-lg shadow-emerald-500/10";
+    } else if (idx === selectedIdx && !isCorrect) {
+      btn.className = "mcq-choice-btn w-full text-left p-3.5 rounded-xl border-2 border-rose-500 bg-rose-500/15 text-rose-700 dark:text-rose-300 font-bold text-xs flex items-start gap-2.5 shadow-lg shadow-rose-500/10";
+    } else {
+      btn.classList.add('opacity-40');
+    }
+  });
+
+  fb.classList.remove('hidden');
+
+  if (isCorrect) {
+    mcqSession.correct++;
+    document.getElementById('mcq-correct-counter').textContent = mcqSession.correct;
+    fb.className = "p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-medium";
+    fb.innerHTML = `<strong>✓ Correct!</strong> ${qObj.explanation}`;
+  } else {
+    mcqSession.wrong++;
+    document.getElementById('mcq-wrong-counter').textContent = mcqSession.wrong;
+    fb.className = "p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs font-medium";
+    fb.innerHTML = `<strong>✕ Incorrect.</strong> You picked ${String.fromCharCode(65 + selectedIdx)}.<br><br><strong>Key Concept:</strong> ${qObj.explanation}`;
+    mcqSession.incorrectReview.push({
+      question: qObj.q,
+      userAnswer: qObj.options[selectedIdx],
+      correctAnswer: qObj.options[qObj.correct],
+      explanation: qObj.explanation
+    });
+  }
+
+  document.getElementById('btn-next-mcq').classList.remove('hidden');
+}
+
+function finishMCQSession() {
+  closeModal('modal-mcq');
+  document.getElementById('scorecard-total').textContent = mcqSession.total;
+  document.getElementById('scorecard-correct').textContent = mcqSession.correct;
+  document.getElementById('scorecard-wrong').textContent = mcqSession.wrong;
+
+  const list = document.getElementById('scorecard-breakdown-list');
+  list.innerHTML = '';
+  if (mcqSession.incorrectReview.length === 0) {
+    list.innerHTML = `<div class="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-center text-xs font-semibold">🏆 Flawless performance! Zero errors encountered.</div>`;
+  } else {
+    mcqSession.incorrectReview.forEach(item => {
+      list.innerHTML += `
+        <div class="p-3.5 rounded-xl theme-card-inner space-y-1.5 text-xs">
+          <div class="font-bold theme-text-title">${item.question}</div>
+          <div class="text-rose-500 font-medium">✕ Your Choice: ${item.userAnswer}</div>
+          <div class="text-emerald-500 font-medium">✓ Correct Concept: ${item.correctAnswer}</div>
+          <div class="theme-text-sub text-[11px] pt-1 leading-relaxed">${item.explanation}</div>
+        </div>
+      `;
+    });
+  }
+  openModal('modal-scorecard');
+}
+
+// GITHUB TELEMETRY
+async function fetchGitHubRepos() {
+  const u = (document.getElementById('in-github-scan').value || currentStudent.github || 'adityarp2008').trim();
+  const c = document.getElementById('github-repos-container');
+  if (!u) return;
+
+  c.innerHTML = '<div class="p-3 theme-text-sub">Querying GitHub public API...</div>';
+  try {
+    const res = await fetch(`https://api.github.com/users/${u}/repos?sort=updated&per_page=6`);
+    const data = await res.json();
+
+    if (!Array.isArray(data)) {
+      c.innerHTML = `<div class="p-3 text-rose-500">User @${u} not found or rate limited.</div>`;
+      return;
+    }
+
+    c.innerHTML = data.map(r => `
+      <a href="${r.html_url}" target="_blank" rel="noopener noreferrer" class="p-3 rounded-xl theme-card-inner hover:border-purple-400 transition flex justify-between items-center text-xs group block">
+        <div class="flex items-center gap-2">
+          <span class="text-base group-hover:scale-110 transition">📦</span>
+          <div>
+            <div class="font-bold theme-text-title group-hover:text-purple-500 transition flex items-center gap-1.5">
+              <span>${r.name}</span>
+              <svg class="w-3 h-3 theme-text-sub" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </div>
+            <div class="text-[10px] theme-text-sub truncate max-w-[280px]">${r.description || 'Public academic repository.'}</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <span class="dynamic-accent-text font-mono text-[10px] font-bold">${r.language || 'Code'}</span>
+          <span class="text-[10px] text-amber-500">★ ${r.stargazers_count}</span>
+        </div>
+      </a>
+    `).join('');
+  } catch(e) {
+    c.innerHTML = '<div class="text-rose-500 p-3">Error connecting to GitHub API.</div>';
+  }
+}
+
+// UI NAVIGATION HELPERS
+function toggleNavSidebar() { document.getElementById('nav-drawer')?.classList.toggle('-translate-x-full'); }
+function toggleTutorChat() { document.getElementById('drawer-ai-tutor')?.classList.toggle('translate-x-full'); }
+function toggleMenu(id, e) { if (e) e.stopPropagation(); document.getElementById(id)?.classList.toggle('hidden'); }
+function closeMenu(id) { document.getElementById(id)?.classList.add('hidden'); }
+function openModal(id) {
+  document.getElementById(id)?.classList.remove('hidden');
+  if (id === 'modal-capabilities') setTimeout(renderRadar, 50);
+}
+function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
+
+function openNotesModal() {
+  document.getElementById('notes-modal-title').textContent = `${currentStudent.career_goal} - Blueprint`;
+  const container = document.getElementById('notes-container');
+  container.innerHTML = `
+    <div class="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-600 dark:text-blue-300 font-semibold mb-2">
+      🚀 Target Curriculum Specifications for ${currentStudent.career_goal}
+    </div>
+    <div class="p-3.5 rounded-xl theme-card-inner space-y-1">
+      <div class="font-bold theme-text-title">Background Assessment</div>
+      <p class="theme-text-sub text-[11px] leading-relaxed">${currentStudent.current_knowledge || 'Undergraduate'}</p>
+    </div>
+  `;
+  openModal('modal-notes');
+}
+
+function cycleFunFact() {
+  const facts = [
+    "Personalized academic architectures reduce career transition time by up to 65%.",
+    "Relational databases use B+ Trees because wide fanouts match physical storage disk page sizes.",
+    "Git was written by Linus Torvalds in roughly 10 days to maintain the Linux kernel codebase."
+  ];
+  const el = document.getElementById('cs-fun-fact-text');
+  if (el) el.textContent = facts[Math.floor(Math.random() * facts.length)];
+}
+
+function initPointerGlow() {
+  const canvas = document.getElementById('glow-spotlight-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let w = canvas.width = window.innerWidth, h = canvas.height = window.innerHeight;
+  window.addEventListener('resize', () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; });
+  window.addEventListener('mousemove', (e) => {
+    ctx.clearRect(0,0,w,h);
+    const grad = ctx.createRadialGradient(e.clientX, e.clientY, 0, e.clientX, e.clientY, 350);
+    grad.addColorStop(0, 'rgba(192, 132, 252, 0.08)');
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0,0,w,h);
+  });
 }
