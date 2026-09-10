@@ -1,91 +1,79 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { name, academicLevel, careerGoal, tenure, github, detectedSkills } = req.body;
-
-  if (!name || !careerGoal || !tenure) {
-    return res.status(400).json({ error: 'Missing required student parameters' });
+  const { name, academicLevel, careerGoal, currentKnowledge, tenure, github } = req.body;
+  if (!name || !careerGoal || !currentKnowledge) {
+    return res.status(400).json({ error: 'Missing required profile telemetry.' });
   }
 
-  const OMNIROUTE_BASE_URL = process.env.OMNIROUTE_BASE_URL || 'https://api.omniroute.ai/v1';
-  const OMNIROUTE_API_KEY = process.env.OMNIROUTE_API_KEY || '';
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({ error: 'GEMINI_API_KEY is not configured on the server.' });
+  }
 
-  const systemPrompt = `You are an elite academic curriculum architect and technical hiring gap analyzer. 
-Analyze the candidate profile and return STRICT RAW JSON ONLY (no markdown backticks, no wrapping text).
-Output schema MUST match this format exactly:
+  try {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      generationConfig: { responseMimeType: "application/json" }
+    });
+
+    const prompt = `You are the lead academic curriculum architect for Align-X.
+Create a personalized learning roadmap for a student from ANY educational background transitioning into their dream role.
+
+Student Profile:
+- Name: ${name}
+- Academic Level: ${academicLevel}
+- Dream Job / Target Role: ${careerGoal}
+- Current Knowledge & Background: ${currentKnowledge}
+- Timeline / Tenure: ${tenure}
+- GitHub: ${github || 'None'}
+
+Return ONLY a strict raw JSON object (no markdown formatting, no backticks):
 {
-  "readiness": <integer 25-50 based on entry level>,
-  "curriculumMastery": <integer 20-45>,
-  "conceptDeficits": <integer 55-80>,
-  "matchedSkills": ["<skill1>", "<skill2>", "<skill3>"],
-  "missingSkills": [
-    {
-      "name": "<skill name>",
-      "tag": "Critical Void",
-      "capstoneTitle": "<title>",
-      "capstoneDesc": "<2 sentence lab blueprint>"
-    }
-  ],
+  "curriculumMastery": 20,
+  "conceptDeficits": 80,
+  "readiness": 25,
+  "targetPace": 75,
   "radar": {
-    "categories": ["Frontend", "Backend APIs", "System Design", "Databases", "DevOps", "Testing"],
-    "candidate": [<s1>, <s2>, <s3>, <s4>, <s5>, <s6>],
-    "benchmark": [90, 85, 80, 85, 75, 75]
+    "categories": ["Domain 1", "Domain 2", "Domain 3", "Domain 4", "Domain 5", "Domain 6"],
+    "candidate": [30, 25, 20, 35, 15, 25],
+    "benchmark": [85, 85, 80, 90, 75, 80]
   },
   "phases": [
     {
-      "phaseTitle": "Phase 1: Core Fundamentals & Prerequisite Labs",
+      "phaseTitle": "Phase 1: Foundational Prerequisites",
       "milestones": [
-        { "id": "m1", "title": "<milestone task>", "hours": "8 hrs", "resource": "<doc or repo>", "completed": false, "xp": 100 }
+        { "id": "m1-1", "title": "First Core Competency Milestone", "hours": "6 hrs", "desc": "Concrete concept breakdown.", "completed": false, "xp": 100 },
+        { "id": "m1-2", "title": "Hands-on Practical Milestone", "hours": "8 hrs", "desc": "Applied project or lab exercise.", "completed": false, "xp": 150 }
       ]
     },
     {
-      "phaseTitle": "Phase 2: Production Implementations & Architecture",
+      "phaseTitle": "Phase 2: Core Domain Mastery",
       "milestones": [
-        { "id": "m2", "title": "<milestone task>", "hours": "14 hrs", "resource": "<doc or repo>", "completed": false, "xp": 150 }
+        { "id": "m2-1", "title": "Intermediate Advanced Practice", "hours": "10 hrs", "desc": "Building real-world portfolio piece.", "completed": false, "xp": 200 },
+        { "id": "m2-2", "title": "Integration & Systems Evaluation", "hours": "12 hrs", "desc": "Stress testing or evaluation review.", "completed": false, "xp": 250 }
+      ]
+    },
+    {
+      "phaseTitle": "Phase 3: Production & Industry Benchmark",
+      "milestones": [
+        { "id": "m3-1", "title": "Capstone Industry Standard Project", "hours": "16 hrs", "desc": "End-to-end deliverable ready for hiring managers.", "completed": false, "xp": 300 }
       ]
     }
   ]
 }`;
 
-  const userPrompt = `Candidate: ${name}
-Current Academic Level: ${academicLevel}
-Career Goal: ${careerGoal}
-Tenure / Urgency Window: ${tenure}
-GitHub Profile: ${github || 'None'}
-Verified Codebase Skills: ${detectedSkills && detectedSkills.length ? detectedSkills.join(', ') : 'Standard Academic Foundation'}
-
-Construct their tailored phased roadmap now. Output raw JSON only.`;
-
-  try {
-    const response = await fetch(`${OMNIROUTE_BASE_URL}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OMNIROUTE_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: process.env.OMNIROUTE_MODEL || 'auto',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-        temperature: 0.2,
-        response_format: { type: 'json_object' }
-      })
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`OmniRoute error (${response.status}): ${errText}`);
-    }
-
-    const completion = await response.json();
-    let raw = completion.choices?.[0]?.message?.content || '{}';
-    raw = raw.replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
+    const result = await model.generateContent(prompt);
+    let raw = result.response.text() || '{}';
+    raw = raw.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
     return res.status(200).json(JSON.parse(raw));
   } catch (err) {
-    return res.status(500).json({ error: 'AI Gateway Error', details: err.message });
+    console.error('Gemini Roadmap Generation Error:', err);
+    return res.status(500).json({ error: 'AI generation error', details: err.message });
   }
 }
