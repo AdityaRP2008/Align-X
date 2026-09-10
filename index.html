@@ -17,9 +17,9 @@
   <canvas id="glow-spotlight-canvas"></canvas>
 
   <!-- ======================================================== -->
-  <!-- 1. AUTH GATEWAY VIEW (Initial Landing Screen)            -->
+  <!-- 1. AUTH GATEWAY & PROFILER VIEW                          -->
   <!-- ======================================================== -->
-  <main id="auth-view" class="relative z-50 w-full max-w-md my-auto px-4 py-8 flex flex-col items-center">
+  <main id="auth-view" class="relative z-50 w-full max-w-lg my-auto px-4 py-8 flex flex-col items-center">
     
     <div class="text-center mb-6 space-y-2">
       <div class="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 items-center justify-center font-black text-white text-xl shadow-lg shadow-purple-500/20">✕</div>
@@ -29,14 +29,14 @@
 
     <div class="w-full study-card rounded-3xl p-6 shadow-2xl space-y-5">
       
-      <!-- Tab Controls with direct inline triggers -->
-      <div class="grid grid-cols-2 p-1 rounded-2xl theme-card-inner text-xs font-bold gap-1">
-        <button type="button" id="tab-btn-signin" onclick="showAuthTab('signin')" class="py-2.5 rounded-xl transition btn-brand shadow-sm cursor-pointer">Sign In</button>
-        <button type="button" id="tab-btn-register" onclick="showAuthTab('register')" class="py-2.5 rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer">Register</button>
+      <!-- Tab Controls -->
+      <div id="auth-tab-bar" class="grid grid-cols-2 p-1 rounded-2xl theme-card-inner text-xs font-bold gap-1">
+        <button type="button" id="tab-btn-signin" onclick="showAuthStep('signin')" class="py-2.5 rounded-xl transition btn-brand shadow-sm cursor-pointer">Sign In</button>
+        <button type="button" id="tab-btn-register" onclick="showAuthStep('register')" class="py-2.5 rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer">Register</button>
       </div>
 
-      <!-- Tab 1: Sign In Form -->
-      <form id="form-signin" onsubmit="event.preventDefault(); triggerSignIn(); return false;" class="space-y-4 text-xs">
+      <!-- Step 1: Sign In Form -->
+      <form id="form-signin" onsubmit="event.preventDefault(); submitSignIn(); return false;" class="space-y-4 text-xs">
         <div>
           <label class="block theme-text-title mb-1.5 font-semibold">Registered Email</label>
           <input type="email" id="signin-email" required value="aditya@joyuniversity.edu.in" placeholder="aditya@joyuniversity.edu.in" class="w-full theme-card-inner rounded-xl px-3.5 py-2.5 theme-text-title focus:outline-none">
@@ -50,8 +50,8 @@
         </button>
       </form>
 
-      <!-- Tab 2: Register Form -->
-      <form id="form-register" onsubmit="event.preventDefault(); triggerRegister(); return false;" style="display: none;" class="space-y-4 text-xs">
+      <!-- Step 2: Register Initial Form -->
+      <form id="form-register" onsubmit="event.preventDefault(); goToProfilerStep(); return false;" style="display: none;" class="space-y-4 text-xs">
         <div>
           <label class="block theme-text-title mb-1.5 font-semibold">Your University / Personal Email</label>
           <input type="email" id="reg-email" required placeholder="aditya@joyuniversity.edu.in" class="w-full theme-card-inner rounded-xl px-3.5 py-2.5 theme-text-title focus:outline-none">
@@ -60,13 +60,61 @@
           <label class="block theme-text-title mb-1.5 font-semibold">Create Password</label>
           <input type="password" id="reg-password" required value="password123" class="w-full theme-card-inner rounded-xl px-3.5 py-2.5 theme-text-title focus:outline-none">
         </div>
-        <p class="text-[11px] theme-text-sub leading-relaxed">Next, you will configure your educational background and target dream role for AI roadmap synthesis.</p>
+        <p class="text-[11px] theme-text-sub leading-relaxed">Next, configure your educational field and target dream role for AI roadmap synthesis.</p>
         <button type="submit" id="btn-submit-register" class="btn-brand w-full py-3 rounded-xl font-bold text-xs shadow-md cursor-pointer">
           Continue to Telemetry Profiler →
         </button>
       </form>
 
-      <!-- Feedback Status -->
+      <!-- Step 3: Integrated Profiler Form -->
+      <form id="form-profiler-integrated" onsubmit="event.preventDefault(); submitProfilerForm(); return false;" style="display: none;" class="space-y-3.5 text-xs">
+        <div class="border-b border-white/10 pb-2 flex items-center justify-between">
+          <span class="font-bold text-xs dynamic-accent-text">Step 2: Educational Background & Target</span>
+          <button type="button" onclick="showAuthStep('register')" class="text-[11px] theme-text-sub hover:underline cursor-pointer">← Back</button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block theme-text-title mb-1 font-semibold">Full Name</label>
+            <input type="text" id="prof-name-input" required placeholder="Aditya Pandey" value="Aditya Pandey" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none">
+          </div>
+          <div>
+            <label class="block theme-text-title mb-1 font-semibold">Educational Field / Degree</label>
+            <input type="text" id="prof-level-input" required placeholder="e.g. B.Tech CSE, B.Com, Biology, Mechanical" value="Semester 6 • B.Tech CSE" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none">
+          </div>
+        </div>
+
+        <div>
+          <label class="block theme-text-title mb-1 font-semibold">Dream Job / Target Goal (Any Field)</label>
+          <input type="text" id="prof-goal-input" required placeholder="e.g. Full-Stack Engineer, Biotech Specialist, Quant Trader" value="Full-Stack Engineer" class="w-full theme-card-inner rounded-xl px-3 py-2 font-bold dynamic-accent-text focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block theme-text-title mb-1 font-semibold">Current Knowledge & Experience (In your own words)</label>
+          <textarea id="prof-know-input" required rows="2" placeholder="Describe what you already know and what you still need to learn..." class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none leading-relaxed">Solid fundamentals in JavaScript and React. Need distributed systems, Redis caching, and Docker containerization.</textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block theme-text-title mb-1 font-semibold">Sprint Tenure</label>
+            <select id="prof-tenure-input" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none">
+              <option value="3 Months" selected>3 Months Sprint</option>
+              <option value="6 Months">6 Months Semester</option>
+              <option value="12 Months">12 Months Comprehensive</option>
+            </select>
+          </div>
+          <div>
+            <label class="block theme-text-title mb-1 font-semibold">GitHub Username (Optional)</label>
+            <input type="text" id="prof-github-input" placeholder="adityarp2008" value="adityarp2008" class="w-full theme-card-inner rounded-xl px-3 py-2 font-mono theme-text-title focus:outline-none">
+          </div>
+        </div>
+
+        <button type="submit" id="btn-submit-ai-profiler" class="btn-brand w-full py-3 rounded-xl font-bold text-xs shadow-md cursor-pointer flex items-center justify-center gap-2">
+          <span>✨ Synthesize Custom Architecture via Gemini →</span>
+        </button>
+      </form>
+
+      <!-- Status Feedback -->
       <div id="auth-status-msg" style="display: none;" class="p-3 rounded-xl text-center text-xs font-semibold"></div>
 
       <!-- Accent Theme Palette -->
@@ -85,68 +133,7 @@
   </main>
 
   <!-- ======================================================== -->
-  <!-- 2. DATA COLLECTION MODAL (Educational Field & Dream Job)  -->
-  <!-- ======================================================== -->
-  <div id="modal-onboarding" class="fixed inset-0 z-[160] hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="study-card rounded-3xl max-w-xl w-full p-6 md:p-8 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
-      <div class="flex items-center justify-between border-b border-white/10 pb-3">
-        <div>
-          <h3 class="text-base font-bold theme-text-title flex items-center gap-2">
-            <span>✨</span> <span>Academic & Career Telemetry Profiler</span>
-          </h3>
-          <p class="text-xs theme-text-sub">Tailored for candidates from ANY educational field</p>
-        </div>
-        <button type="button" onclick="closeModal('modal-onboarding')" class="theme-text-sub hover:text-white text-base cursor-pointer">✕</button>
-      </div>
-
-      <form id="form-profiler" onsubmit="event.preventDefault(); handleProfilerSubmit(event); return false;" class="space-y-3.5 text-xs">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block theme-text-title mb-1 font-semibold">Full Name</label>
-            <input type="text" id="prof-name" required placeholder="Aditya Pandey" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none">
-          </div>
-          <div>
-            <label class="block theme-text-title mb-1 font-semibold">Educational Field / Degree</label>
-            <input type="text" id="prof-academic-level" required placeholder="e.g. B.Com, Mechanical, Biology, CS" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none">
-          </div>
-        </div>
-
-        <div>
-          <label class="block theme-text-title mb-1 font-semibold">Dream Job / Target Goal (Any field)</label>
-          <input type="text" id="prof-career-goal" required placeholder="e.g. Full-Stack Engineer, Quantitative Analyst, Biotech Data Specialist" class="w-full theme-card-inner rounded-xl px-3 py-2 font-bold dynamic-accent-text focus:outline-none">
-        </div>
-
-        <div>
-          <label class="block theme-text-title mb-1 font-semibold">Current Knowledge & Background (Describe in your own words)</label>
-          <textarea id="prof-current-knowledge" required rows="3" placeholder="Describe your current skills, concepts you understand, and what you haven't learned yet..." class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none leading-relaxed"></textarea>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block theme-text-title mb-1 font-semibold">Timeline Target</label>
-            <select id="prof-tenure" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none">
-              <option value="3 Months" selected>3 Months Sprint</option>
-              <option value="6 Months">6 Months Semester</option>
-              <option value="12 Months">12 Months Comprehensive</option>
-            </select>
-          </div>
-          <div>
-            <label class="block theme-text-title mb-1 font-semibold">GitHub Username (Optional)</label>
-            <input type="text" id="prof-github" placeholder="adityarp2008" class="w-full theme-card-inner rounded-xl px-3 py-2 font-mono theme-text-title focus:outline-none">
-          </div>
-        </div>
-
-        <div class="pt-3 flex justify-end gap-2">
-          <button type="submit" id="btn-synthesize-roadmap" class="btn-brand px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 shadow-md cursor-pointer">
-            <span>✨ Synthesize Architecture via Gemini</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- ======================================================== -->
-  <!-- 3. MAIN DASHBOARD VIEW                                   -->
+  <!-- 2. MAIN DASHBOARD VIEW                                   -->
   <!-- ======================================================== -->
   <div id="app-view" class="hidden relative z-10 w-full max-w-[1600px] flex flex-col gap-6 pb-24 px-4 pt-4">
 
@@ -305,7 +292,7 @@
       </div>
     </section>
 
-    <!-- Main 2-Column Core: Left = Study Plan, Right = Quick Actions -->
+    <!-- Main 2-Column Core -->
     <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch relative z-10">
       
       <!-- Left Column: Study Plan -->
@@ -335,7 +322,7 @@
         <div id="study-plan-modules-container" class="space-y-2.5 text-xs"></div>
       </div>
 
-      <!-- Right Column: Quick Actions 2x2 Grid + Level XP Widget -->
+      <!-- Right Column: Quick Actions -->
       <div class="lg:col-span-6 study-card p-6 rounded-3xl flex flex-col justify-between space-y-5">
         <div class="space-y-4">
           <div class="flex items-center justify-between pb-2 border-b border-white/10">
@@ -622,39 +609,48 @@
   </div>
 
   <script>
-    // Inline failsafe for immediate button responsiveness
-    function showAuthTab(tab) {
+    function showAuthStep(step) {
       var fIn = document.getElementById('form-signin');
       var fReg = document.getElementById('form-register');
+      var fProf = document.getElementById('form-profiler-integrated');
       var bIn = document.getElementById('tab-btn-signin');
       var bReg = document.getElementById('tab-btn-register');
-      
-      if (tab === 'signin') {
-        fIn.style.display = 'block';
-        fReg.style.display = 'none';
-        bIn.className = 'py-2.5 rounded-xl transition btn-brand shadow-sm cursor-pointer';
-        bReg.className = 'py-2.5 rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer';
-      } else {
-        fIn.style.display = 'none';
-        fReg.style.display = 'block';
-        bReg.className = 'py-2.5 rounded-xl transition btn-brand shadow-sm cursor-pointer';
-        bIn.className = 'py-2.5 rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer';
+      var tabBar = document.getElementById('auth-tab-bar');
+
+      if (fIn) fIn.style.display = 'none';
+      if (fReg) fReg.style.display = 'none';
+      if (fProf) fProf.style.display = 'none';
+      if (tabBar) tabBar.style.display = 'grid';
+
+      if (step === 'signin') {
+        if (fIn) fIn.style.display = 'block';
+        if (bIn) bIn.className = 'py-2.5 rounded-xl transition btn-brand shadow-sm cursor-pointer';
+        if (bReg) bReg.className = 'py-2.5 rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer';
+      } else if (step === 'register') {
+        if (fReg) fReg.style.display = 'block';
+        if (bReg) bReg.className = 'py-2.5 rounded-xl transition btn-brand shadow-sm cursor-pointer';
+        if (bIn) bIn.className = 'py-2.5 rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer';
+      } else if (step === 'profiler') {
+        if (fProf) fProf.style.display = 'block';
+        if (tabBar) tabBar.style.display = 'none';
       }
+    }
+
+    function goToProfilerStep() {
+      var regEmail = document.getElementById('reg-email');
+      if (regEmail && !regEmail.value.trim()) {
+        regEmail.focus();
+        return;
+      }
+      if (window.pendingRegistrationEmail !== undefined) {
+        window.pendingRegistrationEmail = regEmail ? regEmail.value.trim() : '';
+      }
+      showAuthStep('profiler');
     }
 
     function triggerSignIn() {
-      if (window.handleSignIn) {
-        window.handleSignIn();
-      } else {
-        openOnboardingModal();
-      }
-    }
-
-    function triggerRegister() {
-      if (window.handleRegisterStep1) {
-        window.handleRegisterStep1();
-      } else {
-        openOnboardingModal();
+      if (window.submitSignIn) {
+        window.submitSignIn();
       }
     }
   </script>
