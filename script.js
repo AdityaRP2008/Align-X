@@ -17,7 +17,7 @@ if (window.supabase && typeof window.supabase.createClient === 'function') {
 
 let activePhaseIdx = 0;
 let currentStudent = null;
-let pendingRegistrationEmail = "";
+window.pendingRegistrationEmail = "";
 
 // Fallback initial blueprint
 const defaultBlueprint = {
@@ -104,16 +104,9 @@ const endlessMCQBank = [
 let mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [] };
 
 // ==========================================
-// WINDOW BINDINGS
+// CONTROLLER ACTIONS
 // ==========================================
-window.switchAuthTab = function(tab) {
-  if (typeof showAuthTab === 'function') {
-    showAuthTab(tab);
-  }
-};
-
-window.handleSignIn = async function(e) {
-  if (e && e.preventDefault) e.preventDefault();
+window.submitSignIn = async function() {
   const emailInput = document.getElementById('signin-email');
   const email = emailInput ? emailInput.value.trim() : "aditya@joyuniversity.edu.in";
   const btn = document.getElementById('btn-submit-signin');
@@ -153,38 +146,33 @@ window.handleSignIn = async function(e) {
     } catch (err) {}
   }
 
-  // 3. No existing telemetry profile? Pop open the profiler immediately!
+  // 3. No existing telemetry profile? Transition straight into the profiler
   if (btn) {
     btn.disabled = false;
     btn.textContent = "Sign In →";
   }
-  pendingRegistrationEmail = email;
-  openOnboardingModal();
+  window.pendingRegistrationEmail = email;
+  showAuthStep('profiler');
 };
 
-window.handleRegisterStep1 = function(e) {
-  if (e && e.preventDefault) e.preventDefault();
-  const emailInput = document.getElementById('reg-email');
-  pendingRegistrationEmail = emailInput ? emailInput.value.trim() : "";
-  openOnboardingModal();
-};
-
-window.handleProfilerSubmit = async function(e) {
-  if (e && e.preventDefault) e.preventDefault();
-  const btn = document.getElementById('btn-synthesize-roadmap');
+window.submitProfilerForm = async function() {
+  const btn = document.getElementById('btn-submit-ai-profiler');
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = `<span class="animate-spin">↻</span> Synthesizing with Gemini...`;
+    btn.innerHTML = `<span class="animate-spin">↻</span> Gemini is architecting your roadmap...`;
   }
 
+  const nameVal = document.getElementById('prof-name-input')?.value.trim() || 'Aditya Pandey';
+  const emailVal = window.pendingRegistrationEmail || (nameVal.toLowerCase().replace(/\s+/g, '') + "@alignx.edu");
+
   const payload = {
-    email: pendingRegistrationEmail || currentStudent?.email || (document.getElementById('prof-name').value.trim().toLowerCase().replace(/\s+/g, '') + "@alignx.edu"),
-    name: document.getElementById('prof-name').value.trim(),
-    academicLevel: document.getElementById('prof-academic-level').value.trim(),
-    careerGoal: document.getElementById('prof-career-goal').value.trim(),
-    currentKnowledge: document.getElementById('prof-current-knowledge').value.trim(),
-    tenure: document.getElementById('prof-tenure').value,
-    github: document.getElementById('prof-github').value.trim()
+    email: emailVal,
+    name: nameVal,
+    academicLevel: document.getElementById('prof-level-input')?.value.trim() || 'Student',
+    careerGoal: document.getElementById('prof-goal-input')?.value.trim() || 'Full-Stack Engineer',
+    currentKnowledge: document.getElementById('prof-know-input')?.value.trim() || 'Core concepts',
+    tenure: document.getElementById('prof-tenure-input')?.value || '3 Months',
+    github: document.getElementById('prof-github-input')?.value.trim() || 'adityarp2008'
   };
 
   try {
@@ -243,9 +231,14 @@ window.handleProfilerSubmit = async function(e) {
   } finally {
     if (btn) {
       btn.disabled = false;
-      btn.innerHTML = `<span>✨ Synthesize Architecture via Gemini</span>`;
+      btn.innerHTML = `<span>✨ Synthesize Custom Architecture via Gemini →</span>`;
     }
   }
+};
+
+window.handleProfilerSubmit = function(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  window.submitProfilerForm();
 };
 
 window.openOnboardingModal = function() {
@@ -333,6 +326,7 @@ function showAuthGateway() {
   document.getElementById('app-view')?.classList.add('hidden');
   document.getElementById('btn-floating-center')?.classList.add('hidden');
   document.getElementById('btn-floating-tutor')?.classList.add('hidden');
+  if (typeof showAuthStep === 'function') showAuthStep('signin');
 }
 
 function enterDashboard() {
