@@ -1,6 +1,6 @@
 /**
  * Align-X Academic Engine
- * Authentication Gateway + Gemini Roadmap Synthesis + Safe Supabase Persistence
+ * Reliable Tab Switching + Direct Data Collection Onboarding + Live Telemetry
  */
 
 const SUPABASE_URL = "https://eydgvjsgkqjyqjkkedi.supabase.co";
@@ -11,39 +11,40 @@ if (window.supabase && typeof window.supabase.createClient === 'function') {
   try {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   } catch (e) {
-    console.warn("Supabase running offline fallback mode.");
+    console.warn("Supabase local fallback mode.");
   }
 }
 
 let activePhaseIdx = 0;
 let currentStudent = null;
+let pendingRegistrationEmail = "";
 
-// Initial fallback profile
-const defaultGuestStudent = {
+// Default fallback blueprint
+const defaultBlueprint = {
   email: "aditya@joyuniversity.edu.in",
   name: "Aditya Pandey",
   academic_level: "Semester 6 • B.Tech Computer Science",
   career_goal: "Full-Stack Engineer",
-  current_knowledge: "Solid foundation in React and JavaScript. Needs B+ Trees, Docker, and Redis concurrency.",
+  current_knowledge: "Foundation in JavaScript and React. Needs containerization, B+ tree disk structures, and Redis concurrency.",
   tenure: "3 Months",
   github: "adityarp2008",
-  readiness: 68,
-  curriculum_mastery: 60,
-  concept_deficits: 40,
+  readiness: 25,
+  curriculum_mastery: 0,
+  concept_deficits: 100,
   target_pace: 75,
-  xp: 800,
-  level: 2,
+  xp: 0,
+  level: 1,
   radar: {
     categories: ["Frontend", "Backend APIs", "System Design", "Databases", "DevOps", "Testing"],
-    candidate: [85, 78, 42, 70, 35, 60],
+    candidate: [25, 20, 15, 30, 10, 20],
     benchmark: [90, 85, 80, 85, 75, 75]
   },
   phases: [
     {
-      phaseTitle: "Phase 1: Foundations & Systems Architecture",
+      phaseTitle: "Phase 1: Foundations & Architecture",
       milestones: [
-        { id: "p1-1", title: "Implement B+ Tree Indexing in PostgreSQL", hours: "6 hrs", desc: "Match disk page block read fanouts.", completed: true, xp: 120 },
-        { id: "p1-2", title: "Configure High-Performance Nginx Reverse Proxy", hours: "4 hrs", desc: "Isolate application runtime.", completed: true, xp: 90 }
+        { id: "p1-1", title: "Implement B+ Tree Indexing in PostgreSQL", hours: "6 hrs", desc: "Reduce random disk block reads.", completed: false, xp: 120 },
+        { id: "p1-2", title: "Configure High-Performance Nginx Reverse Proxy", hours: "4 hrs", desc: "Isolate application runtime.", completed: false, xp: 90 }
       ]
     },
     {
@@ -63,7 +64,7 @@ const defaultGuestStudent = {
   ]
 };
 
-// MCQ Question Bank
+// Continuous MCQ Bank
 const endlessMCQBank = [
   {
     q: "Why do relational database engines (PostgreSQL, InnoDB) prefer B+ Trees over standard Red-Black Binary Trees for disk index storage?",
@@ -102,13 +103,26 @@ const endlessMCQBank = [
 
 let mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [] };
 
-// APP INITIALIZATION
+// ==========================================
+// DOM READY & EVENT ATTACHMENTS
+// ==========================================
 window.addEventListener('DOMContentLoaded', () => {
   const savedTheme = localStorage.getItem('alignx_accent') || 'purple';
   setAccentTheme(savedTheme);
   initPointerGlow();
 
-  // Check if student session exists in localStorage
+  // Attach explicit click handlers to Auth Tabs
+  const btnIn = document.getElementById('tab-btn-signin');
+  const btnReg = document.getElementById('tab-btn-register');
+  if (btnIn) btnIn.addEventListener('click', () => switchAuthTab('signin'));
+  if (btnReg) btnReg.addEventListener('click', () => switchAuthTab('register'));
+
+  const formIn = document.getElementById('form-signin');
+  const formReg = document.getElementById('form-register');
+  if (formIn) formIn.addEventListener('submit', handleSignIn);
+  if (formReg) formReg.addEventListener('submit', handleRegisterStep1);
+
+  // Check existing session
   const savedSession = localStorage.getItem('alignx_student_active');
   if (savedSession) {
     try {
@@ -132,7 +146,7 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// AUTH GATEWAY CONTROLLERS
+// TAB SWITCHING
 function switchAuthTab(tab) {
   const formIn = document.getElementById('form-signin');
   const formReg = document.getElementById('form-register');
@@ -143,18 +157,19 @@ function switchAuthTab(tab) {
   if (tab === 'signin') {
     formIn.classList.remove('hidden');
     formReg.classList.add('hidden');
-    btnIn.className = "py-2 rounded-xl transition btn-brand shadow-sm";
-    btnReg.className = "py-2 rounded-xl transition theme-text-sub hover:opacity-100";
+    btnIn.className = "py-2.5 rounded-xl transition btn-brand shadow-sm";
+    btnReg.className = "py-2.5 rounded-xl transition theme-text-sub hover:opacity-100";
   } else {
     formIn.classList.add('hidden');
     formReg.classList.remove('hidden');
-    btnReg.className = "py-2 rounded-xl transition btn-brand shadow-sm";
-    btnIn.className = "py-2 rounded-xl transition theme-text-sub hover:opacity-100";
+    btnReg.className = "py-2.5 rounded-xl transition btn-brand shadow-sm";
+    btnIn.className = "py-2.5 rounded-xl transition theme-text-sub hover:opacity-100";
   }
 }
 
 function showAuthMsg(msg, isError = false) {
   const el = document.getElementById('auth-status-msg');
+  if (!el) return;
   el.textContent = msg;
   el.className = isError 
     ? "p-3 rounded-xl text-center text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30" 
@@ -166,56 +181,77 @@ function hideAuthMsg() {
   document.getElementById('auth-status-msg')?.classList.add('hidden');
 }
 
-// HANDLE SIGN IN
+// SIGN IN FLOW
 async function handleSignIn(e) {
   e.preventDefault();
   const email = document.getElementById('signin-email').value.trim();
   const btn = document.getElementById('btn-submit-signin');
   btn.disabled = true;
-  btn.textContent = "Authenticating with Supabase...";
+  btn.textContent = "Authenticating...";
 
+  // 1. Check Supabase
   if (supabase) {
     try {
       const { data, error } = await supabase.from('students').select('*').eq('email', email).single();
       if (data && !error) {
         currentStudent = data;
         localStorage.setItem('alignx_student_active', JSON.stringify(currentStudent));
+        btn.disabled = false;
+        btn.textContent = "Sign In →";
         enterDashboard();
         return;
       }
     } catch (err) {
-      console.warn("Supabase lookup error:", err.message);
+      console.warn("Supabase lookup offline:", err.message);
     }
   }
 
-  // If email matches default mock or offline student
-  if (email.toLowerCase().includes("aditya")) {
-    currentStudent = defaultGuestStudent;
-    localStorage.setItem('alignx_student_active', JSON.stringify(currentStudent));
-    enterDashboard();
-    return;
+  // 2. Check LocalStorage
+  const localData = localStorage.getItem('alignx_student_active');
+  if (localData) {
+    try {
+      const parsed = JSON.parse(localData);
+      if (parsed.email && parsed.email.toLowerCase() === email.toLowerCase()) {
+        currentStudent = parsed;
+        btn.disabled = false;
+        btn.textContent = "Sign In →";
+        enterDashboard();
+        return;
+      }
+    } catch (e) {}
   }
 
+  // 3. If no existing roadmap found, open Data Collection Questionnaire
   btn.disabled = false;
-  btn.textContent = "Enter Academic Dashboard →";
-  showAuthMsg(`Account for "${email}" not found. Please click the Register tab to create your profile.`, true);
+  btn.textContent = "Sign In →";
+  pendingRegistrationEmail = email;
+  openOnboardingModal();
+  showAuthMsg(`Account loaded. Please complete your academic telemetry profile.`, false);
 }
 
-// HANDLE REGISTER (GEMINI POWERED)
-async function handleRegister(e) {
+// REGISTER FLOW (STEP 1 -> OPENS DATA COLLECTION)
+function handleRegisterStep1(e) {
   e.preventDefault();
-  const btn = document.getElementById('btn-submit-register');
+  const email = document.getElementById('reg-email').value.trim();
+  pendingRegistrationEmail = email;
+  openOnboardingModal();
+}
+
+// DATA COLLECTION SUBMISSION (CALLS GEMINI VIA /api/roadmap)
+async function handleProfilerSubmit(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn-synthesize-roadmap');
   btn.disabled = true;
-  btn.innerHTML = `<span class="animate-spin">↻</span> Synthesizing with Gemini...`;
+  btn.innerHTML = `<span class="animate-spin">↻</span> Gemini is architecting your roadmap...`;
 
   const payload = {
-    name: document.getElementById('reg-name').value.trim(),
-    academicLevel: document.getElementById('reg-academic-level').value.trim(),
-    email: document.getElementById('reg-email').value.trim(),
-    careerGoal: document.getElementById('reg-career-goal').value.trim(),
-    currentKnowledge: document.getElementById('reg-current-knowledge').value.trim(),
-    tenure: document.getElementById('reg-tenure').value,
-    github: document.getElementById('reg-github').value.trim()
+    email: pendingRegistrationEmail || currentStudent?.email || document.getElementById('prof-name').value.trim().toLowerCase().replace(/\s+/g, '') + "@alignx.edu",
+    name: document.getElementById('prof-name').value.trim(),
+    academicLevel: document.getElementById('prof-academic-level').value.trim(),
+    careerGoal: document.getElementById('prof-career-goal').value.trim(),
+    currentKnowledge: document.getElementById('prof-current-knowledge').value.trim(),
+    tenure: document.getElementById('prof-tenure').value,
+    github: document.getElementById('prof-github').value.trim()
   };
 
   try {
@@ -237,42 +273,51 @@ async function handleRegister(e) {
       tenure: payload.tenure,
       github: payload.github,
       readiness: aiData.readiness || 25,
-      curriculum_mastery: aiData.curriculumMastery || 20,
-      concept_deficits: aiData.conceptDeficits || 80,
+      curriculum_mastery: aiData.curriculumMastery || 0,
+      concept_deficits: aiData.conceptDeficits || 100,
       target_pace: aiData.targetPace || 75,
-      radar: aiData.radar || defaultGuestStudent.radar,
-      phases: aiData.phases || defaultGuestStudent.phases,
+      radar: aiData.radar || defaultBlueprint.radar,
+      phases: aiData.phases || defaultBlueprint.phases,
       xp: 0,
       level: 1
     };
 
     // Save to Supabase
     if (supabase) {
-      await supabase.from('students').upsert(currentStudent, { onConflict: 'email' });
+      try {
+        await supabase.from('students').upsert(currentStudent, { onConflict: 'email' });
+      } catch (err) {
+        console.warn("Supabase upsert:", err);
+      }
     }
 
     localStorage.setItem('alignx_student_active', JSON.stringify(currentStudent));
+    closeModal('modal-onboarding');
     enterDashboard();
   } catch (err) {
-    console.error("Registration error:", err);
-    // Offline local fallback so the user is never stuck
+    console.warn("Gemini offline fallback triggered:", err.message);
+    // Create adaptive custom local profile so student is never blocked
     currentStudent = {
-      ...defaultGuestStudent,
-      name: payload.name,
+      ...defaultBlueprint,
       email: payload.email,
+      name: payload.name,
       academic_level: payload.academicLevel,
       career_goal: payload.careerGoal,
       current_knowledge: payload.currentKnowledge,
+      tenure: payload.tenure,
       github: payload.github
     };
+
     localStorage.setItem('alignx_student_active', JSON.stringify(currentStudent));
+    closeModal('modal-onboarding');
     enterDashboard();
   } finally {
     btn.disabled = false;
-    btn.innerHTML = `<span>✨ Synthesize Architecture with Gemini →</span>`;
+    btn.innerHTML = `<span>✨ Synthesize Architecture via Gemini</span>`;
   }
 }
 
+// LOGOUT
 function handleLogout() {
   localStorage.removeItem('alignx_student_active');
   currentStudent = null;
@@ -280,18 +325,27 @@ function handleLogout() {
 }
 
 function showAuthGateway() {
-  document.getElementById('auth-view').classList.remove('hidden');
-  document.getElementById('app-view').classList.add('hidden');
-  document.getElementById('btn-floating-center').classList.add('hidden');
-  document.getElementById('btn-floating-tutor').classList.add('hidden');
+  document.getElementById('auth-view')?.classList.remove('hidden');
+  document.getElementById('app-view')?.classList.add('hidden');
+  document.getElementById('btn-floating-center')?.classList.add('hidden');
+  document.getElementById('btn-floating-tutor')?.classList.add('hidden');
 }
 
 function enterDashboard() {
-  document.getElementById('auth-view').classList.add('hidden');
-  document.getElementById('app-view').classList.remove('hidden');
-  document.getElementById('btn-floating-center').classList.remove('hidden');
-  document.getElementById('btn-floating-tutor').classList.remove('hidden');
+  document.getElementById('auth-view')?.classList.add('hidden');
+  document.getElementById('app-view')?.classList.remove('hidden');
+  document.getElementById('btn-floating-center')?.classList.remove('hidden');
+  document.getElementById('btn-floating-tutor')?.classList.remove('hidden');
   updateDashboardUI();
+}
+
+function openOnboardingModal() {
+  document.getElementById('prof-name').value = currentStudent?.name || '';
+  document.getElementById('prof-academic-level').value = currentStudent?.academic_level || '';
+  document.getElementById('prof-career-goal').value = currentStudent?.career_goal || '';
+  document.getElementById('prof-current-knowledge').value = currentStudent?.current_knowledge || '';
+  document.getElementById('prof-github').value = currentStudent?.github || '';
+  openModal('modal-onboarding');
 }
 
 // DASHBOARD UI UPDATES
@@ -301,10 +355,10 @@ function updateDashboardUI() {
 
   document.getElementById('nav-current-role').textContent = s.career_goal || 'Full-Stack Engineer';
   document.getElementById('nav-github-label').textContent = s.github ? `@${s.github}` : '@student';
-  document.getElementById('nav-user-name').textContent = s.name || 'Aditya Pandey';
-  document.getElementById('drawer-user-name').textContent = s.name || 'Aditya Pandey';
+  document.getElementById('nav-user-name').textContent = s.name || 'Student Scholar';
+  document.getElementById('drawer-user-name').textContent = s.name || 'Student Scholar';
   document.getElementById('nav-academic-term').textContent = s.academic_level || 'Active Student';
-  document.getElementById('drawer-user-goal').textContent = s.career_goal || 'Goal Unset';
+  document.getElementById('drawer-user-goal').textContent = s.career_goal || 'Target Goal';
 
   const initials = (s.name || 'AP').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   document.getElementById('nav-avatar-initials').textContent = initials;
@@ -343,7 +397,7 @@ function updateRadialMeter(circleId, percentage) {
   circle.style.strokeDashoffset = circumference - (clamped / 100) * circumference;
 }
 
-// STUDY PLAN MODULE RENDERER
+// STUDY PLAN MODULES
 function changeStudyPlanPhase(phaseIdx) {
   activePhaseIdx = phaseIdx;
   document.getElementById('active-week-label').textContent = `Phase ${phaseIdx + 1}`;
@@ -398,7 +452,7 @@ function renderRoadmapModal() {
   if (!container || !currentStudent) return;
   container.innerHTML = '';
 
-  document.getElementById('roadmap-track-name').textContent = currentStudent.career_goal || 'Selected Target Goal';
+  document.getElementById('roadmap-track-name').textContent = currentStudent.career_goal || 'Target Goal';
   const phases = currentStudent.phases || [];
 
   phases.forEach((phase, pIdx) => {
@@ -432,7 +486,7 @@ function renderRoadmapModal() {
   });
 }
 
-// PROGRESS CALCULATION
+// COURSE COMPLETION TELEMETRY
 async function toggleMilestoneState(mId) {
   let total = 0, completed = 0;
 
@@ -466,18 +520,9 @@ async function toggleMilestoneState(mId) {
   if (supabase && currentStudent.email) {
     try {
       await supabase.from('students').upsert(currentStudent, { onConflict: 'email' });
-    } catch (e) {
-      console.warn("Supabase update error:", e);
-    }
+    } catch (e) {}
   }
 
-  updateDashboardUI();
-}
-
-function quickSwitchGoal(goalName) {
-  if (!currentStudent) return;
-  currentStudent.career_goal = goalName;
-  closeMenu('menu-tracks');
   updateDashboardUI();
 }
 
@@ -489,9 +534,9 @@ function renderRadar() {
   const w = canvas.width, h = canvas.height;
   const cx = w / 2, cy = h / 2, radius = 95;
 
-  const cats = currentStudent.radar?.categories || ["Frontend", "Backend APIs", "System Design", "Databases", "DevOps", "Testing"];
-  const vals = currentStudent.radar?.candidate || [85, 78, 42, 70, 35, 60];
-  const bench = currentStudent.radar?.benchmark || [90, 85, 80, 85, 75, 75];
+  const cats = currentStudent.radar?.categories || ["Domain 1", "Domain 2", "Domain 3", "Domain 4", "Domain 5", "Domain 6"];
+  const vals = currentStudent.radar?.candidate || [30, 30, 30, 30, 30, 30];
+  const bench = currentStudent.radar?.benchmark || [85, 85, 80, 85, 75, 75];
   const n = cats.length;
 
   ctx.clearRect(0, 0, w, h);
@@ -630,7 +675,7 @@ function startEndlessMCQSession() {
   mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [] };
   document.getElementById('mcq-correct-counter').textContent = '0';
   document.getElementById('mcq-wrong-counter').textContent = '0';
-  document.getElementById('mcq-badge-track').textContent = currentStudent?.career_goal || 'General';
+  document.getElementById('mcq-badge-track').textContent = currentStudent?.career_goal || 'General Track';
   openModal('modal-mcq');
   generateNextMCQ();
 }
