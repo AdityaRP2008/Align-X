@@ -10,59 +10,15 @@ let supabase = null;
 if (window.supabase && typeof window.supabase.createClient === 'function') {
   try {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    window.supabase = supabase;
   } catch (e) {
     console.warn("Supabase running local mode.");
   }
 }
 
 let activePhaseIdx = 0;
-let currentStudent = null;
-window.pendingRegistrationEmail = "";
-
-// Fallback initial blueprint
-const defaultBlueprint = {
-  email: "aditya@joyuniversity.edu.in",
-  name: "Aditya Pandey",
-  academic_level: "Semester 6 • B.Tech Computer Science",
-  career_goal: "Full-Stack Engineer",
-  current_knowledge: "Foundation in JavaScript and React. Needs containerization, B+ tree disk structures, and Redis concurrency.",
-  tenure: "3 Months",
-  github: "adityarp2008",
-  readiness: 25,
-  curriculum_mastery: 0,
-  concept_deficits: 100,
-  target_pace: 75,
-  xp: 0,
-  level: 1,
-  radar: {
-    categories: ["Frontend", "Backend APIs", "System Design", "Databases", "DevOps", "Testing"],
-    candidate: [25, 20, 15, 30, 10, 20],
-    benchmark: [90, 85, 80, 85, 75, 75]
-  },
-  phases: [
-    {
-      phaseTitle: "Phase 1: Foundations & Architecture",
-      milestones: [
-        { id: "p1-1", title: "Implement B+ Tree Indexing in PostgreSQL", hours: "6 hrs", desc: "Reduce random disk block reads.", completed: false, xp: 120 },
-        { id: "p1-2", title: "Configure High-Performance Nginx Reverse Proxy", hours: "4 hrs", desc: "Isolate application runtime.", completed: false, xp: 90 }
-      ]
-    },
-    {
-      phaseTitle: "Phase 2: Concurrency & Distributed Storage",
-      milestones: [
-        { id: "p2-1", title: "Deploy Redis Atomic Lua Token Bucket Rate Limiter", hours: "8 hrs", desc: "Eliminate multi-instance race conditions.", completed: false, xp: 200 },
-        { id: "p2-2", title: "Design Multi-Region Event Pub/Sub with Kafka", hours: "10 hrs", desc: "Event ordering across brokers.", completed: false, xp: 250 }
-      ]
-    },
-    {
-      phaseTitle: "Phase 3: Production Hardening & Cloud Native",
-      milestones: [
-        { id: "p3-1", title: "Multi-Stage Docker Compose Containerization", hours: "6 hrs", desc: "Secure production containers.", completed: false, xp: 150 },
-        { id: "p3-2", title: "Automate Integration & Stress Testing (Pytest/k6)", hours: "8 hrs", desc: "Load test concurrent scenarios.", completed: false, xp: 180 }
-      ]
-    }
-  ]
-};
+if (!window.currentStudent) window.currentStudent = null;
+if (!window.pendingRegistrationEmail) window.pendingRegistrationEmail = "";
 
 // Continuous MCQ Bank
 const endlessMCQBank = [
@@ -121,8 +77,8 @@ window.submitSignIn = async function() {
     try {
       const { data, error } = await supabase.from('students').select('*').eq('email', email).single();
       if (data && !error && data.career_goal) {
-        currentStudent = data;
-        localStorage.setItem('alignx_student_active', JSON.stringify(currentStudent));
+        window.currentStudent = data;
+        localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
         if (btn) { btn.disabled = false; btn.textContent = "Sign In →"; }
         enterDashboard();
         return;
@@ -138,7 +94,7 @@ window.submitSignIn = async function() {
     try {
       const parsed = JSON.parse(localData);
       if (parsed.email && parsed.email.toLowerCase() === email.toLowerCase() && parsed.career_goal) {
-        currentStudent = parsed;
+        window.currentStudent = parsed;
         if (btn) { btn.disabled = false; btn.textContent = "Sign In →"; }
         enterDashboard();
         return;
@@ -146,115 +102,18 @@ window.submitSignIn = async function() {
     } catch (err) {}
   }
 
-  // 3. No existing telemetry profile? Transition straight into the profiler
+  // 3. No existing profile? Transition straight to the profiler
   if (btn) {
     btn.disabled = false;
     btn.textContent = "Sign In →";
   }
   window.pendingRegistrationEmail = email;
-  showAuthStep('profiler');
+  if (typeof showAuthStep === 'function') showAuthStep('profiler');
 };
 
-window.submitProfilerForm = async function() {
-  const btn = document.getElementById('btn-submit-ai-profiler');
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = `<span class="animate-spin">↻</span> Gemini is architecting your roadmap...`;
-  }
-
-  const nameVal = document.getElementById('prof-name-input')?.value.trim() || 'Aditya Pandey';
-  const emailVal = window.pendingRegistrationEmail || (nameVal.toLowerCase().replace(/\s+/g, '') + "@alignx.edu");
-
-  const payload = {
-    email: emailVal,
-    name: nameVal,
-    academicLevel: document.getElementById('prof-level-input')?.value.trim() || 'Student',
-    careerGoal: document.getElementById('prof-goal-input')?.value.trim() || 'Full-Stack Engineer',
-    currentKnowledge: document.getElementById('prof-know-input')?.value.trim() || 'Core concepts',
-    tenure: document.getElementById('prof-tenure-input')?.value || '3 Months',
-    github: document.getElementById('prof-github-input')?.value.trim() || 'adityarp2008'
-  };
-
-  try {
-    const res = await fetch('/api/roadmap', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const aiData = await res.json();
-
-    if (aiData.error) throw new Error(aiData.error);
-
-    currentStudent = {
-      email: payload.email,
-      name: payload.name,
-      academic_level: payload.academicLevel,
-      career_goal: payload.careerGoal,
-      current_knowledge: payload.currentKnowledge,
-      tenure: payload.tenure,
-      github: payload.github,
-      readiness: aiData.readiness || 25,
-      curriculum_mastery: aiData.curriculumMastery || 0,
-      concept_deficits: aiData.conceptDeficits || 100,
-      target_pace: aiData.targetPace || 75,
-      radar: aiData.radar || defaultBlueprint.radar,
-      phases: aiData.phases || defaultBlueprint.phases,
-      xp: 0,
-      level: 1
-    };
-
-    if (supabase) {
-      try {
-        await supabase.from('students').upsert(currentStudent, { onConflict: 'email' });
-      } catch (err) {}
-    }
-
-    localStorage.setItem('alignx_student_active', JSON.stringify(currentStudent));
-    closeModal('modal-onboarding');
-    enterDashboard();
-  } catch (err) {
-    console.warn("Gemini fallback engaged:", err.message);
-    currentStudent = {
-      ...defaultBlueprint,
-      email: payload.email,
-      name: payload.name,
-      academic_level: payload.academicLevel,
-      career_goal: payload.careerGoal,
-      current_knowledge: payload.currentKnowledge,
-      tenure: payload.tenure,
-      github: payload.github
-    };
-
-    localStorage.setItem('alignx_student_active', JSON.stringify(currentStudent));
-    closeModal('modal-onboarding');
-    enterDashboard();
-  } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = `<span>✨ Synthesize Custom Architecture via Gemini →</span>`;
-    }
-  }
-};
-
-window.handleProfilerSubmit = function(e) {
-  if (e && e.preventDefault) e.preventDefault();
-  window.submitProfilerForm();
-};
-
-window.openOnboardingModal = function() {
-  const nameEl = document.getElementById('prof-name');
-  const levelEl = document.getElementById('prof-academic-level');
-  const goalEl = document.getElementById('prof-career-goal');
-  const knowEl = document.getElementById('prof-current-knowledge');
-  const ghEl = document.getElementById('prof-github');
-
-  if (nameEl) nameEl.value = currentStudent?.name || '';
-  if (levelEl) levelEl.value = currentStudent?.academic_level || '';
-  if (goalEl) goalEl.value = currentStudent?.career_goal || '';
-  if (knowEl) knowEl.value = currentStudent?.current_knowledge || '';
-  if (ghEl) ghEl.value = currentStudent?.github || '';
-
-  openModal('modal-onboarding');
+window.openRoadmapModal = function() {
+  renderRoadmapModal();
+  openModal('modal-roadmap');
 };
 
 window.openModal = function(id) {
@@ -287,7 +146,7 @@ window.toggleTutorChat = function() {
 
 window.handleLogout = function() {
   localStorage.removeItem('alignx_student_active');
-  currentStudent = null;
+  window.currentStudent = null;
   showAuthGateway();
 };
 
@@ -302,7 +161,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const savedSession = localStorage.getItem('alignx_student_active');
   if (savedSession) {
     try {
-      currentStudent = JSON.parse(savedSession);
+      window.currentStudent = JSON.parse(savedSession);
       enterDashboard();
     } catch (e) {
       showAuthGateway();
@@ -322,30 +181,40 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 function showAuthGateway() {
-  document.getElementById('auth-view')?.classList.remove('hidden');
-  document.getElementById('app-view')?.classList.add('hidden');
-  document.getElementById('btn-floating-center')?.classList.add('hidden');
-  document.getElementById('btn-floating-tutor')?.classList.add('hidden');
+  const authView = document.getElementById('auth-view');
+  const appView = document.getElementById('app-view');
+  const cBtn = document.getElementById('btn-floating-center');
+  const tBtn = document.getElementById('btn-floating-tutor');
+
+  if (authView) authView.style.display = 'flex';
+  if (appView) appView.style.display = 'none';
+  if (cBtn) cBtn.classList.add('hidden');
+  if (tBtn) tBtn.classList.add('hidden');
   if (typeof showAuthStep === 'function') showAuthStep('signin');
 }
 
 function enterDashboard() {
-  document.getElementById('auth-view')?.classList.add('hidden');
-  document.getElementById('app-view')?.classList.remove('hidden');
-  document.getElementById('btn-floating-center')?.classList.remove('hidden');
-  document.getElementById('btn-floating-tutor')?.classList.remove('hidden');
+  const authView = document.getElementById('auth-view');
+  const appView = document.getElementById('app-view');
+  const cBtn = document.getElementById('btn-floating-center');
+  const tBtn = document.getElementById('btn-floating-tutor');
+
+  if (authView) authView.style.display = 'none';
+  if (appView) appView.style.display = 'flex';
+  if (cBtn) cBtn.classList.remove('hidden');
+  if (tBtn) tBtn.classList.remove('hidden');
   updateDashboardUI();
 }
 
 // DASHBOARD UI UPDATES
 function updateDashboardUI() {
-  if (!currentStudent) return;
-  const s = currentStudent;
+  if (!window.currentStudent) return;
+  const s = window.currentStudent;
 
-  document.getElementById('nav-current-role').textContent = s.career_goal || 'Full-Stack Engineer';
+  document.getElementById('nav-current-role').textContent = s.career_goal || 'AI Engineer';
   document.getElementById('nav-github-label').textContent = s.github ? `@${s.github}` : '@student';
-  document.getElementById('nav-user-name').textContent = s.name || 'Student Scholar';
-  document.getElementById('drawer-user-name').textContent = s.name || 'Student Scholar';
+  document.getElementById('nav-user-name').textContent = s.name || 'Aditya Pandey';
+  document.getElementById('drawer-user-name').textContent = s.name || 'Aditya Pandey';
   document.getElementById('nav-academic-term').textContent = s.academic_level || 'Active Student';
   document.getElementById('drawer-user-goal').textContent = s.career_goal || 'Target Goal';
 
@@ -396,13 +265,13 @@ window.changeStudyPlanPhase = function(phaseIdx) {
 
 function renderStudyPlanModules() {
   const container = document.getElementById('study-plan-modules-container');
-  if (!container || !currentStudent) return;
+  if (!container || !window.currentStudent) return;
   container.innerHTML = '';
 
-  const phases = currentStudent.phases || [];
+  const phases = window.currentStudent.phases || [];
   const currentPhase = phases[activePhaseIdx] || phases[0];
 
-  if (!currentPhase || !currentPhase.milestones) {
+  if (!currentPhase || !currentPhase.milestones || currentPhase.milestones.length === 0) {
     container.innerHTML = `<div class="p-4 text-center theme-text-sub">No milestones mapped yet.</div>`;
     return;
   }
@@ -431,18 +300,13 @@ function renderStudyPlanModules() {
 }
 
 // ROADMAP MODAL
-window.openRoadmapModal = function() {
-  renderRoadmapModal();
-  openModal('modal-roadmap');
-};
-
 function renderRoadmapModal() {
   const container = document.getElementById('roadmap-phases-container');
-  if (!container || !currentStudent) return;
+  if (!container || !window.currentStudent) return;
   container.innerHTML = '';
 
-  document.getElementById('roadmap-track-name').textContent = currentStudent.career_goal || 'Target Goal';
-  const phases = currentStudent.phases || [];
+  document.getElementById('roadmap-track-name').textContent = window.currentStudent.career_goal || 'Target Goal';
+  const phases = window.currentStudent.phases || [];
 
   phases.forEach((phase, pIdx) => {
     const box = document.createElement('div');
@@ -479,13 +343,13 @@ function renderRoadmapModal() {
 async function toggleMilestoneState(mId) {
   let total = 0, completed = 0;
 
-  currentStudent.phases.forEach(phase => {
+  window.currentStudent.phases.forEach(phase => {
     phase.milestones.forEach(m => {
       total++;
       if (m.id === mId) {
         m.completed = !m.completed;
         const delta = m.xp || 100;
-        currentStudent.xp = m.completed ? (currentStudent.xp || 0) + delta : Math.max(0, (currentStudent.xp || 0) - delta);
+        window.currentStudent.xp = m.completed ? (window.currentStudent.xp || 0) + delta : Math.max(0, (window.currentStudent.xp || 0) - delta);
       }
       if (m.completed) completed++;
     });
@@ -493,22 +357,22 @@ async function toggleMilestoneState(mId) {
 
   const ratio = completed / (total || 1);
   const mastery = Math.round(ratio * 100);
-  currentStudent.curriculum_mastery = mastery;
-  currentStudent.concept_deficits = Math.max(0, 100 - mastery);
-  currentStudent.readiness = Math.min(100, Math.round(25 + ratio * 75));
-  currentStudent.level = Math.floor((currentStudent.xp || 0) / 1000) + 1;
+  window.currentStudent.curriculum_mastery = mastery;
+  window.currentStudent.concept_deficits = Math.max(0, 100 - mastery);
+  window.currentStudent.readiness = Math.min(100, Math.round(25 + ratio * 75));
+  window.currentStudent.level = Math.floor((window.currentStudent.xp || 0) / 1000) + 1;
 
-  if (currentStudent.radar && currentStudent.radar.candidate) {
-    currentStudent.radar.candidate = currentStudent.radar.candidate.map((val, idx) => {
-      const target = currentStudent.radar.benchmark ? currentStudent.radar.benchmark[idx] : 85;
+  if (window.currentStudent.radar && window.currentStudent.radar.candidate) {
+    window.currentStudent.radar.candidate = window.currentStudent.radar.candidate.map((val, idx) => {
+      const target = window.currentStudent.radar.benchmark ? window.currentStudent.radar.benchmark[idx] : 85;
       return Math.min(target, Math.round(30 + ratio * 60));
     });
   }
 
-  localStorage.setItem('alignx_student_active', JSON.stringify(currentStudent));
-  if (supabase && currentStudent.email) {
+  localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
+  if (supabase && window.currentStudent.email) {
     try {
-      await supabase.from('students').upsert(currentStudent, { onConflict: 'email' });
+      await supabase.from('students').upsert(window.currentStudent, { onConflict: 'email' });
     } catch (e) {}
   }
 
@@ -518,14 +382,14 @@ async function toggleMilestoneState(mId) {
 // RADAR MATRIX VISUALIZER
 function renderRadar() {
   const canvas = document.getElementById('competency-radar-canvas');
-  if (!canvas || !currentStudent) return;
+  if (!canvas || !window.currentStudent) return;
   const ctx = canvas.getContext('2d');
   const w = canvas.width, h = canvas.height;
   const cx = w / 2, cy = h / 2, radius = 95;
 
-  const cats = currentStudent.radar?.categories || ["Domain 1", "Domain 2", "Domain 3", "Domain 4", "Domain 5", "Domain 6"];
-  const vals = currentStudent.radar?.candidate || [30, 30, 30, 30, 30, 30];
-  const bench = currentStudent.radar?.benchmark || [85, 85, 80, 85, 75, 75];
+  const cats = window.currentStudent.radar?.categories || ["Python", "Algorithms", "Machine Learning", "Deep Learning", "Math/Stats", "Data Pipelines"];
+  const vals = window.currentStudent.radar?.candidate || [30, 20, 15, 10, 25, 15];
+  const bench = window.currentStudent.radar?.benchmark || [90, 85, 85, 80, 80, 75];
   const n = cats.length;
 
   ctx.clearRect(0, 0, w, h);
@@ -615,14 +479,14 @@ window.handleTutorSend = async function(e) {
     const res = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: msg, studentContext: currentStudent })
+      body: JSON.stringify({ message: msg, studentContext: window.currentStudent })
     });
     const data = await res.json();
     typing.remove();
     box.innerHTML += `<div class="p-2.5 rounded-xl theme-card-inner theme-text-title leading-relaxed">${(data.reply || 'Insight verified.').replace(/\n/g, '<br/>')}</div>`;
   } catch (err) {
     typing.remove();
-    box.innerHTML += `<div class="p-2.5 rounded-xl theme-card-inner theme-text-title"><strong>Tutor:</strong> Focus on your active phase milestones for ${currentStudent?.career_goal || 'your target goal'}!</div>`;
+    box.innerHTML += `<div class="p-2.5 rounded-xl theme-card-inner theme-text-title"><strong>Tutor:</strong> Focus on your active phase milestones for ${window.currentStudent?.career_goal || 'your target goal'}!</div>`;
   }
   box.scrollTop = box.scrollHeight;
 };
@@ -664,7 +528,7 @@ window.startEndlessMCQSession = function() {
   mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [] };
   document.getElementById('mcq-correct-counter').textContent = '0';
   document.getElementById('mcq-wrong-counter').textContent = '0';
-  document.getElementById('mcq-badge-track').textContent = currentStudent?.career_goal || 'General Track';
+  document.getElementById('mcq-badge-track').textContent = window.currentStudent?.career_goal || 'General Track';
   openModal('modal-mcq');
   generateNextMCQ();
 };
@@ -762,7 +626,7 @@ window.finishMCQSession = function() {
 
 // GITHUB TELEMETRY
 window.fetchGitHubRepos = async function() {
-  const u = (document.getElementById('in-github-scan').value || currentStudent?.github || 'adityarp2008').trim();
+  const u = (document.getElementById('in-github-scan').value || window.currentStudent?.github || 'adityarp2008').trim();
   const c = document.getElementById('github-repos-container');
   if (!u) return;
 
@@ -800,15 +664,15 @@ window.fetchGitHubRepos = async function() {
 };
 
 window.openNotesModal = function() {
-  document.getElementById('notes-modal-title').textContent = `${currentStudent?.career_goal || 'Engineering'} - Architecture Blueprint`;
+  document.getElementById('notes-modal-title').textContent = `${window.currentStudent?.career_goal || 'Engineering'} - Architecture Blueprint`;
   const container = document.getElementById('notes-container');
   container.innerHTML = `
     <div class="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-600 dark:text-blue-300 font-semibold mb-2">
-      🚀 Active Curricula Specs for ${currentStudent?.career_goal || 'Selected Track'}
+      🚀 Active Curricula Specs for ${window.currentStudent?.career_goal || 'Selected Track'}
     </div>
     <div class="p-3.5 rounded-xl theme-card-inner space-y-1">
       <div class="font-bold theme-text-title">Current Domain Knowledge Profile</div>
-      <p class="theme-text-sub text-[11px] leading-relaxed">${currentStudent?.current_knowledge || 'Undergraduate student'}</p>
+      <p class="theme-text-sub text-[11px] leading-relaxed">${window.currentStudent?.current_knowledge || 'Undergraduate student'}</p>
     </div>
   `;
   openModal('modal-notes');
