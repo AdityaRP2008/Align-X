@@ -19,7 +19,7 @@ let activePhaseIdx = 0;
 let currentStudent = null;
 let pendingRegistrationEmail = "";
 
-// Default fallback blueprint
+// Fallback initial blueprint
 const defaultBlueprint = {
   email: "aditya@joyuniversity.edu.in",
   name: "Aditya Pandey",
@@ -104,25 +104,11 @@ const endlessMCQBank = [
 let mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [] };
 
 // ==========================================
-// WINDOW BINDINGS (Guaranteed Event Routing)
+// WINDOW BINDINGS
 // ==========================================
 window.switchAuthTab = function(tab) {
-  const formIn = document.getElementById('form-signin');
-  const formReg = document.getElementById('form-register');
-  const btnIn = document.getElementById('tab-btn-signin');
-  const btnReg = document.getElementById('tab-btn-register');
-  hideAuthMsg();
-
-  if (tab === 'signin') {
-    if (formIn) formIn.classList.remove('hidden');
-    if (formReg) formReg.classList.add('hidden');
-    if (btnIn) btnIn.className = "py-2.5 rounded-xl transition btn-brand shadow-sm";
-    if (btnReg) btnReg.className = "py-2.5 rounded-xl transition theme-text-sub hover:opacity-100";
-  } else {
-    if (formIn) formIn.classList.add('hidden');
-    if (formReg) formReg.classList.remove('hidden');
-    if (btnReg) btnReg.className = "py-2.5 rounded-xl transition btn-brand shadow-sm";
-    if (btnIn) btnIn.className = "py-2.5 rounded-xl transition theme-text-sub hover:opacity-100";
+  if (typeof showAuthTab === 'function') {
+    showAuthTab(tab);
   }
 };
 
@@ -141,7 +127,7 @@ window.handleSignIn = async function(e) {
   if (supabase) {
     try {
       const { data, error } = await supabase.from('students').select('*').eq('email', email).single();
-      if (data && !error) {
+      if (data && !error && data.career_goal) {
         currentStudent = data;
         localStorage.setItem('alignx_student_active', JSON.stringify(currentStudent));
         if (btn) { btn.disabled = false; btn.textContent = "Sign In →"; }
@@ -192,7 +178,7 @@ window.handleProfilerSubmit = async function(e) {
   }
 
   const payload = {
-    email: pendingRegistrationEmail || currentStudent?.email || document.getElementById('prof-name').value.trim().toLowerCase().replace(/\s+/g, '') + "@alignx.edu",
+    email: pendingRegistrationEmail || currentStudent?.email || (document.getElementById('prof-name').value.trim().toLowerCase().replace(/\s+/g, '') + "@alignx.edu"),
     name: document.getElementById('prof-name').value.trim(),
     academicLevel: document.getElementById('prof-academic-level').value.trim(),
     careerGoal: document.getElementById('prof-career-goal').value.trim(),
@@ -239,7 +225,7 @@ window.handleProfilerSubmit = async function(e) {
     closeModal('modal-onboarding');
     enterDashboard();
   } catch (err) {
-    console.warn("Gemini offline fallback triggered:", err.message);
+    console.warn("Gemini fallback engaged:", err.message);
     currentStudent = {
       ...defaultBlueprint,
       email: payload.email,
@@ -355,20 +341,6 @@ function enterDashboard() {
   document.getElementById('btn-floating-center')?.classList.remove('hidden');
   document.getElementById('btn-floating-tutor')?.classList.remove('hidden');
   updateDashboardUI();
-}
-
-function showAuthMsg(msg, isError = false) {
-  const el = document.getElementById('auth-status-msg');
-  if (!el) return;
-  el.textContent = msg;
-  el.className = isError 
-    ? "p-3 rounded-xl text-center text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30" 
-    : "p-3 rounded-xl text-center text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
-  el.classList.remove('hidden');
-}
-
-function hideAuthMsg() {
-  document.getElementById('auth-status-msg')?.classList.add('hidden');
 }
 
 // DASHBOARD UI UPDATES
@@ -719,7 +691,7 @@ window.generateNextMCQ = function() {
   qObj.options.forEach((opt, idx) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = "mcq-choice-btn w-full text-left p-3.5 rounded-xl theme-card-inner text-xs theme-text-title font-medium transition flex items-start gap-2.5";
+    btn.className = "mcq-choice-btn w-full text-left p-3.5 rounded-xl theme-card-inner text-xs theme-text-title font-medium transition flex items-start gap-2.5 cursor-pointer";
     btn.innerHTML = `<span class="font-mono dynamic-accent-text font-bold">${String.fromCharCode(65 + idx)}.</span> <span>${opt}</span>`;
     btn.onclick = () => handleMCQChoice(idx, qObj);
     container.appendChild(btn);
