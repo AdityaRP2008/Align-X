@@ -5,8 +5,8 @@
  */
 
 // SUPABASE INITIALIZATION
-const SUPABASE_URL = "https://eydgvjsgkqjyqjkkedi.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5ZGd2anNna3FqeXFqa2tlZGkiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc1NzQ4OTc1MCwiZXhwIjoyMDczMDY1NzUwfQ.YOUR_KEY";
+const SUPABASE_URL = "https://eydgvcjsgkqiyqjkkedi.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5ZGd2Y2pzZ2txaXlxamtrZWRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwMzc4NTUsImV4cCI6MjEwNDYxMzg1NX0.LuM7hHQuAZwvLyxXZycsl8lDkKoqKCsiD64PiVOcnKI";
 
 let supabase = null;
 try {
