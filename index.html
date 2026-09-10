@@ -19,6 +19,9 @@
   <!-- ======================================================== -->
   <!-- 1. AUTH GATEWAY VIEW (Displayed by default)              -->
   <!-- ======================================================== -->
+  <!-- ======================================================== -->
+  <!-- 1. AUTH GATEWAY VIEW                                     -->
+  <!-- ======================================================== -->
   <main id="auth-view" class="relative z-30 w-full max-w-md my-auto px-4 py-8 flex flex-col items-center">
     
     <div class="text-center mb-6 space-y-2">
@@ -31,15 +34,15 @@
       
       <!-- Tab Controls -->
       <div class="grid grid-cols-2 p-1 rounded-2xl theme-card-inner text-xs font-bold gap-1">
-        <button type="button" id="tab-btn-signin" class="py-2.5 rounded-xl transition btn-brand shadow-sm">Sign In</button>
-        <button type="button" id="tab-btn-register" class="py-2.5 rounded-xl transition theme-text-sub hover:opacity-100">Register</button>
+        <button type="button" id="tab-btn-signin" onclick="switchAuthTab('signin')" class="py-2.5 rounded-xl transition btn-brand shadow-sm">Sign In</button>
+        <button type="button" id="tab-btn-register" onclick="switchAuthTab('register')" class="py-2.5 rounded-xl transition theme-text-sub hover:opacity-100">Register</button>
       </div>
 
       <!-- Tab 1: Sign In -->
-      <form id="form-signin" class="space-y-4 text-xs">
+      <form id="form-signin" onsubmit="event.preventDefault(); handleSignIn(); return false;" class="space-y-4 text-xs">
         <div>
           <label class="block theme-text-title mb-1.5 font-semibold">Registered Email</label>
-          <input type="email" id="signin-email" required placeholder="aditya@joyuniversity.edu.in" class="w-full theme-card-inner rounded-xl px-3.5 py-2.5 theme-text-title focus:outline-none">
+          <input type="email" id="signin-email" required value="aditya@joyuniversity.edu.in" placeholder="aditya@joyuniversity.edu.in" class="w-full theme-card-inner rounded-xl px-3.5 py-2.5 theme-text-title focus:outline-none">
         </div>
         <div>
           <label class="block theme-text-title mb-1.5 font-semibold">Password</label>
@@ -50,8 +53,8 @@
         </button>
       </form>
 
-      <!-- Tab 2: Register (Triggers Onboarding) -->
-      <form id="form-register" class="hidden space-y-4 text-xs">
+      <!-- Tab 2: Register (Directly opens profiler) -->
+      <form id="form-register" onsubmit="event.preventDefault(); handleRegisterStep1(); return false;" class="hidden space-y-4 text-xs">
         <div>
           <label class="block theme-text-title mb-1.5 font-semibold">Your University / Personal Email</label>
           <input type="email" id="reg-email" required placeholder="aditya@joyuniversity.edu.in" class="w-full theme-card-inner rounded-xl px-3.5 py-2.5 theme-text-title focus:outline-none">
@@ -73,17 +76,16 @@
       <div class="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] theme-text-sub">
         <span>Accent Theme:</span>
         <div class="flex items-center gap-1.5">
-          <button onclick="setAccentTheme('purple')" class="w-4 h-4 rounded-full bg-[#C084FC]"></button>
-          <button onclick="setAccentTheme('emerald')" class="w-4 h-4 rounded-full bg-[#34D399]"></button>
-          <button onclick="setAccentTheme('amber')" class="w-4 h-4 rounded-full bg-[#FBBF24]"></button>
-          <button onclick="setAccentTheme('cyan')" class="w-4 h-4 rounded-full bg-[#38BDF8]"></button>
-          <button onclick="setAccentTheme('white')" class="w-4 h-4 rounded-full bg-[#FFFFFF] border border-slate-500"></button>
-          <button onclick="setAccentTheme('light')" class="w-4 h-4 rounded-full bg-[#7C3AED]"></button>
+          <button type="button" onclick="setAccentTheme('purple')" class="w-4 h-4 rounded-full bg-[#C084FC]"></button>
+          <button type="button" onclick="setAccentTheme('emerald')" class="w-4 h-4 rounded-full bg-[#34D399]"></button>
+          <button type="button" onclick="setAccentTheme('amber')" class="w-4 h-4 rounded-full bg-[#FBBF24]"></button>
+          <button type="button" onclick="setAccentTheme('cyan')" class="w-4 h-4 rounded-full bg-[#38BDF8]"></button>
+          <button type="button" onclick="setAccentTheme('white')" class="w-4 h-4 rounded-full bg-[#FFFFFF] border border-slate-500"></button>
+          <button type="button" onclick="setAccentTheme('light')" class="w-4 h-4 rounded-full bg-[#7C3AED]"></button>
         </div>
       </div>
     </div>
   </main>
-
   <!-- ======================================================== -->
   <!-- 2. DATA COLLECTION MODAL (Background & Dream Job)        -->
   <!-- ======================================================== -->
