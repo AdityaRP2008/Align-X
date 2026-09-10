@@ -36,7 +36,7 @@
       </div>
 
       <!-- Step 1: Sign In Form -->
-      <form id="form-signin" onsubmit="event.preventDefault(); submitSignIn(); return false;" class="space-y-4 text-xs">
+      <div id="form-signin" class="space-y-4 text-xs">
         <div>
           <label class="block theme-text-title mb-1.5 font-semibold">Registered Email</label>
           <input type="email" id="signin-email" required value="aditya@joyuniversity.edu.in" placeholder="aditya@joyuniversity.edu.in" class="w-full theme-card-inner rounded-xl px-3.5 py-2.5 theme-text-title focus:outline-none">
@@ -45,13 +45,13 @@
           <label class="block theme-text-title mb-1.5 font-semibold">Password</label>
           <input type="password" id="signin-password" required value="password123" class="w-full theme-card-inner rounded-xl px-3.5 py-2.5 theme-text-title focus:outline-none">
         </div>
-        <button type="submit" id="btn-submit-signin" class="btn-brand w-full py-3 rounded-xl font-bold text-xs shadow-md cursor-pointer">
+        <button type="button" id="btn-submit-signin" onclick="submitSignIn()" class="btn-brand w-full py-3 rounded-xl font-bold text-xs shadow-md cursor-pointer">
           Sign In →
         </button>
-      </form>
+      </div>
 
       <!-- Step 2: Register Initial Form -->
-      <form id="form-register" onsubmit="event.preventDefault(); goToProfilerStep(); return false;" style="display: none;" class="space-y-4 text-xs">
+      <div id="form-register" style="display: none;" class="space-y-4 text-xs">
         <div>
           <label class="block theme-text-title mb-1.5 font-semibold">Your University / Personal Email</label>
           <input type="email" id="reg-email" required placeholder="aditya@joyuniversity.edu.in" class="w-full theme-card-inner rounded-xl px-3.5 py-2.5 theme-text-title focus:outline-none">
@@ -61,13 +61,13 @@
           <input type="password" id="reg-password" required value="password123" class="w-full theme-card-inner rounded-xl px-3.5 py-2.5 theme-text-title focus:outline-none">
         </div>
         <p class="text-[11px] theme-text-sub leading-relaxed">Next, configure your educational field and target dream role for AI roadmap synthesis.</p>
-        <button type="submit" id="btn-submit-register" class="btn-brand w-full py-3 rounded-xl font-bold text-xs shadow-md cursor-pointer">
+        <button type="button" id="btn-submit-register" onclick="goToProfilerStep()" class="btn-brand w-full py-3 rounded-xl font-bold text-xs shadow-md cursor-pointer">
           Continue to Telemetry Profiler →
         </button>
-      </form>
+      </div>
 
-      <!-- Step 3: Integrated Profiler Form -->
-      <form id="form-profiler-integrated" onsubmit="event.preventDefault(); submitProfilerForm(); return false;" style="display: none;" class="space-y-3.5 text-xs">
+      <!-- Step 3: Integrated Profiler Form (Direct In-Card) -->
+      <div id="form-profiler-integrated" style="display: none;" class="space-y-3.5 text-xs">
         <div class="border-b border-white/10 pb-2 flex items-center justify-between">
           <span class="font-bold text-xs dynamic-accent-text">Step 2: Educational Background & Target</span>
           <button type="button" onclick="showAuthStep('register')" class="text-[11px] theme-text-sub hover:underline cursor-pointer">← Back</button>
@@ -80,27 +80,27 @@
           </div>
           <div>
             <label class="block theme-text-title mb-1 font-semibold">Educational Field / Degree</label>
-            <input type="text" id="prof-level-input" required placeholder="e.g. B.Tech CSE, B.Com, Biology, Mechanical" value="Semester 6 • B.Tech CSE" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none">
+            <input type="text" id="prof-level-input" required placeholder="e.g. B.Tech CSE, 1st semester, Biology, Mechanical" value="1st semester" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none">
           </div>
         </div>
 
         <div>
           <label class="block theme-text-title mb-1 font-semibold">Dream Job / Target Goal (Any Field)</label>
-          <input type="text" id="prof-goal-input" required placeholder="e.g. Full-Stack Engineer, Biotech Specialist, Quant Trader" value="Full-Stack Engineer" class="w-full theme-card-inner rounded-xl px-3 py-2 font-bold dynamic-accent-text focus:outline-none">
+          <input type="text" id="prof-goal-input" required placeholder="e.g. AI Engineer, Full-Stack Engineer, Biotech Specialist" value="AI Engineer" class="w-full theme-card-inner rounded-xl px-3 py-2 font-bold dynamic-accent-text focus:outline-none">
         </div>
 
         <div>
           <label class="block theme-text-title mb-1 font-semibold">Current Knowledge & Experience (In your own words)</label>
-          <textarea id="prof-know-input" required rows="2" placeholder="Describe what you already know and what you still need to learn..." class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none leading-relaxed">Solid fundamentals in JavaScript and React. Need distributed systems, Redis caching, and Docker containerization.</textarea>
+          <textarea id="prof-know-input" required rows="2" placeholder="Describe what you already know..." class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none leading-relaxed">basic html css and python</textarea>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block theme-text-title mb-1 font-semibold">Sprint Tenure</label>
             <select id="prof-tenure-input" class="w-full theme-card-inner rounded-xl px-3 py-2 theme-text-title focus:outline-none">
-              <option value="3 Months" selected>3 Months Sprint</option>
+              <option value="3 Months">3 Months Sprint</option>
               <option value="6 Months">6 Months Semester</option>
-              <option value="12 Months">12 Months Comprehensive</option>
+              <option value="12 Months Comprehensive" selected>12 Months Comprehensive</option>
             </select>
           </div>
           <div>
@@ -109,10 +109,11 @@
           </div>
         </div>
 
-        <button type="submit" id="btn-submit-ai-profiler" class="btn-brand w-full py-3 rounded-xl font-bold text-xs shadow-md cursor-pointer flex items-center justify-center gap-2">
+        <!-- DIRECT ONCLICK CALL TO GUARANTEE EXECUTION -->
+        <button type="button" id="btn-submit-ai-profiler" onclick="submitProfilerForm()" class="btn-brand w-full py-3 rounded-xl font-bold text-xs shadow-md cursor-pointer flex items-center justify-center gap-2">
           <span>✨ Synthesize Custom Architecture via Gemini →</span>
         </button>
-      </form>
+      </div>
 
       <!-- Status Feedback -->
       <div id="auth-status-msg" style="display: none;" class="p-3 rounded-xl text-center text-xs font-semibold"></div>
@@ -135,7 +136,7 @@
   <!-- ======================================================== -->
   <!-- 2. MAIN DASHBOARD VIEW                                   -->
   <!-- ======================================================== -->
-  <div id="app-view" class="hidden relative z-10 w-full max-w-[1600px] flex flex-col gap-6 pb-24 px-4 pt-4">
+  <div id="app-view" style="display: none;" class="relative z-10 w-full max-w-[1600px] flex flex-col gap-6 pb-24 px-4 pt-4">
 
     <!-- Top Navigation Bar -->
     <header class="w-full study-card px-4 lg:px-6 py-3 rounded-2xl flex items-center justify-between gap-4">
@@ -152,12 +153,12 @@
         <div class="relative pl-2" id="dropdown-track-wrapper">
           <button type="button" onclick="toggleMenu('menu-tracks', event)" class="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-white/10 text-xs font-medium theme-card-inner transition cursor-pointer">
             <span class="theme-text-sub">Target Goal:</span>
-            <span id="nav-current-role" class="dynamic-accent-text font-bold">Full-Stack Engineer</span>
+            <span id="nav-current-role" class="dynamic-accent-text font-bold">AI Engineer</span>
             <svg class="w-3.5 h-3.5 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </button>
           
           <div id="menu-tracks" class="hidden absolute left-0 top-full mt-2 w-64 rounded-xl dropdown-menu-pane p-1.5 text-xs space-y-1">
-            <button type="button" onclick="openOnboardingModal(); closeMenu('menu-tracks');" class="w-full text-left px-3 py-2 rounded-lg dropdown-item-btn font-semibold dynamic-accent-text">✨ Update Goal & Knowledge Profile</button>
+            <button type="button" onclick="showAuthStep('profiler'); document.getElementById('auth-view').style.display='flex'; document.getElementById('app-view').style.display='none'; closeMenu('menu-tracks');" class="w-full text-left px-3 py-2 rounded-lg dropdown-item-btn font-semibold dynamic-accent-text">✨ Update Goal & Knowledge Profile</button>
             <button type="button" onclick="openRoadmapModal(); closeMenu('menu-tracks');" class="w-full text-left px-3 py-2 rounded-lg dropdown-item-btn">📚 View Phased Roadmap</button>
           </div>
         </div>
@@ -204,21 +205,21 @@
       <div class="flex items-center gap-3">
         <button type="button" onclick="openModal('modal-github')" class="px-3 py-1.5 rounded-xl border border-white/10 text-xs font-mono flex items-center gap-2 theme-card-inner transition cursor-pointer">
           <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span id="nav-github-label">@student</span>
+          <span id="nav-github-label">@adityarp2008</span>
         </button>
 
         <button type="button" onclick="handleLogout()" class="px-3 py-1.5 rounded-xl border border-rose-500/30 text-rose-400 hover:bg-rose-500/10 text-xs font-bold transition cursor-pointer">
           Logout
         </button>
 
-        <div class="flex items-center gap-2.5 p-1 rounded-xl theme-card-inner border border-white/10 cursor-pointer" onclick="openOnboardingModal()">
+        <div class="flex items-center gap-2.5 p-1 rounded-xl theme-card-inner border border-white/10 cursor-pointer">
           <div class="relative">
             <div class="w-7 h-7 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center font-bold text-xs dynamic-accent-text" id="nav-avatar-initials">AP</div>
             <span class="absolute -bottom-1 -right-1 px-1 py-0.2 bg-amber-500 text-black font-extrabold text-[7px] rounded-full" id="nav-level-badge">L1</span>
           </div>
           <div class="hidden sm:block text-left pr-2">
             <div class="text-xs font-semibold theme-text-title" id="nav-user-name">Aditya Pandey</div>
-            <div class="text-[9px] theme-text-sub" id="nav-academic-term">B.Tech Student</div>
+            <div class="text-[9px] theme-text-sub" id="nav-academic-term">1st semester</div>
           </div>
         </div>
       </div>
@@ -412,7 +413,7 @@
       </div>
 
       <nav class="space-y-2 text-xs font-semibold">
-        <button type="button" onclick="openOnboardingModal(); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 dynamic-accent-text transition cursor-pointer">
+        <button type="button" onclick="showAuthStep('profiler'); document.getElementById('auth-view').style.display='flex'; document.getElementById('app-view').style.display='none'; toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 dynamic-accent-text transition cursor-pointer">
           <span class="flex items-center gap-2.5"><span>✨</span> <span>Configure Goal & Background</span></span>
           <span class="text-[10px] font-mono dynamic-accent-text font-bold">Profiler</span>
         </button>
@@ -446,7 +447,7 @@
 
     <div class="p-4 rounded-2xl theme-card-inner space-y-1.5 text-xs">
       <div class="font-bold theme-text-title" id="drawer-user-name">Aditya Pandey</div>
-      <div class="text-[11px] theme-text-sub" id="drawer-user-goal">Full-Stack Engineer</div>
+      <div class="text-[11px] theme-text-sub" id="drawer-user-goal">AI Engineer</div>
     </div>
   </aside>
 
@@ -608,6 +609,7 @@
     </form>
   </div>
 
+  <!-- GUARANTEED INLINE CONTROLLER -->
   <script>
     function showAuthStep(step) {
       var fIn = document.getElementById('form-signin');
@@ -642,15 +644,133 @@
         regEmail.focus();
         return;
       }
-      if (window.pendingRegistrationEmail !== undefined) {
-        window.pendingRegistrationEmail = regEmail ? regEmail.value.trim() : '';
-      }
+      window.pendingRegistrationEmail = regEmail ? regEmail.value.trim() : '';
       showAuthStep('profiler');
     }
 
-    function triggerSignIn() {
-      if (window.submitSignIn) {
-        window.submitSignIn();
+    // Direct inline fallback for synthesis to guarantee execution
+    async function submitProfilerForm() {
+      var btn = document.getElementById('btn-submit-ai-profiler');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="animate-spin">↻</span> Gemini is architecting your roadmap...';
+      }
+
+      var nameVal = document.getElementById('prof-name-input') ? document.getElementById('prof-name-input').value.trim() : 'Aditya Pandey';
+      var emailVal = window.pendingRegistrationEmail || (nameVal.toLowerCase().replace(/\s+/g, '') + "@alignx.edu");
+
+      var payload = {
+        email: emailVal,
+        name: nameVal,
+        academicLevel: document.getElementById('prof-level-input') ? document.getElementById('prof-level-input').value.trim() : '1st semester',
+        careerGoal: document.getElementById('prof-goal-input') ? document.getElementById('prof-goal-input').value.trim() : 'AI Engineer',
+        currentKnowledge: document.getElementById('prof-know-input') ? document.getElementById('prof-know-input').value.trim() : 'basic html css and python',
+        tenure: document.getElementById('prof-tenure-input') ? document.getElementById('prof-tenure-input').value : '12 Months Comprehensive',
+        github: document.getElementById('prof-github-input') ? document.getElementById('prof-github-input').value.trim() : 'adityarp2008'
+      };
+
+      try {
+        var res = await fetch('/api/roadmap', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        var aiData = await res.json();
+
+        if (aiData.error) throw new Error(aiData.error);
+
+        window.currentStudent = {
+          email: payload.email,
+          name: payload.name,
+          academic_level: payload.academicLevel,
+          career_goal: payload.careerGoal,
+          current_knowledge: payload.currentKnowledge,
+          tenure: payload.tenure,
+          github: payload.github,
+          readiness: aiData.readiness || 25,
+          curriculum_mastery: aiData.curriculumMastery || 0,
+          concept_deficits: aiData.conceptDeficits || 100,
+          target_pace: aiData.targetPace || 75,
+          radar: aiData.radar || {
+            categories: ["Python", "Algorithms", "Machine Learning", "Deep Learning", "Math/Stats", "Data Pipelines"],
+            candidate: [25, 20, 15, 10, 20, 15],
+            benchmark: [90, 85, 85, 80, 80, 75]
+          },
+          phases: aiData.phases || [],
+          xp: 0,
+          level: 1
+        };
+
+        if (window.supabase) {
+          try { await window.supabase.from('students').upsert(window.currentStudent, { onConflict: 'email' }); } catch (e) {}
+        }
+
+        localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
+        enterDashboardDirect();
+      } catch (err) {
+        console.warn("Gemini synthesis fallback:", err.message);
+        window.currentStudent = {
+          email: payload.email,
+          name: payload.name,
+          academic_level: payload.academicLevel,
+          career_goal: payload.careerGoal,
+          current_knowledge: payload.currentKnowledge,
+          tenure: payload.tenure,
+          github: payload.github,
+          readiness: 25,
+          curriculum_mastery: 0,
+          concept_deficits: 100,
+          target_pace: 75,
+          radar: {
+            categories: ["Python", "Algorithms", "Machine Learning", "Deep Learning", "Math/Stats", "Data Pipelines"],
+            candidate: [30, 20, 15, 10, 25, 15],
+            benchmark: [90, 85, 85, 80, 80, 75]
+          },
+          phases: [
+            {
+              phaseTitle: "Phase 1: Foundations & Python Fundamentals",
+              milestones: [
+                { id: "ai1-1", title: "Master Python OOP & Data Structures", hours: "8 hrs", desc: "Object models, generators, and vector primitives.", completed: false, xp: 120 },
+                { id: "ai1-2", title: "Linear Algebra & Probability for Machine Learning", hours: "10 hrs", desc: "Matrix dot products, eigenvalues, and distributions.", completed: false, xp: 150 }
+              ]
+            },
+            {
+              phaseTitle: "Phase 2: Core Machine Learning & Model Evaluation",
+              milestones: [
+                { id: "ai2-1", title: "Implement Scikit-Learn Regression & Classification", hours: "12 hrs", desc: "Train-test splits, cross-validation, and ROC metrics.", completed: false, xp: 200 },
+                { id: "ai2-2", title: "Feature Engineering & Data Preprocessing Pipelines", hours: "10 hrs", desc: "Imputation, one-hot encoding, and scaling.", completed: false, xp: 220 }
+              ]
+            },
+            {
+              phaseTitle: "Phase 3: Deep Learning & Production Deployment",
+              milestones: [
+                { id: "ai3-1", title: "PyTorch Neural Networks & Backpropagation", hours: "16 hrs", desc: "Tensors, autograd, and training loops.", completed: false, xp: 280 },
+                { id: "ai3-2", title: "Deploy Model API with FastAPI & Docker", hours: "14 hrs", desc: "Containerize inference endpoint for production.", completed: false, xp: 300 }
+              ]
+            }
+          ],
+          xp: 0,
+          level: 1
+        };
+
+        localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
+        enterDashboardDirect();
+      }
+    }
+
+    function enterDashboardDirect() {
+      var authView = document.getElementById('auth-view');
+      var appView = document.getElementById('app-view');
+      var cBtn = document.getElementById('btn-floating-center');
+      var tBtn = document.getElementById('btn-floating-tutor');
+
+      if (authView) authView.style.display = 'none';
+      if (appView) appView.style.display = 'flex';
+      if (cBtn) cBtn.classList.remove('hidden');
+      if (tBtn) tBtn.classList.remove('hidden');
+
+      if (typeof updateDashboardUI === 'function') {
+        updateDashboardUI();
       }
     }
   </script>
