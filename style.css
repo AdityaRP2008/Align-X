@@ -1,3 +1,7 @@
+/* ======================================================== */
+/* ALIGN-X PRODUCTION STYLESHEET                            */
+/* ======================================================== */
+
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -5,6 +9,7 @@
   box-sizing: border-box;
 }
 
+/* Theme 1: Cyber Purple (Default) */
 :root, html[data-theme="purple"] {
   --bg-page: #0B0E17;
   --panel-bg: #101624;
@@ -22,6 +27,7 @@
   --module-item-border: rgba(255, 255, 255, 0.07);
 }
 
+/* Theme 2: Emerald Matrix */
 html[data-theme="emerald"] {
   --bg-page: #060E0A;
   --panel-bg: #0D1A12;
@@ -39,6 +45,7 @@ html[data-theme="emerald"] {
   --module-item-border: rgba(255, 255, 255, 0.07);
 }
 
+/* Theme 3: Solar Amber */
 html[data-theme="amber"] {
   --bg-page: #0F0A06;
   --panel-bg: #1A120B;
@@ -56,6 +63,7 @@ html[data-theme="amber"] {
   --module-item-border: rgba(255, 255, 255, 0.07);
 }
 
+/* Theme 4: Ocean Cyan */
 html[data-theme="cyan"] {
   --bg-page: #060B12;
   --panel-bg: #0C1626;
@@ -73,6 +81,7 @@ html[data-theme="cyan"] {
   --module-item-border: rgba(255, 255, 255, 0.07);
 }
 
+/* Theme 5: Minimal Pure White */
 html[data-theme="white"] {
   --bg-page: #0A0A0E;
   --panel-bg: #14141A;
@@ -90,6 +99,7 @@ html[data-theme="white"] {
   --module-item-border: rgba(255, 255, 255, 0.08);
 }
 
+/* Theme 6: High-Contrast Light Mode */
 html[data-theme="light"] {
   --bg-page: #F1F5F9;
   --panel-bg: #FFFFFF;
@@ -118,13 +128,25 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* Fixed: background canvas MUST NEVER intercept clicks */
 #glow-spotlight-canvas {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
   width: 100vw;
   height: 100vh;
   pointer-events: none !important;
-  z-index: 0;
+  z-index: -1 !important;
+}
+
+#auth-view {
+  position: relative;
+  z-index: 50 !important;
+  pointer-events: auto !important;
+}
+
+#auth-view * {
+  pointer-events: auto !important;
 }
 
 .study-card {
@@ -190,6 +212,7 @@ header {
 
 .dropdown-item-btn {
   color: var(--text-primary) !important;
+  cursor: pointer;
 }
 .dropdown-item-btn:hover {
   background-color: rgba(var(--accent-main-rgb), 0.12) !important;
@@ -200,6 +223,7 @@ header {
   color: #07090E;
   font-weight: 700;
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 html[data-theme="light"] .btn-brand {
