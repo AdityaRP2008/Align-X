@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" class="dark scroll-smooth">
 <head>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Align-X | Career Gap Architecture</title>
+  <title>Align-X | Adaptive Career Architecture & Academy</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,459 +18,681 @@
           fontFamily: {
             sans: ['"Plus Jakarta Sans"', 'sans-serif'],
             mono: ['"JetBrains Mono"', 'monospace'],
-          },
-          colors: {
-            mint: {
-              300: '#86E294',
-              400: '#60D673',
-              500: '#40BD54',
-              900: '#0F3816',
-              950: '#071F0C'
-            }
           }
         }
       }
     }
   </script>
+  <!-- Supabase CDN Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="min-h-screen flex font-sans bg-[#07090D] text-slate-200 antialiased selection:bg-mint-400/20 selection:text-mint-300">
+<body class="selection:bg-purple-500/20 selection:text-purple-400">
 
-  <!-- Interactive Pointer Grid Spotlight -->
-  <canvas id="spotlight-canvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+  <!-- Interactive Pointer Glow Canvas -->
+  <canvas id="glow-spotlight-canvas"></canvas>
 
-  <!-- Left Collapsible Sidebar -->
-  <aside id="app-sidebar" class="relative z-30 w-64 border-r border-white/[0.08] bg-[#07090D]/90 backdrop-blur-xl flex flex-col justify-between p-4 shrink-0 transition-all duration-300 hidden md:flex">
-    <div class="space-y-6">
-      <!-- Brand Logo -->
-      <div class="flex items-center gap-3 px-2 py-1">
-        <div class="w-9 h-9 rounded-xl bg-mint-950/70 border border-mint-400/40 flex items-center justify-center font-mono font-bold text-base text-mint-400 shadow-glow-mint">
-          X
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="text-base font-bold text-white tracking-tight">Align-X</span>
-            <span class="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-mint-950/60 border border-mint-400/30 text-mint-300">v2.6</span>
-          </div>
-          <p class="text-[11px] text-slate-400">Team CODE-X</p>
+  <!-- Full WebApp Header -->
+  <header class="relative z-30 w-full border-b border-slate-200 dark:border-white/10 bg-white/90 dark:bg-[#0B0E17]/90 backdrop-blur-xl px-4 lg:px-8 py-3.5">
+    <div class="max-w-[1600px] mx-auto flex items-center justify-between gap-4">
+      
+      <!-- Left: Hamburger (3 lines) & Current Path -->
+      <div class="flex items-center gap-3">
+        <button type="button" onclick="toggleNavSidebar()" id="btn-hamburger" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition" title="Navigation Drawer">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-white/[0.04] border border-slate-300 dark:border-white/10 text-xs font-medium text-slate-700 dark:text-slate-200">
+          <span class="text-slate-400">Career Goal:</span>
+          <span id="nav-current-role" class="text-orange-600 dark:text-purple-400 font-bold">Unconfigured</span>
         </div>
       </div>
 
-      <!-- Sidebar Navigation Links -->
-      <nav class="space-y-1 text-xs font-semibold">
-        <button onclick="switchView('overview')" id="side-overview" class="side-link active-nav-link w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]">
-          <svg class="w-4 h-4 text-mint-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
-          <span>Gap Topology</span>
+      <!-- Right: GitHub Scanner, Theme, Auth, Profile -->
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        
+        <button type="button" onclick="openModal('modal-github')" id="btn-nav-github" class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white/60 dark:bg-white/[0.03] text-xs font-mono flex items-center gap-2 text-slate-700 dark:text-slate-200 hover:border-purple-400 transition hidden">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span id="nav-github-label">GitHub Audit</span>
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
         </button>
 
-        <button onclick="switchView('roadmap')" id="side-roadmap" class="side-link w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]">
-          <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-          <span>Phased Roadmap</span>
+        <button type="button" onclick="toggleTheme()" class="p-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 transition" title="Toggle Theme">
+          <svg id="icon-sun" class="w-4 h-4 hidden dark:block text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg id="icon-moon" class="w-4 h-4 block dark:hidden text-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
 
-        <button onclick="switchView('diagnostic')" id="side-diagnostic" class="side-link w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]">
-          <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
-          <span>Mini Diagnostic</span>
+        <button type="button" onclick="openAuthModal('login')" id="btn-auth-trigger" class="btn-brand px-3.5 py-1.5 rounded-xl text-xs shadow-glow-primary">
+          Sign In / Register
+        </button>
+
+        <!-- Profile Widget -->
+        <div class="relative hidden" id="profile-dropdown-wrapper">
+          <button type="button" onclick="toggleMenu('menu-profile', event)" class="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition">
+            <div class="relative">
+              <div class="w-8 h-8 rounded-lg bg-purple-500/20 border border-purple-500/40 flex items-center justify-center font-bold text-xs text-purple-400" id="nav-avatar-initials">
+                --
+              </div>
+              <span id="player-level-badge" class="absolute -bottom-1 -right-1 px-1 py-0.2 bg-amber-500 text-black font-extrabold text-[8px] rounded-full">L1</span>
+            </div>
+            <div class="hidden sm:block text-left">
+              <div class="text-xs font-semibold text-slate-800 dark:text-white" id="nav-user-name">Guest Student</div>
+              <div class="text-[10px] text-slate-500 dark:text-slate-400" id="nav-user-term">Setup Required</div>
+            </div>
+            <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+
+          <div id="menu-profile" class="hidden absolute right-0 top-full mt-2 w-64 rounded-xl bg-white dark:bg-[#101420] border border-slate-200 dark:border-white/10 shadow-2xl p-2 z-50 text-xs">
+            <div class="p-2 border-b border-slate-200 dark:border-white/5 space-y-0.5">
+              <div class="font-bold text-slate-800 dark:text-white" id="menu-profile-fullname">Candidate</div>
+              <div class="text-[11px] text-purple-400 font-mono" id="menu-profile-xp">XP: 0 / 1000</div>
+            </div>
+            <div class="pt-1">
+              <button type="button" onclick="openModal('modal-onboarding')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-300 transition">Update Academic Goal</button>
+              <button type="button" onclick="openModal('modal-roadmap')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-purple-400 font-bold transition">📚 View Personalised Roadmap</button>
+              <button type="button" onclick="logoutStudent()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-rose-500 font-medium transition">Sign Out</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Canvas Container -->
+  <main class="relative z-10 w-full max-w-[1600px] mx-auto px-4 lg:px-8 py-6 space-y-6">
+
+    <!-- CS Fact Capsule -->
+    <section class="p-3.5 rounded-2xl study-card flex items-center justify-between gap-3 text-xs bg-gradient-to-r from-orange-500/10 dark:from-purple-500/10 via-transparent to-transparent">
+      <div class="flex items-center gap-3">
+        <span class="text-sm">💡</span>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-mono uppercase font-extrabold tracking-wider text-orange-600 dark:text-purple-400">DID YOU KNOW? (CS INSIGHT OF THE MOMENT)</span>
+            <span class="text-[9px] text-slate-400 font-mono">• auto-refreshes</span>
+          </div>
+          <p id="cs-fun-fact-text" class="text-slate-700 dark:text-slate-300 text-xs mt-0.5 font-medium transition-opacity duration-300">
+            Apollo 11's lunar guidance computer had only 4 kilobytes of RAM and operated at roughly 1 MHz clock speed.
+          </p>
+        </div>
+      </div>
+      <button type="button" onclick="cycleFunFact()" class="shrink-0 text-xs px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/10 hover:border-purple-400 text-slate-700 dark:text-slate-300 font-mono flex items-center gap-1.5 transition">
+        <span>↻</span> <span>Next Fact</span>
+      </button>
+    </section>
+
+    <!-- Empty State Onboarding Callout (Visible before data collection) -->
+    <div id="onboarding-callout" class="p-8 rounded-3xl study-card text-center space-y-4 border-2 border-dashed border-purple-400/40">
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-3xl">
+        📋
+      </div>
+      <div class="space-y-1 max-w-lg mx-auto">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">Begin Your Personalized Career Architecture</h2>
+        <p class="text-xs text-slate-500">Sign in or register to set your academic level, career goal, and deadline. Your custom phased roadmap, telemetry meters, and skill gaps will generate dynamically.</p>
+      </div>
+      <button type="button" onclick="openAuthModal('signup')" class="btn-brand px-6 py-2.5 rounded-xl text-xs font-bold shadow-glow-primary">
+        Create Student Profile →
+      </button>
+    </div>
+
+    <!-- THE 4 CORE TELEMETRY DIALS -->
+    <section id="telemetry-dials-section" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 hidden">
+      
+      <!-- Dial 1: Curriculum Mastery -->
+      <div class="study-card p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <span class="w-2 h-2 rounded-full bg-orange-600 dark:bg-purple-400"></span>
+            <span class="text-[10px] font-mono text-slate-600 dark:text-slate-300 tracking-wider font-extrabold">CURRICULUM MASTERY</span>
+          </div>
+          <div class="flex items-baseline gap-1.5">
+            <span id="meter-current-val" class="text-3xl font-extrabold font-mono text-slate-900 dark:text-white">0%</span>
+            <span class="text-xs text-slate-400">/100%</span>
+          </div>
+          <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1" id="meter-current-sub">Awaiting verification</div>
+        </div>
+        <div class="relative w-16 h-16 shrink-0 flex items-center justify-center">
+          <svg class="w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="26" stroke="rgba(148, 163, 184, 0.2)" stroke-width="5" fill="transparent"/>
+            <circle id="circle-current-skill" cx="32" cy="32" r="26" stroke="#C084FC" stroke-width="5" fill="transparent"
+                    stroke-linecap="round" stroke-dasharray="163.36" stroke-dashoffset="163.36"
+                    class="transition-all duration-1000 ease-out"/>
+          </svg>
+          <span class="absolute text-[11px] font-mono font-bold text-orange-600 dark:text-purple-400" id="circle-current-label">0%</span>
+        </div>
+      </div>
+
+      <!-- Dial 2: Concept Deficits -->
+      <div class="study-card p-5 rounded-2xl flex items-center justify-between border-purple-400/40 shadow-sm">
+        <div>
+          <div class="flex items-center gap-1.5 mb-1">
+            <span class="w-2.5 h-2.5 rounded-full bg-purple-600 dark:bg-purple-400 animate-pulse"></span>
+            <span class="text-xs font-mono text-purple-700 dark:text-purple-300 tracking-wider font-black">CONCEPT DEFICITS</span>
+          </div>
+          <div class="flex items-baseline gap-2 mt-0.5">
+            <span id="meter-gap-val" class="text-4xl font-black font-mono text-purple-700 dark:text-purple-300">100%</span>
+            <span class="text-xs text-purple-600 dark:text-purple-400 font-bold uppercase tracking-wider">untested void</span>
+          </div>
+          <div class="text-xs text-purple-800 dark:text-purple-200 font-semibold mt-1" id="meter-gap-sub">Syllabus unmapped</div>
+        </div>
+        <div class="relative w-16 h-16 shrink-0 flex items-center justify-center">
+          <svg class="w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="26" stroke="rgba(148, 163, 184, 0.2)" stroke-width="5" fill="transparent"/>
+            <circle id="circle-skill-gap" cx="32" cy="32" r="26" stroke="#C084FC" stroke-width="5.5" fill="transparent"
+                    stroke-linecap="round" stroke-dasharray="163.36" stroke-dashoffset="0"
+                    class="transition-all duration-1000 ease-out"/>
+          </svg>
+          <span class="absolute text-xs font-mono font-black text-purple-700 dark:text-purple-300" id="circle-gap-label">100%</span>
+        </div>
+      </div>
+
+      <!-- Dial 3: Career Readiness -->
+      <div class="study-card p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <span class="w-2 h-2 rounded-full bg-orange-600 dark:bg-purple-400"></span>
+            <span class="text-[10px] font-mono text-slate-600 dark:text-slate-300 tracking-wider font-extrabold">CAREER READINESS</span>
+          </div>
+          <div class="flex items-baseline gap-1.5">
+            <span id="meter-readiness-val" class="text-3xl font-extrabold font-mono text-slate-900 dark:text-white">0%</span>
+            <span class="text-xs text-slate-400 font-semibold">score</span>
+          </div>
+          <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1" id="meter-readiness-sub">Pending AI diagnosis</div>
+        </div>
+        <div class="relative w-16 h-16 shrink-0 flex items-center justify-center">
+          <svg class="w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="26" stroke="rgba(148, 163, 184, 0.2)" stroke-width="5" fill="transparent"/>
+            <circle id="circle-career-readiness" cx="32" cy="32" r="26" stroke="#C084FC" stroke-width="5" fill="transparent"
+                    stroke-linecap="round" stroke-dasharray="163.36" stroke-dashoffset="163.36"
+                    class="transition-all duration-1000 ease-out"/>
+          </svg>
+          <span class="absolute text-[11px] font-mono font-bold text-orange-600 dark:text-purple-400" id="circle-readiness-label">0%</span>
+        </div>
+      </div>
+
+      <!-- Dial 4: Tenure Countdown Pace -->
+      <div class="study-card p-5 rounded-2xl flex items-center justify-between">
+        <div>
+          <div class="flex items-center gap-1.5 mb-1.5">
+            <span class="w-2 h-2 rounded-full bg-orange-600 dark:bg-purple-400"></span>
+            <span class="text-[10px] font-mono text-slate-600 dark:text-slate-300 tracking-wider font-extrabold">TARGET PACE</span>
+          </div>
+          <div class="flex items-baseline gap-1.5">
+            <span id="meter-time-val" class="text-3xl font-extrabold font-mono text-slate-900 dark:text-white">0%</span>
+            <span class="text-xs text-slate-400 font-semibold">pace</span>
+          </div>
+          <div class="text-[11px] text-slate-500 dark:text-slate-400 mt-1" id="meter-tenure-sub">Tenure unset</div>
+        </div>
+        <div class="relative w-16 h-16 shrink-0 flex items-center justify-center">
+          <svg class="w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="26" stroke="rgba(148, 163, 184, 0.2)" stroke-width="5" fill="transparent"/>
+            <circle id="circle-time-goal" cx="32" cy="32" r="26" stroke="#C084FC" stroke-width="5" fill="transparent"
+                    stroke-linecap="round" stroke-dasharray="163.36" stroke-dashoffset="163.36"
+                    class="transition-all duration-1000 ease-out"/>
+          </svg>
+          <span class="absolute text-[11px] font-mono font-bold text-orange-600 dark:text-purple-400" id="circle-time-label">0%</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Main 2-Column Dashboard Core -->
+    <section id="dashboard-core-section" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch hidden">
+
+      <!-- Left Column: Knowledge Domain Vector Matrix -->
+      <div class="lg:col-span-6 study-card p-6 rounded-3xl flex flex-col justify-between space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10">
+          <div>
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+              <span>Knowledge Domain Vector Matrix</span>
+              <span class="text-slate-400 font-normal text-xs">(Student vs Target)</span>
+            </h3>
+            <p class="text-xs text-slate-500">Live distance from production engineering capability.</p>
+          </div>
+          <div class="flex items-center gap-3 text-xs font-mono font-semibold">
+            <span class="text-orange-600 dark:text-purple-400 flex items-center gap-1.5">
+              <span class="w-2.5 h-0.5 bg-orange-600 dark:bg-purple-400"></span> Candidate
+            </span>
+            <span class="text-slate-400 flex items-center gap-1.5">
+              <span class="w-2.5 h-0.5 bg-slate-400 border-t border-dashed"></span> Benchmark
+            </span>
+          </div>
+        </div>
+        
+        <div class="relative w-full h-[320px] flex items-center justify-center">
+          <canvas id="competency-radar-canvas" class="max-w-full max-h-full"></canvas>
+        </div>
+      </div>
+
+      <!-- Right Column: Academic Curriculum Breakdown & Achievements -->
+      <div class="lg:col-span-6 study-card p-6 rounded-3xl flex flex-col justify-between space-y-5">
+        <div class="space-y-4">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10">
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Academic Curriculum Breakdown</h3>
+            <button type="button" onclick="openModal('modal-roadmap')" class="text-xs font-mono font-bold text-orange-600 dark:text-purple-400 hover:underline">
+              Open Full Roadmap →
+            </button>
+          </div>
+
+          <div class="space-y-2">
+            <span class="text-xs font-black tracking-wide text-purple-700 dark:text-purple-300 uppercase">High-Priority Gaps (Lab / Capstone Modules):</span>
+            <div class="flex flex-wrap gap-2.5 pt-1" id="chips-missing-critical"></div>
+          </div>
+
+          <div class="space-y-2 pt-3 border-t border-slate-200 dark:border-white/10">
+            <span class="text-xs font-bold text-orange-600 dark:text-purple-400">Verified Technical Assets:</span>
+            <div class="flex flex-wrap gap-2" id="chips-matched-skills"></div>
+          </div>
+        </div>
+
+        <!-- Level & XP Progress Widget -->
+        <div class="achievement-outline-card space-y-2.5 text-left">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-amber-500 flex items-center gap-1.5">
+              <span>⚡</span> <span id="xp-level-title">Level 1: Candidate</span>
+            </span>
+            <span id="xp-progress-label" class="font-mono text-slate-400 font-semibold">0 / 1000 XP</span>
+          </div>
+          <div class="w-full bg-slate-200 dark:bg-slate-700/50 h-2 rounded-full overflow-hidden">
+            <div id="xp-progress-bar" class="bg-gradient-to-r from-purple-500 to-amber-400 h-full transition-all duration-500" style="width: 0%;"></div>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-slate-500 pt-0.5">
+            <span>Solve adaptive quizzes or complete milestones to level up</span>
+            <button type="button" onclick="openModal('modal-achievements')" class="text-amber-500 underline font-bold">Achievements (<span id="achievements-unlocked-count">0</span>)</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Left Sliding Navigation Drawer -->
+  <aside id="nav-drawer" class="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-white/95 dark:bg-[#0E1322]/95 border-r border-slate-200 dark:border-white/10 backdrop-blur-2xl z-50 transform -translate-x-full transition-transform duration-300 flex flex-col justify-between p-6 shadow-2xl">
+    <div class="space-y-6">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-base">
+            🎓
+          </div>
+          <span class="font-extrabold text-sm text-slate-900 dark:text-white">Align-X Campus</span>
+        </div>
+        <button type="button" onclick="toggleNavSidebar()" class="text-slate-400 hover:text-white p-1 text-sm">✕</button>
+      </div>
+
+      <nav class="space-y-1.5 text-xs font-semibold">
+        <!-- Personalized Roadmap Sidebar Item -->
+        <button type="button" onclick="openPersonalizedRoadmap(); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-700 dark:text-purple-300 transition">
+          <span class="flex items-center gap-2.5"><span>📚</span> <span>Personalized Roadmap</span></span>
+          <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 bg-purple-500/20 rounded">AI Path</span>
+        </button>
+
+        <button type="button" onclick="startAdaptiveMCQSession(); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 transition">
+          <span class="flex items-center gap-2.5"><span>📝</span> <span>Endless Adaptive MCQs</span></span>
+          <span class="text-[10px] font-mono text-emerald-500 font-bold">Continuous</span>
+        </button>
+
+        <button type="button" onclick="startEndlessPuzzleSession(); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 transition">
+          <span class="flex items-center gap-2.5"><span>🧩</span> <span>Endless Logic Riddles</span></span>
+          <span class="text-[10px] font-mono text-amber-500 font-bold">Infinite</span>
+        </button>
+
+        <button type="button" onclick="openModal('modal-github'); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 transition">
+          <span class="flex items-center gap-2.5"><span>🐙</span> <span>GitHub Repository Inspector</span></span>
+          <span class="text-[10px] font-mono text-cyan-400 font-bold">API</span>
+        </button>
+
+        <button type="button" onclick="openModal('modal-achievements'); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 transition">
+          <span class="flex items-center gap-2.5"><span>🏆</span> <span>Academic Achievements</span></span>
+          <span class="text-[10px] font-mono text-amber-400 font-bold">Badges</span>
+        </button>
+
+        <button type="button" onclick="toggleTutorChat(); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 text-slate-700 dark:text-slate-200 transition">
+          <span class="flex items-center gap-2.5"><span>💬</span> <span>Consult AI Tutor</span></span>
+          <span class="text-[10px] font-mono text-orange-500 font-bold">OmniRoute</span>
         </button>
       </nav>
     </div>
 
-    <!-- Sidebar Footer Telemetry Widget -->
-    <div class="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2 text-xs">
-      <div class="flex items-center justify-between text-slate-400">
-        <span class="font-mono text-[10px]">READINESS INDEX</span>
-        <span class="text-mint-400 font-mono font-bold" id="side-readiness-val">68%</span>
-      </div>
-      <div class="w-full bg-slate-800/80 h-1.5 rounded-full overflow-hidden">
-        <div id="side-progress-bar" class="bg-mint-400 h-full rounded-full transition-all duration-700" style="width: 68%;"></div>
-      </div>
-      <div class="text-[11px] text-slate-400 pt-1 flex items-center justify-between">
-        <span>Target Gap:</span>
-        <span class="font-mono text-slate-300" id="side-deficit-val">32% to Zero</span>
-      </div>
+    <div class="p-4 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 space-y-1.5 text-xs">
+      <div class="font-bold text-slate-800 dark:text-slate-200" id="drawer-student-name">Guest Student</div>
+      <div class="text-[11px] text-slate-500" id="drawer-student-meta">Session Unauthenticated</div>
     </div>
   </aside>
 
-  <!-- Main Content Layout -->
-  <div class="flex-1 flex flex-col min-w-0">
-
-    <!-- Top Navigation Bar -->
-    <header class="sticky top-0 z-40 w-full border-b border-white/[0.08] bg-[#07090D]/85 backdrop-blur-xl px-6 lg:px-10 py-3">
-      <div class="flex items-center justify-between gap-4">
-        
-        <!-- Left: Breadcrumb / Target Role Dropdown -->
-        <div class="flex items-center gap-3">
-          <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white p-1">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-          </button>
-
-          <!-- Career Track Dropdown Menu -->
-          <div class="relative" id="dropdown-track-wrapper">
-            <button onclick="toggleMenu('menu-tracks')" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 text-xs font-medium text-slate-200 transition">
-              <span class="text-slate-400">Target Role:</span>
-              <span id="nav-current-role" class="text-mint-400 font-semibold">Full-Stack Engineer</span>
-              <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </button>
-            
-            <div id="menu-tracks" class="hidden absolute top-full mt-2 w-60 rounded-xl bg-[#101420] border border-white/10 shadow-2xl p-1.5 z-50">
-              <button onclick="selectTrack('Full-Stack Software Engineer')" class="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-white/5 text-slate-200 transition flex items-center justify-between">
-                <span>Full-Stack Engineer</span>
-                <span class="text-[10px] font-mono text-mint-400">2026 Core</span>
-              </button>
-              <button onclick="selectTrack('AI & ML Systems Engineer')" class="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-white/5 text-slate-200 transition flex items-center justify-between">
-                <span>AI & ML Engineer</span>
-                <span class="text-[10px] font-mono text-slate-400">vLLM / LangGraph</span>
-              </button>
-              <button onclick="selectTrack('Cloud & DevOps Engineer')" class="w-full text-left px-3 py-2 text-xs rounded-lg hover:bg-white/5 text-slate-200 transition flex items-center justify-between">
-                <span>Cloud & DevOps</span>
-                <span class="text-[10px] font-mono text-slate-400">K8s / Terraform</span>
-              </button>
-            </div>
+  <!-- MODAL: PERSONALIZED ROADMAP & LIVE MILESTONE CHECKER -->
+  <div id="modal-roadmap" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="study-card rounded-3xl max-w-3xl w-full p-6 md:p-8 space-y-5 bg-white dark:bg-[#101424] border border-purple-500/40 shadow-2xl max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base">📚</span>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white">Personalized Career Roadmap</h3>
+            <span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-600 dark:text-purple-300">OmniRoute Phased Sprint</span>
           </div>
+          <p class="text-xs text-slate-500 mt-0.5">Ticking completed milestones updates your readiness score, grants XP, and syncs live to Supabase.</p>
         </div>
-
-        <!-- Right: Actions & User Dropdown Profile -->
-        <div class="flex items-center gap-3">
-          <!-- Time Horizon Filter Dropdown -->
-          <div class="relative hidden sm:block" id="dropdown-horizon-wrapper">
-            <button onclick="toggleMenu('menu-horizon')" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 text-xs text-slate-300 transition">
-              <span class="text-slate-400">Timeline:</span>
-              <span id="nav-horizon-label" class="font-mono text-mint-400">3 Months</span>
-              <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </button>
-            <div id="menu-horizon" class="hidden absolute right-0 top-full mt-2 w-48 rounded-xl bg-[#101420] border border-white/10 shadow-2xl p-1.5 z-50 text-xs">
-              <button onclick="selectHorizon('3-Month Internship Season', '3 Months')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-slate-200">3 Months (Internship)</button>
-              <button onclick="selectHorizon('6-Month Placement Drive', '6 Months')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-slate-200">6 Months (Placements)</button>
-              <button onclick="selectHorizon('12-Month Grad Track', '12 Months')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-slate-200">12 Months (Graduate)</button>
-            </div>
-          </div>
-
-          <button onclick="openAuthModal('signup')" class="px-3.5 py-1.5 rounded-lg bg-mint-400 hover:bg-mint-300 text-slate-950 font-bold text-xs transition shadow-glow-mint">
-            Sign In / Register
-          </button>
-
-          <!-- Authenticated Profile Menu -->
-          <div class="relative" id="profile-dropdown-wrapper">
-            <button onclick="toggleMenu('menu-profile')" class="flex items-center gap-2 p-1 rounded-xl hover:bg-white/5 transition">
-              <div class="w-8 h-8 rounded-lg bg-mint-950 border border-mint-400/40 flex items-center justify-center font-bold text-xs text-mint-300" id="nav-avatar-initials">
-                AP
-              </div>
-              <div class="hidden md:block text-left">
-                <div class="text-xs font-semibold text-white" id="nav-user-name">Aditya Pandey</div>
-                <div class="text-[10px] text-slate-400" id="nav-user-term">Sem 6 • B.Tech CSE</div>
-              </div>
-              <svg class="w-3.5 h-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </button>
-
-            <div id="menu-profile" class="hidden absolute right-0 top-full mt-2 w-64 rounded-xl bg-[#101420] border border-white/10 shadow-2xl p-2 z-50 text-xs">
-              <div class="p-2 border-b border-white/5 space-y-0.5">
-                <div class="font-bold text-white" id="menu-profile-fullname">Aditya Pandey</div>
-                <div class="text-slate-400 text-[11px]" id="menu-profile-github">@aditya-dev-26</div>
-                <div class="text-[11px] text-mint-400 pt-1 font-medium" id="menu-profile-role">Full-Stack Software Engineer</div>
-              </div>
-              <div class="pt-1">
-                <button onclick="openOnboardingModal()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-slate-300 transition">Update Academic Record</button>
-                <button onclick="triggerAIRoadmapGeneration()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-mint-400 transition">Re-run AI Gap Analysis</button>
-                <button onclick="exportCareerPlan()" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-slate-300 transition">Export Career Blueprint</button>
-                <button onclick="openAuthModal('login')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 text-rose-400 transition">Switch Profile</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- Main Workspace -->
-    <main class="relative z-10 max-w-7xl w-full mx-auto px-6 lg:px-10 py-7 flex-1 space-y-7">
-
-      <!-- KPI Summary Row -->
-      <section class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <!-- Student Info Tile -->
-        <div class="glass-card p-5 rounded-2xl border border-white/[0.08] flex flex-col justify-between">
-          <div class="flex items-center justify-between">
-            <span class="text-[11px] font-mono text-mint-400 tracking-wider">CANDIDATE</span>
-            <span class="w-2 h-2 rounded-full bg-mint-400" title="Audited Profile"></span>
-          </div>
-          <div class="mt-3">
-            <div class="text-base font-bold text-white" id="dash-student-name">Aditya Pandey</div>
-            <div class="text-xs text-slate-400 mt-0.5" id="dash-student-role">Full-Stack Software Engineer</div>
-          </div>
-          <div class="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs text-slate-400">
-            <span id="dash-github-handle" class="font-mono text-slate-300">@aditya-dev-26</span>
-            <button onclick="simulateCodeAudit()" id="btn-gh-audit" class="text-mint-400 hover:underline transition">Verify Code</button>
-          </div>
-        </div>
-
-        <!-- Production Readiness Radial Meter -->
-        <div class="glass-card p-5 rounded-2xl border border-white/[0.08] flex items-center justify-between">
-          <div>
-            <span class="text-[11px] font-mono text-slate-400 tracking-wider">PRODUCTION READINESS</span>
-            <div class="my-1.5 flex items-baseline gap-1.5">
-              <span id="dash-readiness-pct" class="text-3xl font-extrabold font-mono text-white">68%</span>
-              <span class="text-xs text-slate-400">/ 100%</span>
-            </div>
-            <div class="text-[11px] text-slate-400">Live 2026 hiring bar</div>
-          </div>
-          <div class="relative w-16 h-16 shrink-0 flex items-center justify-center">
-            <svg class="w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
-              <circle cx="32" cy="32" r="26" stroke="rgba(255, 255, 255, 0.08)" stroke-width="5" fill="transparent"/>
-              <circle id="dash-readiness-circle" cx="32" cy="32" r="26" stroke="#60D673" stroke-width="5" fill="transparent"
-                      stroke-linecap="round" stroke-dasharray="163.36" stroke-dashoffset="52.27"
-                      class="transition-all duration-1000 ease-out" style="filter: drop-shadow(0 0 6px rgba(96, 214, 115, 0.4));"/>
-            </svg>
-            <span class="absolute text-[11px] font-mono font-bold text-mint-400" id="dash-mini-score">68%</span>
-          </div>
-        </div>
-
-        <!-- Verified Competencies -->
-        <div class="glass-card p-5 rounded-2xl border border-white/[0.08] flex flex-col justify-between">
-          <div class="flex items-center justify-between">
-            <span class="text-[11px] font-mono text-mint-400 tracking-wider">VERIFIED ASSETS</span>
-            <span class="text-[10px] font-mono bg-mint-950/60 px-2 py-0.5 rounded border border-mint-400/30 text-mint-300">Audited</span>
-          </div>
-          <div class="my-2 flex items-baseline gap-2">
-            <span id="dash-matched-count" class="text-3xl font-extrabold font-mono text-mint-400">8</span>
-            <span class="text-xs text-slate-400">Competencies</span>
-          </div>
-          <span class="text-xs text-slate-400" id="dash-audit-note">Inspected 34 conventional commits</span>
-        </div>
-
-        <!-- Critical Missing Gaps -->
-        <div class="glass-card p-5 rounded-2xl border border-white/[0.08] flex flex-col justify-between">
-          <div class="flex items-center justify-between">
-            <span class="text-[11px] font-mono text-rose-400 tracking-wider">CRITICAL VOIDS</span>
-            <span class="text-[10px] font-mono bg-rose-950/60 px-2 py-0.5 rounded border border-rose-500/30 text-rose-300">Gaps</span>
-          </div>
-          <div class="my-2 flex items-baseline gap-2">
-            <span id="dash-missing-count" class="text-3xl font-extrabold font-mono text-rose-400">4</span>
-            <span class="text-xs text-slate-400">Must-bridge gaps</span>
-          </div>
-          <span class="text-xs text-slate-400" id="dash-deficit-note">32% Deficit to Zero</span>
-        </div>
-      </section>
-
-      <!-- VIEW PANEL 1: GAP TOPOLOGY & RADAR (Default) -->
-      <div id="view-overview" class="view-panel space-y-6">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          
-          <div class="lg:col-span-7 glass-card p-6 rounded-2xl border border-white/[0.08]">
-            <div class="flex items-center justify-between pb-4 mb-4 border-b border-white/[0.06]">
-              <div>
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                  <span>Competency Vector Matrix</span>
-                  <span class="text-[11px] font-mono text-slate-400 font-normal">(Candidate vs Target)</span>
-                </h3>
-                <p class="text-xs text-slate-400">Visualizing distance to day-one production engineering capability.</p>
-              </div>
-              <div class="flex items-center gap-4 text-xs font-mono">
-                <span class="flex items-center gap-1.5 text-mint-400"><span class="w-2.5 h-0.5 bg-mint-400 shadow-glow-mint"></span> Candidate</span>
-                <span class="flex items-center gap-1.5 text-slate-500"><span class="w-2.5 h-0.5 bg-slate-500 border-t border-dashed"></span> Benchmark</span>
-              </div>
-            </div>
-            <div class="relative w-full h-80 flex items-center justify-center">
-              <canvas id="competency-radar-canvas" class="max-h-full max-w-full"></canvas>
-            </div>
-          </div>
-
-          <div class="lg:col-span-5 glass-card p-6 rounded-2xl border border-white/[0.08] space-y-5">
-            <div class="flex items-center justify-between">
-              <h3 class="text-sm font-bold text-white">Skill Topology Breakdown</h3>
-              <button onclick="triggerAIRoadmapGeneration()" class="text-[11px] font-mono text-mint-400 hover:underline">Recompute via AI</button>
-            </div>
-
-            <div class="space-y-2">
-              <span class="text-xs font-semibold text-rose-400">Critical Voids (Click for Capstone Blueprint):</span>
-              <div class="flex flex-wrap gap-2 pt-1" id="chips-missing-critical"></div>
-            </div>
-
-            <div class="space-y-2 pt-3 border-t border-white/[0.06]">
-              <span class="text-xs font-semibold text-mint-400">Verified Technical Assets:</span>
-              <div class="flex flex-wrap gap-2 pt-1" id="chips-matched-skills"></div>
-            </div>
-          </div>
-        </div>
+        <button onclick="closeModal('modal-roadmap')" class="text-slate-400 hover:text-white text-sm">✕</button>
       </div>
 
-      <!-- VIEW PANEL 2: PHASED ROADMAP SPRINTS -->
-      <div id="view-roadmap" class="view-panel hidden space-y-6">
-        <div class="glass-card p-6 rounded-2xl border border-white/[0.08]">
-          <div class="flex flex-wrap items-center justify-between pb-4 mb-6 border-b border-white/[0.06] gap-3">
-            <div>
-              <h3 class="text-base font-bold text-white flex items-center gap-2">
-                <span>Adaptive Phased Roadmap</span>
-                <span class="text-[10px] font-mono bg-mint-950/60 border border-mint-400/30 text-mint-300 px-2 py-0.5 rounded-full">Interactive Rescoring</span>
-              </h3>
-              <p class="text-xs text-slate-400 mt-0.5">Ticking completed milestones updates your readiness score in real time.</p>
-            </div>
-            <button onclick="triggerAIRoadmapGeneration()" class="px-3 py-1 rounded-lg bg-mint-400/10 hover:bg-mint-400/20 border border-mint-400/30 text-mint-300 text-xs font-semibold">Regenerate Roadmap via AI</button>
-          </div>
-          <div class="space-y-5" id="roadmap-phases-container"></div>
-        </div>
+      <div class="flex-1 overflow-y-auto space-y-4 pr-1" id="roadmap-phases-container">
+        <!-- Rendered dynamically -->
       </div>
-
-      <!-- VIEW PANEL 3: MINI DIAGNOSTIC CHALLENGE -->
-      <div id="view-diagnostic" class="view-panel hidden space-y-6">
-        <div class="glass-card p-6 lg:p-8 rounded-2xl border border-mint-400/30 max-w-3xl mx-auto space-y-5 shadow-glow-mint">
-          <div class="flex items-center justify-between pb-4 border-b border-white/[0.06]">
-            <div>
-              <h3 class="text-base font-bold text-white">Rapid Technical Diagnostic</h3>
-              <p class="text-xs text-slate-400">Pinpoints system blindspots in 120 seconds rather than forcing a 30-hour tutorial.</p>
-            </div>
-            <span class="text-xs font-mono text-mint-300 bg-mint-950/60 border border-mint-400/30 px-2.5 py-1 rounded-lg">Topic: Concurrency</span>
-          </div>
-
-          <div class="p-4 rounded-xl bg-black/40 border border-white/[0.06] space-y-3">
-            <p class="text-xs font-medium leading-relaxed text-slate-200">
-              <strong>Production Scenario:</strong> Your backend API handles 10,000 req/sec across 4 auto-scaled pods. You need to implement an exact rate limiter without distributed race conditions or database bottlenecking. Which approach is production-grade?
-            </p>
-
-            <div class="space-y-2 pt-2" id="quiz-options-container">
-              <button onclick="handleQuizAnswer(0)" class="quiz-btn w-full text-left p-3.5 rounded-xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.06] text-xs text-slate-300 transition flex items-start gap-3">
-                <span class="font-mono text-slate-400 font-semibold">A.</span>
-                <span>Store incoming timestamps in a local Node.js in-memory Map reset every 60 seconds.</span>
-              </button>
-              <button onclick="handleQuizAnswer(1)" class="quiz-btn w-full text-left p-3.5 rounded-xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.06] text-xs text-slate-300 transition flex items-start gap-3">
-                <span class="font-mono text-slate-400 font-semibold">B.</span>
-                <span>Use Redis running an atomic Lua script (Token Bucket algorithm) for single-cycle linear execution.</span>
-              </button>
-              <button onclick="handleQuizAnswer(2)" class="quiz-btn w-full text-left p-3.5 rounded-xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.06] text-xs text-slate-300 transition flex items-start gap-3">
-                <span class="font-mono text-slate-400 font-semibold">C.</span>
-                <span>Dispatch an indexed SQL query `SELECT COUNT(*) WHERE created_at > NOW() - INTERVAL '1 minute'`.</span>
-              </button>
-            </div>
-
-            <div id="quiz-feedback" class="hidden mt-4 p-4 rounded-xl text-xs leading-relaxed"></div>
-          </div>
-        </div>
-      </div>
-
-    </main>
+    </div>
   </div>
 
-  <!-- MULTI-STEP MODAL: AUTHENTICATION (LOGIN / SIGN UP) -->
+  <!-- MODAL 1: AUTHENTICATION (LOGIN / REGISTER) -->
   <div id="modal-auth" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="glass-card border border-mint-400/30 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl relative">
-      <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+    <div class="study-card rounded-3xl max-w-md w-full p-6 space-y-5 bg-white dark:bg-[#101424] border border-purple-500/40 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-3">
         <div>
-          <h3 class="text-base font-bold text-white" id="auth-modal-title">Student Access Portal</h3>
-          <p class="text-xs text-slate-400">Initialize your career gap telemetry profile</p>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white" id="auth-modal-title">Student Access Portal</h3>
+          <p class="text-xs text-slate-500">Sign in to save and sync your learning progress</p>
         </div>
-        <button onclick="closeModal('modal-auth')" class="text-slate-400 hover:text-white p-1">✕</button>
+        <button type="button" onclick="closeModal('modal-auth')" class="text-slate-400 hover:text-white">✕</button>
       </div>
 
-      <div class="flex p-1 rounded-xl bg-white/[0.03] border border-white/5 text-xs">
-        <button onclick="setAuthMode('login')" id="btn-mode-login" class="w-1/2 py-1.5 rounded-lg font-semibold transition text-slate-400">Log In</button>
-        <button onclick="setAuthMode('signup')" id="btn-mode-signup" class="w-1/2 py-1.5 rounded-lg font-semibold transition text-slate-950 bg-mint-400">Register Account</button>
+      <div class="flex p-1 rounded-xl bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-white/5 text-xs">
+        <button type="button" onclick="setAuthMode('login')" id="btn-auth-mode-login" class="w-1/2 py-2 rounded-lg font-bold text-slate-500 transition">Log In</button>
+        <button type="button" onclick="setAuthMode('signup')" id="btn-auth-mode-signup" class="w-1/2 py-2 rounded-lg font-bold btn-brand shadow-sm transition">Register</button>
       </div>
 
       <form id="form-auth" onsubmit="handleAuthSubmit(event)" class="space-y-3.5 text-xs">
         <div>
-          <label class="block text-slate-300 font-medium mb-1">University / Professional Email</label>
-          <input type="email" id="auth-email" required placeholder="aditya@joyuniversity.edu.in" class="w-full bg-[#07090D] border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-mint-400">
+          <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-1">University / Professional Email</label>
+          <input type="email" id="auth-email" placeholder="student@university.edu" required class="w-full bg-slate-50 dark:bg-black/30 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-purple-400">
         </div>
         <div>
-          <label class="block text-slate-300 font-medium mb-1">Password</label>
-          <input type="password" id="auth-password" required placeholder="••••••••••••" class="w-full bg-[#07090D] border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-mint-400">
+          <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Password</label>
+          <input type="password" id="auth-password" placeholder="••••••••••••" required class="w-full bg-slate-50 dark:bg-black/30 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-purple-400">
         </div>
 
-        <button type="submit" class="w-full py-2.5 rounded-xl bg-mint-400 hover:bg-mint-300 text-slate-950 font-bold text-xs transition shadow-glow-mint">
-          Continue to Academic Profile →
+        <button type="submit" id="btn-auth-submit" class="btn-brand w-full py-2.5 rounded-xl font-bold shadow-glow-primary transition">
+          Continue →
         </button>
       </form>
     </div>
   </div>
 
-  <!-- MULTI-STEP MODAL: STUDENT PROFILE & ONBOARDING DATA INGESTION -->
-  <div id="modal-onboarding" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="glass-card border border-mint-400/30 rounded-2xl max-w-xl w-full p-6 space-y-4 shadow-2xl relative">
-      <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+  <!-- MODAL 2: STUDENT PROFILE ONBOARDING (DATA COLLECTION) -->
+  <div id="modal-onboarding" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="study-card rounded-3xl max-w-xl w-full p-6 md:p-8 space-y-5 bg-white dark:bg-[#101424] border border-purple-500/40 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-white/10 pb-3">
         <div>
-          <h3 class="text-base font-bold text-white">Student Enrollment & Skill Verification</h3>
-          <p class="text-xs text-slate-400">Feeds the real-time AI Skill Gap Engine</p>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Academic Telemetry Profile</h3>
+          <p class="text-xs text-slate-500">Provide your career parameters to synthesize your tailored roadmap</p>
         </div>
-        <button onclick="closeModal('modal-onboarding')" class="text-slate-400 hover:text-white p-1">✕</button>
+        <button type="button" onclick="closeModal('modal-onboarding')" class="text-slate-400 hover:text-white">✕</button>
       </div>
 
-      <form id="form-onboarding" onsubmit="handleOnboardingSubmit(event)" class="space-y-3.5 text-xs">
-        <div class="grid grid-cols-2 gap-3">
+      <form id="form-onboarding" onsubmit="handleOnboardingSubmit(event)" class="space-y-4 text-xs">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-slate-300 font-medium mb-1">Full Name</label>
-            <input type="text" id="in-name" required value="Aditya Pandey" class="w-full bg-[#07090D] border border-white/10 rounded-lg px-3 py-2 text-white focus:border-mint-400">
+            <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Student Full Name</label>
+            <input type="text" id="in-name" required placeholder="e.g. Aditya Pandey" class="w-full bg-slate-50 dark:bg-black/30 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-purple-400">
           </div>
           <div>
-            <label class="block text-slate-300 font-medium mb-1">Target Dream Role</label>
-            <select id="in-role" class="w-full bg-[#07090D] border border-white/10 rounded-lg px-3 py-2 text-mint-400 font-semibold focus:border-mint-400">
+            <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Current Academic Level</label>
+            <select id="in-academic-level" required class="w-full bg-slate-50 dark:bg-black/30 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-purple-400">
+              <option value="Undergraduate (Semester 1 - 4)">Undergraduate (Semester 1 - 4)</option>
+              <option value="Undergraduate (Semester 5 - 6)" selected>Undergraduate (Semester 5 - 6)</option>
+              <option value="Final Year Student (Semester 7 - 8)">Final Year Student (Semester 7 - 8)</option>
+              <option value="Postgraduate / Master's Student">Postgraduate / Master's Student</option>
+              <option value="Bootcamp / Self-Taught Developer">Bootcamp / Self-Taught Developer</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Target Career Goal</label>
+            <select id="in-career-goal" required class="w-full bg-slate-50 dark:bg-black/30 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2 text-orange-600 dark:text-purple-400 font-bold focus:outline-none focus:border-purple-400">
               <option value="Full-Stack Software Engineer">Full-Stack Software Engineer</option>
               <option value="AI & ML Systems Engineer">AI & ML Systems Engineer</option>
               <option value="Cloud & DevOps Engineer">Cloud & DevOps Engineer</option>
+              <option value="Backend High-Throughput Architect">Backend High-Throughput Architect</option>
             </select>
           </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-slate-300 font-medium mb-1">Current Degree & Major</label>
-            <input type="text" id="in-degree" value="B.Tech Computer Science" class="w-full bg-[#07090D] border border-white/10 rounded-lg px-3 py-2 text-white focus:border-mint-400">
-          </div>
-          <div>
-            <label class="block text-slate-300 font-medium mb-1">Current Semester / Term</label>
-            <select id="in-semester" class="w-full bg-[#07090D] border border-white/10 rounded-lg px-3 py-2 text-white focus:border-mint-400">
-              <option value="Semester 4">Semester 4 (Sophomore)</option>
-              <option value="Semester 6" selected>Semester 6 (Pre-Final Year)</option>
-              <option value="Semester 8">Semester 8 (Final Year)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-slate-300 font-medium mb-1">GitHub Profile Handle</label>
-            <input type="text" id="in-github" value="aditya-dev-26" placeholder="username" class="w-full bg-[#07090D] border border-white/10 rounded-lg px-3 py-2 text-white font-mono focus:border-mint-400">
-          </div>
-          <div>
-            <label class="block text-slate-300 font-medium mb-1">Internship / Job Urgency</label>
-            <select id="in-horizon" class="w-full bg-[#07090D] border border-white/10 rounded-lg px-3 py-2 text-white focus:border-mint-400">
-              <option value="3-Month Internship Season" selected>3 Months (Internship Season)</option>
-              <option value="6-Month Placement Drive">6 Months (Campus Placements)</option>
-              <option value="12-Month Grad Track">12 Months (Graduate Hire)</option>
+            <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-1">Tenure Left to Achieve Goal</label>
+            <select id="in-tenure" required class="w-full bg-slate-50 dark:bg-black/30 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-purple-400">
+              <option value="1 Month (Emergency Sprint)">1 Month (Emergency Sprint)</option>
+              <option value="3 Months (Internship Season)" selected>3 Months (Internship Season)</option>
+              <option value="6 Months (Placement Drives)">6 Months (Placement Drives)</option>
+              <option value="12 Months (Graduate Hire)">12 Months (Graduate Hire)</option>
             </select>
           </div>
         </div>
 
         <div>
-          <label class="block text-slate-300 font-medium mb-1">Current Self-Reported Skills (Comma Separated)</label>
-          <input type="text" id="in-skills" value="React, Node.js, Python, PostgreSQL, REST APIs" class="w-full bg-[#07090D] border border-white/10 rounded-lg px-3 py-2 text-white focus:border-mint-400">
+          <label class="block text-slate-700 dark:text-slate-300 font-semibold mb-1">GitHub Username (Public Repository Audit)</label>
+          <div class="flex gap-2">
+            <input type="text" id="in-github" placeholder="e.g. AdityaRP2008" required class="flex-1 bg-slate-50 dark:bg-black/30 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-purple-400">
+            <button type="button" onclick="verifyAndInspectGitHubInput()" class="px-3 py-2 rounded-xl bg-slate-200 dark:bg-white/10 text-slate-700 dark:text-slate-300 font-mono font-bold hover:bg-purple-500 hover:text-white transition">
+              Verify Repo
+            </button>
+          </div>
+          <div id="github-verify-note" class="text-[11px] text-slate-500 mt-1">We analyze public repositories to detect active languages, commit cadence, and frameworks.</div>
         </div>
 
         <div class="pt-2 flex justify-end gap-2">
-          <button type="button" onclick="closeModal('modal-onboarding')" class="px-4 py-2 rounded-lg bg-white/5 text-slate-300 hover:bg-white/10">Cancel</button>
-          <button type="submit" id="btn-generate-roadmap" class="px-5 py-2 rounded-lg bg-mint-400 hover:bg-mint-300 text-slate-950 font-bold shadow-glow-mint">
-            Generate AI Career Roadmap →
+          <button type="button" onclick="closeModal('modal-onboarding')" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-white/10 text-slate-500">Cancel</button>
+          <button type="submit" id="btn-save-onboarding" class="btn-brand px-6 py-2 rounded-xl font-bold shadow-glow-primary">
+            Generate Roadmap with OmniRoute →
           </button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL: CAPSTONE SPEC DRAWER -->
-  <div id="modal-capstone" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="glass-card border border-mint-400/30 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl relative">
-      <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
-        <h4 class="text-sm font-bold text-white" id="capstone-title">Capstone Blueprint</h4>
-        <button onclick="closeModal('modal-capstone')" class="text-slate-400 hover:text-white p-1">✕</button>
-      </div>
-      <div class="space-y-3 text-xs leading-relaxed text-slate-300">
-        <div class="p-3 rounded-xl bg-mint-950/40 border border-mint-400/20 text-mint-300">
-          <strong>Strategic Intent:</strong> Ship a production-grade codebase to provide undeniable proof of capability to technical recruiters.
+  <!-- MODAL 3: ENDLESS ADAPTIVE MCQ STUDIO -->
+  <div id="modal-mcq" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="study-card rounded-3xl max-w-2xl w-full p-6 space-y-5 bg-white dark:bg-[#101424] border border-purple-500/40 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base">📝</span>
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Endless Adaptive MCQ Studio</h3>
+            <span id="mcq-badge-track" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-600 dark:text-purple-300">Track</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">Infinite question stream matched to your syllabus</p>
         </div>
-        <p id="capstone-desc">
-          Build a high-throughput microservice that incorporates low-latency caching and automated containerization.
-        </p>
+        <div class="flex items-center gap-3 font-mono text-xs font-bold">
+          <div class="text-slate-500">⏱ <span id="mcq-session-timer">00:00</span></div>
+          <div class="text-emerald-500">✓ <span id="mcq-correct-counter">0</span></div>
+          <div class="text-rose-500">✕ <span id="mcq-wrong-counter">0</span></div>
+          <button type="button" onclick="finishMCQSession()" class="text-slate-400 hover:text-white ml-2 text-sm">✕</button>
+        </div>
       </div>
-      <div class="flex justify-end pt-2">
-        <button onclick="closeModal('modal-capstone')" class="px-4 py-1.5 rounded-lg bg-mint-400 hover:bg-mint-300 text-slate-950 font-bold text-xs">Dismiss</button>
+
+      <div class="space-y-4">
+        <div class="flex items-center justify-between text-xs font-mono text-slate-400">
+          <span id="mcq-question-number">Question #1</span>
+          <span id="mcq-topic-tag" class="text-purple-500 font-bold">Concept</span>
+        </div>
+
+        <p id="mcq-question-text" class="text-sm font-bold text-slate-900 dark:text-white leading-relaxed">
+          Loading challenge...
+        </p>
+
+        <div id="mcq-choices-container" class="space-y-2.5 pt-1"></div>
+        <div id="mcq-instant-feedback" class="hidden p-3.5 rounded-xl text-xs leading-relaxed font-medium"></div>
+
+        <div class="pt-2 flex items-center justify-between">
+          <button type="button" onclick="finishMCQSession()" class="px-3.5 py-1.5 rounded-xl border border-slate-300 dark:border-white/10 text-slate-500 text-xs font-semibold">
+            Finish & Review Scorecard
+          </button>
+          <button type="button" id="btn-next-mcq" onclick="generateNextMCQ()" class="btn-brand px-5 py-2 rounded-xl text-xs font-bold transition hidden">
+            Next Challenge →
+          </button>
+        </div>
       </div>
     </div>
+  </div>
+
+  <!-- MODAL 4: ENDLESS LOGIC RIDDLE STUDIO -->
+  <div id="modal-puzzle" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="study-card rounded-3xl max-w-2xl w-full p-6 space-y-5 bg-white dark:bg-[#101424] border border-purple-500/40 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base">🧩</span>
+            <h3 class="text-sm font-bold text-slate-900 dark:text-white">Endless Logic & Systems Riddle Arena</h3>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">Continuous distributed system riddles and puzzle challenges</p>
+        </div>
+        <div class="flex items-center gap-3 font-mono text-xs font-bold">
+          <div class="text-emerald-500">Solved: <span id="puzzle-solved-counter">0</span></div>
+          <button type="button" onclick="closeModal('modal-puzzle')" class="text-slate-400 hover:text-white ml-2 text-sm">✕</button>
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <div class="flex items-center justify-between text-xs font-mono text-slate-400">
+          <span id="puzzle-title-number">Riddle #1</span>
+          <span id="puzzle-topic-tag" class="text-amber-500 font-bold">Distributed Systems</span>
+        </div>
+
+        <p id="puzzle-scenario-text" class="text-xs font-semibold text-slate-800 dark:text-slate-200 leading-relaxed">
+          Loading scenario...
+        </p>
+
+        <div id="puzzle-choices-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
+        <div id="puzzle-instant-feedback" class="hidden p-3.5 rounded-xl text-xs leading-relaxed font-medium"></div>
+
+        <div class="pt-2 flex justify-end">
+          <button type="button" id="btn-next-puzzle" onclick="generateNextPuzzle()" class="btn-brand px-5 py-2 rounded-xl text-xs font-bold transition hidden">
+            Next Logic Riddle →
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 5: FINAL PERFORMANCE SCORECARD -->
+  <div id="modal-scorecard" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="study-card rounded-3xl max-w-3xl w-full p-6 md:p-8 space-y-5 bg-white dark:bg-[#101424] border border-purple-500/40 shadow-2xl max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span>📊</span> <span>Session Performance Diagnostic</span>
+          </h3>
+          <p class="text-xs text-slate-500">Comprehensive score review and root-cause analysis for missed questions</p>
+        </div>
+        <button onclick="closeModal('modal-scorecard')" class="text-slate-400 hover:text-white text-sm">✕</button>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+        <div class="p-3 rounded-2xl bg-slate-100 dark:bg-white/[0.03] border border-slate-200 dark:border-white/5">
+          <span class="text-[10px] font-mono text-slate-400 uppercase font-bold">Total Answered</span>
+          <div id="scorecard-total" class="text-2xl font-black font-mono mt-0.5">0</div>
+        </div>
+        <div class="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+          <span class="text-[10px] font-mono uppercase font-bold">Correct</span>
+          <div id="scorecard-correct" class="text-2xl font-black font-mono mt-0.5">0</div>
+        </div>
+        <div class="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400">
+          <span class="text-[10px] font-mono uppercase font-bold">Incorrect</span>
+          <div id="scorecard-wrong" class="text-2xl font-black font-mono mt-0.5">0</div>
+        </div>
+        <div class="p-3 rounded-2xl bg-slate-100 dark:bg-white/[0.03] border border-slate-200 dark:border-white/5">
+          <span class="text-[10px] font-mono text-slate-400 uppercase font-bold">Accuracy / Pace</span>
+          <div id="scorecard-accuracy" class="text-2xl font-black font-mono mt-0.5">0%</div>
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto space-y-3 pr-1">
+        <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Concept Gaps & Plain-English Explanations:</h4>
+        <div id="scorecard-breakdown-list" class="space-y-3 text-xs"></div>
+      </div>
+
+      <div class="pt-3 border-t border-slate-200 dark:border-white/10 flex justify-end gap-2">
+        <button type="button" onclick="closeModal('modal-scorecard')" class="px-4 py-2 rounded-xl border border-slate-300 dark:border-white/10 text-xs font-semibold">
+          Return to Dashboard
+        </button>
+        <button type="button" onclick="closeModal('modal-scorecard'); startAdaptiveMCQSession();" class="btn-brand px-5 py-2 rounded-xl text-xs font-bold">
+          Start New Practice Sprint →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 6: GITHUB REPO INSPECTOR -->
+  <div id="modal-github" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="study-card rounded-3xl max-w-lg w-full p-6 space-y-4 bg-white dark:bg-[#101424] border border-purple-500/40 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">🐙</span>
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white">GitHub Public Repository Telemetry</h3>
+        </div>
+        <button onclick="closeModal('modal-github')" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <div class="flex gap-2">
+        <input type="text" id="in-github-scan" placeholder="GitHub username" class="flex-1 bg-slate-100 dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-purple-400 font-mono">
+        <button type="button" onclick="fetchGitHubRepos()" id="btn-fetch-github" class="btn-brand px-4 py-2 rounded-xl text-xs font-bold">
+          Scan Public Repos
+        </button>
+      </div>
+
+      <div id="github-repos-container" class="max-h-64 overflow-y-auto space-y-2 pr-1 text-xs">
+        <div class="p-4 text-center text-slate-400">
+          Enter a username to scan public repositories via GitHub API.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 7: ACHIEVEMENTS -->
+  <div id="modal-achievements" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="study-card rounded-3xl max-w-2xl w-full p-6 space-y-5 bg-white dark:bg-[#101424] border border-white/20 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-white/10">
+        <div>
+          <h3 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span>🏆</span> <span>Academic Achievements & Badges</span>
+          </h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Unlock badges by advancing through milestones</p>
+        </div>
+        <button onclick="closeModal('modal-achievements')" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5" id="achievements-grid"></div>
+    </div>
+  </div>
+
+  <!-- MODAL 8: CAPSTONE BLUEPRINT DRAWER -->
+  <div id="modal-capstone" class="fixed inset-0 z-50 hidden bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="study-card rounded-2xl max-w-md w-full p-6 space-y-3 bg-white dark:bg-[#101424] border border-slate-200 dark:border-white/10">
+      <h3 class="text-sm font-bold text-slate-900 dark:text-white" id="capstone-title">Lab Specification</h3>
+      <p id="capstone-desc" class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-medium"></p>
+      <div class="flex justify-end pt-2">
+        <button type="button" onclick="closeModal('modal-capstone')" class="btn-brand px-4 py-1.5 rounded-xl text-xs font-bold">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drawer: AI 1-on-1 Tutor Chat -->
+  <div id="drawer-ai-tutor" class="fixed right-0 top-0 bottom-0 w-full sm:w-[380px] bg-white/95 dark:bg-[#07090D]/95 border-l border-slate-200 dark:border-white/10 backdrop-blur-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
+    <div class="p-4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
+      <h3 class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <span>🎓 Align-X AI Tutor</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-purple-400 animate-ping"></span>
+      </h3>
+      <button onclick="toggleTutorChat()" class="text-slate-400 hover:text-white">✕</button>
+    </div>
+
+    <div id="tutor-chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 text-xs">
+      <div class="p-3 rounded-xl bg-slate-100 dark:bg-white/[0.03] text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-white/5">
+        🎓 Hello! I am your Align-X AI Tutor. Ask me any conceptual question about your learning roadmap, system design, or interview prep.
+      </div>
+    </div>
+
+    <form onsubmit="handleTutorSend(event)" class="p-3 border-t border-slate-200 dark:border-white/10 flex gap-2">
+      <input type="text" id="tutor-input" placeholder="Ask your question..." required class="flex-1 bg-slate-50 dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-purple-400">
+      <button type="submit" class="btn-brand px-3.5 py-2 rounded-xl text-xs font-bold">Send</button>
+    </form>
   </div>
 
   <script src="script.js"></script>
