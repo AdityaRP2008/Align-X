@@ -33,7 +33,7 @@ Student Profile:
 - Timeline / Tenure: ${tenure}
 - GitHub: ${github || 'None'}
 
-Return ONLY a strict raw JSON object (no markdown formatting, no backticks):
+Return ONLY a strict raw JSON object matching this schema (do not use markdown quotes):
 {
   "curriculumMastery": 20,
   "conceptDeficits": 80,
