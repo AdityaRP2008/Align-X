@@ -1,10 +1,13 @@
 {
   "name": "align-x-academy",
-  "version": "5.0.0",
+  "version": "7.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vercel dev",
-    "build": "echo 'Build complete'"
+    "build": "echo 'Ready for deployment'"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@google/genai": "^0.1.1"
+  }
 }
