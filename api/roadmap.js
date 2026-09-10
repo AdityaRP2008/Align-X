@@ -3,51 +3,60 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { fullName, targetRole, degree, semester, horizon, skills, github } = req.body;
+  const { name, academicLevel, careerGoal, tenure, github, detectedSkills } = req.body;
 
-  if (!fullName || !targetRole) {
-    return res.status(400).json({ error: 'Missing required parameters' });
+  if (!name || !careerGoal || !tenure) {
+    return res.status(400).json({ error: 'Missing required student parameters' });
   }
 
   const OMNIROUTE_BASE_URL = process.env.OMNIROUTE_BASE_URL || 'https://api.omniroute.ai/v1';
   const OMNIROUTE_API_KEY = process.env.OMNIROUTE_API_KEY || '';
 
-  const systemPrompt = `You are a technical career gap analyzer. Analyze the candidate and return STRICT RAW JSON ONLY (no backticks, no markdown codeblocks).
-The output must match this exact schema:
+  const systemPrompt = `You are an elite academic curriculum architect and technical hiring gap analyzer. 
+Analyze the candidate profile and return STRICT RAW JSON ONLY (no markdown backticks, no wrapping text).
+Output schema MUST match this format exactly:
 {
-  "readiness": <integer 0-100>,
-  "matchedSkills": ["<skill1>", "<skill2>"],
+  "readiness": <integer 25-50 based on entry level>,
+  "curriculumMastery": <integer 20-45>,
+  "conceptDeficits": <integer 55-80>,
+  "matchedSkills": ["<skill1>", "<skill2>", "<skill3>"],
   "missingSkills": [
     {
       "name": "<skill name>",
-      "tag": "<e.g. Critical Void | High Priority>",
-      "capstoneTitle": "<title of portfolio project>",
-      "capstoneDesc": "<2-sentence implementation blueprint>"
+      "tag": "Critical Void",
+      "capstoneTitle": "<title>",
+      "capstoneDesc": "<2 sentence lab blueprint>"
     }
   ],
   "radar": {
     "categories": ["Frontend", "Backend APIs", "System Design", "Databases", "DevOps", "Testing"],
-    "candidate": [<score 0-100>, <score 0-100>, <score 0-100>, <score 0-100>, <score 0-100>, <score 0-100>],
+    "candidate": [<s1>, <s2>, <s3>, <s4>, <s5>, <s6>],
     "benchmark": [90, 85, 80, 85, 75, 75]
   },
   "phases": [
     {
-      "phaseTitle": "Phase 1: Bridge Core Voids (Weeks 1-4)",
+      "phaseTitle": "Phase 1: Core Fundamentals & Prerequisite Labs",
       "milestones": [
-        { "id": "m1", "title": "<task description>", "hours": "<e.g. 8 hrs>", "resource": "<docs or reference>" }
+        { "id": "m1", "title": "<milestone task>", "hours": "8 hrs", "resource": "<doc or repo>", "completed": false, "xp": 100 }
+      ]
+    },
+    {
+      "phaseTitle": "Phase 2: Production Implementations & Architecture",
+      "milestones": [
+        { "id": "m2", "title": "<milestone task>", "hours": "14 hrs", "resource": "<doc or repo>", "completed": false, "xp": 150 }
       ]
     }
   ]
 }`;
 
-  const userPrompt = `Student: ${fullName}
-Degree: ${degree} (${semester})
-Target Role: ${targetRole}
-Urgency Window: ${horizon}
-GitHub: ${github || 'N/A'}
-Self-Reported/Git Skills: ${skills || 'HTML, CSS, JavaScript, Basic Python'}
+  const userPrompt = `Candidate: ${name}
+Current Academic Level: ${academicLevel}
+Career Goal: ${careerGoal}
+Tenure / Urgency Window: ${tenure}
+GitHub Profile: ${github || 'None'}
+Verified Codebase Skills: ${detectedSkills && detectedSkills.length ? detectedSkills.join(', ') : 'Standard Academic Foundation'}
 
-Generate the gap analysis and structured phased roadmap now. Return ONLY valid raw JSON.`;
+Construct their tailored phased roadmap now. Output raw JSON only.`;
 
   try {
     const response = await fetch(`${OMNIROUTE_BASE_URL}/chat/completions`, {
@@ -73,17 +82,10 @@ Generate the gap analysis and structured phased roadmap now. Return ONLY valid r
     }
 
     const completion = await response.json();
-    let rawContent = completion.choices?.[0]?.message?.content || '{}';
-
-    rawContent = rawContent.replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
-    const parsedData = JSON.parse(rawContent);
-
-    return res.status(200).json(parsedData);
+    let raw = completion.choices?.[0]?.message?.content || '{}';
+    raw = raw.replace(/^```json\s*/, '').replace(/```\s*$/, '').trim();
+    return res.status(200).json(JSON.parse(raw));
   } catch (err) {
-    console.error('OmniRoute Execution Error:', err);
-    return res.status(500).json({
-      error: 'Failed to process roadmap via OmniRoute gateway',
-      details: err.message
-    });
+    return res.status(500).json({ error: 'AI Gateway Error', details: err.message });
   }
 }
