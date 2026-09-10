@@ -1,10 +1,10 @@
 {
-  "name": "align-x",
-  "version": "1.0.0",
+  "name": "align-x-academy",
+  "version": "5.0.0",
   "private": true,
   "scripts": {
     "dev": "vercel dev",
-    "build": "echo 'Static & Serverless ready'"
+    "build": "echo 'Build complete'"
   },
   "dependencies": {}
 }
