@@ -9,8 +9,8 @@ export default async function handler(req, res) {
   const OMNIROUTE_BASE_URL = process.env.OMNIROUTE_BASE_URL || 'https://api.omniroute.ai/v1';
   const OMNIROUTE_API_KEY = process.env.OMNIROUTE_API_KEY || '';
 
-  const systemPrompt = `You are the Align-X AI Holographic Tutor. Provide concise, expert engineering guidance with code snippets or bullets.
-Student: ${context?.name || 'Engineer'}, Target: ${context?.roleTitle || 'Full-Stack'}, Readiness: ${context?.readiness || 68}%.`;
+  const systemPrompt = `You are the Align-X Academic Computer Science Tutor. Provide concise, clear, and actionable feedback with code or bullet points.
+Candidate: ${context?.name || 'Student'}, Goal: ${context?.careerGoal || 'Software Engineer'}, Readiness: ${context?.readiness || 0}%, Tenure: ${context?.tenure || 'N/A'}.`;
 
   try {
     const response = await fetch(`${OMNIROUTE_BASE_URL}/chat/completions`, {
@@ -31,7 +31,7 @@ Student: ${context?.name || 'Engineer'}, Target: ${context?.roleTitle || 'Full-S
 
     if (!response.ok) throw new Error(await response.text());
     const comp = await response.json();
-    return res.status(200).json({ reply: comp.choices?.[0]?.message?.content || "No response." });
+    return res.status(200).json({ reply: comp.choices?.[0]?.message?.content || "No response generated." });
   } catch (err) {
     return res.status(500).json({ error: 'Tutor Error', details: err.message });
   }
