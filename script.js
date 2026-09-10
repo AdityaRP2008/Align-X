@@ -1,28 +1,30 @@
 /**
  * Align-X Academic Engine
- * Any Educational Field Profiler + Supabase Cloud Database + Gemini API
+ * Authentication Gateway + Gemini Roadmap Synthesis + Safe Supabase Persistence
  */
 
 const SUPABASE_URL = "https://eydgvjsgkqjyqjkkedi.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5ZGd2anNna3FqeXFqa2tlZGkiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc1NzQ4OTc1MCwiZXhwIjoyMDczMDY1NzUwfQ.f11c7dG38yT7CwhL6f6f9lKkEee9r8r_placeholder";
 
 let supabase = null;
-try {
-  if (window.supabase) {
+if (window.supabase && typeof window.supabase.createClient === 'function') {
+  try {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } catch (e) {
+    console.warn("Supabase running offline fallback mode.");
   }
-} catch (e) {
-  console.warn("Supabase init local:", e.message);
 }
 
 let activePhaseIdx = 0;
+let currentStudent = null;
 
-let currentStudent = {
-  email: "guest@alignx.edu",
+// Initial fallback profile
+const defaultGuestStudent = {
+  email: "aditya@joyuniversity.edu.in",
   name: "Aditya Pandey",
   academic_level: "Semester 6 • B.Tech Computer Science",
   career_goal: "Full-Stack Engineer",
-  current_knowledge: "Solid understanding of JavaScript and React. Needs containerization, B+ tree disk structures, and Redis concurrency.",
+  current_knowledge: "Solid foundation in React and JavaScript. Needs B+ Trees, Docker, and Redis concurrency.",
   tenure: "3 Months",
   github: "adityarp2008",
   readiness: 68,
@@ -40,14 +42,14 @@ let currentStudent = {
     {
       phaseTitle: "Phase 1: Foundations & Systems Architecture",
       milestones: [
-        { id: "p1-1", title: "Implement B+ Tree Indexing in PostgreSQL", hours: "6 hrs", desc: "Reduce random disk block reads.", completed: true, xp: 120 },
+        { id: "p1-1", title: "Implement B+ Tree Indexing in PostgreSQL", hours: "6 hrs", desc: "Match disk page block read fanouts.", completed: true, xp: 120 },
         { id: "p1-2", title: "Configure High-Performance Nginx Reverse Proxy", hours: "4 hrs", desc: "Isolate application runtime.", completed: true, xp: 90 }
       ]
     },
     {
       phaseTitle: "Phase 2: Concurrency & Distributed Storage",
       milestones: [
-        { id: "p2-1", title: "Deploy Redis Atomic Lua Token Bucket Rate Limiter", hours: "8 hrs", desc: "Eliminate pod race conditions.", completed: false, xp: 200 },
+        { id: "p2-1", title: "Deploy Redis Atomic Lua Token Bucket Rate Limiter", hours: "8 hrs", desc: "Eliminate multi-instance race conditions.", completed: false, xp: 200 },
         { id: "p2-2", title: "Design Multi-Region Event Pub/Sub with Kafka", hours: "10 hrs", desc: "Event ordering across brokers.", completed: false, xp: 250 }
       ]
     },
@@ -61,7 +63,7 @@ let currentStudent = {
   ]
 };
 
-// Continuous MCQ Bank
+// MCQ Question Bank
 const endlessMCQBank = [
   {
     q: "Why do relational database engines (PostgreSQL, InnoDB) prefer B+ Trees over standard Red-Black Binary Trees for disk index storage?",
@@ -100,24 +102,29 @@ const endlessMCQBank = [
 
 let mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [] };
 
+// APP INITIALIZATION
 window.addEventListener('DOMContentLoaded', () => {
   const savedTheme = localStorage.getItem('alignx_accent') || 'purple';
   setAccentTheme(savedTheme);
+  initPointerGlow();
 
-  const localSaved = localStorage.getItem('alignx_student_active');
-  if (localSaved) {
+  // Check if student session exists in localStorage
+  const savedSession = localStorage.getItem('alignx_student_active');
+  if (savedSession) {
     try {
-      currentStudent = JSON.parse(localSaved);
+      currentStudent = JSON.parse(savedSession);
+      enterDashboard();
     } catch (e) {
-      console.warn("Using default session state");
+      showAuthGateway();
     }
+  } else {
+    showAuthGateway();
   }
 
-  updateDashboardUI();
-  initPointerGlow();
   setInterval(cycleFunFact, 8000);
   window.addEventListener('resize', renderRadar);
 
+  // Global click to dismiss dropdowns
   document.addEventListener('click', (e) => {
     if (!e.target.closest('#dropdown-track-wrapper')) closeMenu('menu-tracks');
     if (!e.target.closest('#dropdown-theme-wrapper')) closeMenu('menu-themes');
@@ -125,21 +132,184 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// SYNC & UI UPDATES
+// AUTH GATEWAY CONTROLLERS
+function switchAuthTab(tab) {
+  const formIn = document.getElementById('form-signin');
+  const formReg = document.getElementById('form-register');
+  const btnIn = document.getElementById('tab-btn-signin');
+  const btnReg = document.getElementById('tab-btn-register');
+  hideAuthMsg();
+
+  if (tab === 'signin') {
+    formIn.classList.remove('hidden');
+    formReg.classList.add('hidden');
+    btnIn.className = "py-2 rounded-xl transition btn-brand shadow-sm";
+    btnReg.className = "py-2 rounded-xl transition theme-text-sub hover:opacity-100";
+  } else {
+    formIn.classList.add('hidden');
+    formReg.classList.remove('hidden');
+    btnReg.className = "py-2 rounded-xl transition btn-brand shadow-sm";
+    btnIn.className = "py-2 rounded-xl transition theme-text-sub hover:opacity-100";
+  }
+}
+
+function showAuthMsg(msg, isError = false) {
+  const el = document.getElementById('auth-status-msg');
+  el.textContent = msg;
+  el.className = isError 
+    ? "p-3 rounded-xl text-center text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30" 
+    : "p-3 rounded-xl text-center text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+  el.classList.remove('hidden');
+}
+
+function hideAuthMsg() {
+  document.getElementById('auth-status-msg')?.classList.add('hidden');
+}
+
+// HANDLE SIGN IN
+async function handleSignIn(e) {
+  e.preventDefault();
+  const email = document.getElementById('signin-email').value.trim();
+  const btn = document.getElementById('btn-submit-signin');
+  btn.disabled = true;
+  btn.textContent = "Authenticating with Supabase...";
+
+  if (supabase) {
+    try {
+      const { data, error } = await supabase.from('students').select('*').eq('email', email).single();
+      if (data && !error) {
+        currentStudent = data;
+        localStorage.setItem('alignx_student_active', JSON.stringify(currentStudent));
+        enterDashboard();
+        return;
+      }
+    } catch (err) {
+      console.warn("Supabase lookup error:", err.message);
+    }
+  }
+
+  // If email matches default mock or offline student
+  if (email.toLowerCase().includes("aditya")) {
+    currentStudent = defaultGuestStudent;
+    localStorage.setItem('alignx_student_active', JSON.stringify(currentStudent));
+    enterDashboard();
+    return;
+  }
+
+  btn.disabled = false;
+  btn.textContent = "Enter Academic Dashboard →";
+  showAuthMsg(`Account for "${email}" not found. Please click the Register tab to create your profile.`, true);
+}
+
+// HANDLE REGISTER (GEMINI POWERED)
+async function handleRegister(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn-submit-register');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="animate-spin">↻</span> Synthesizing with Gemini...`;
+
+  const payload = {
+    name: document.getElementById('reg-name').value.trim(),
+    academicLevel: document.getElementById('reg-academic-level').value.trim(),
+    email: document.getElementById('reg-email').value.trim(),
+    careerGoal: document.getElementById('reg-career-goal').value.trim(),
+    currentKnowledge: document.getElementById('reg-current-knowledge').value.trim(),
+    tenure: document.getElementById('reg-tenure').value,
+    github: document.getElementById('reg-github').value.trim()
+  };
+
+  try {
+    const res = await fetch('/api/roadmap', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const aiData = await res.json();
+
+    if (aiData.error) throw new Error(aiData.error);
+
+    currentStudent = {
+      email: payload.email,
+      name: payload.name,
+      academic_level: payload.academicLevel,
+      career_goal: payload.careerGoal,
+      current_knowledge: payload.currentKnowledge,
+      tenure: payload.tenure,
+      github: payload.github,
+      readiness: aiData.readiness || 25,
+      curriculum_mastery: aiData.curriculumMastery || 20,
+      concept_deficits: aiData.conceptDeficits || 80,
+      target_pace: aiData.targetPace || 75,
+      radar: aiData.radar || defaultGuestStudent.radar,
+      phases: aiData.phases || defaultGuestStudent.phases,
+      xp: 0,
+      level: 1
+    };
+
+    // Save to Supabase
+    if (supabase) {
+      await supabase.from('students').upsert(currentStudent, { onConflict: 'email' });
+    }
+
+    localStorage.setItem('alignx_student_active', JSON.stringify(currentStudent));
+    enterDashboard();
+  } catch (err) {
+    console.error("Registration error:", err);
+    // Offline local fallback so the user is never stuck
+    currentStudent = {
+      ...defaultGuestStudent,
+      name: payload.name,
+      email: payload.email,
+      academic_level: payload.academicLevel,
+      career_goal: payload.careerGoal,
+      current_knowledge: payload.currentKnowledge,
+      github: payload.github
+    };
+    localStorage.setItem('alignx_student_active', JSON.stringify(currentStudent));
+    enterDashboard();
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<span>✨ Synthesize Architecture with Gemini →</span>`;
+  }
+}
+
+function handleLogout() {
+  localStorage.removeItem('alignx_student_active');
+  currentStudent = null;
+  showAuthGateway();
+}
+
+function showAuthGateway() {
+  document.getElementById('auth-view').classList.remove('hidden');
+  document.getElementById('app-view').classList.add('hidden');
+  document.getElementById('btn-floating-center').classList.add('hidden');
+  document.getElementById('btn-floating-tutor').classList.add('hidden');
+}
+
+function enterDashboard() {
+  document.getElementById('auth-view').classList.add('hidden');
+  document.getElementById('app-view').classList.remove('hidden');
+  document.getElementById('btn-floating-center').classList.remove('hidden');
+  document.getElementById('btn-floating-tutor').classList.remove('hidden');
+  updateDashboardUI();
+}
+
+// DASHBOARD UI UPDATES
 function updateDashboardUI() {
+  if (!currentStudent) return;
   const s = currentStudent;
-  document.getElementById('nav-current-role').textContent = s.career_goal || 'Custom Track';
+
+  document.getElementById('nav-current-role').textContent = s.career_goal || 'Full-Stack Engineer';
   document.getElementById('nav-github-label').textContent = s.github ? `@${s.github}` : '@student';
-  document.getElementById('nav-user-name').textContent = s.name || 'Student Scholar';
-  document.getElementById('drawer-user-name').textContent = s.name || 'Student Scholar';
-  document.getElementById('nav-academic-term').textContent = s.academic_level || 'Active Candidate';
+  document.getElementById('nav-user-name').textContent = s.name || 'Aditya Pandey';
+  document.getElementById('drawer-user-name').textContent = s.name || 'Aditya Pandey';
+  document.getElementById('nav-academic-term').textContent = s.academic_level || 'Active Student';
   document.getElementById('drawer-user-goal').textContent = s.career_goal || 'Goal Unset';
-  
-  const initials = (s.name || 'AX').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
+  const initials = (s.name || 'AP').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   document.getElementById('nav-avatar-initials').textContent = initials;
   document.getElementById('nav-level-badge').textContent = `L${s.level || 1}`;
 
-  // Telemetry Dials
   document.getElementById('meter-current-val').innerHTML = `${s.curriculum_mastery}% <span class="text-xs font-normal theme-text-sub">/100%</span>`;
   document.getElementById('meter-gap-val').innerHTML = `${s.concept_deficits}% <span class="text-xs font-normal theme-text-sub">untested</span>`;
   document.getElementById('meter-readiness-val').innerHTML = `${s.readiness}% <span class="text-xs font-normal theme-text-sub">score</span>`;
@@ -155,7 +325,6 @@ function updateDashboardUI() {
   updateRadialMeter('dial-ring-3', s.readiness);
   updateRadialMeter('dial-ring-4', s.target_pace || 75);
 
-  // XP & Level
   document.getElementById('xp-level-title').textContent = `⚡ Level ${s.level || 1}: Apprentice Architect`;
   document.getElementById('xp-progress-label').textContent = `${s.xp || 0} / 1000 XP`;
   document.getElementById('xp-progress-bar').style.width = `${Math.min(100, ((s.xp || 0) % 1000) / 10)}%`;
@@ -169,12 +338,12 @@ function updateRadialMeter(circleId, percentage) {
   const circle = document.getElementById(circleId);
   if (!circle) return;
   const clamped = Math.max(0, Math.min(100, percentage));
-  const circumference = 2 * Math.PI * 26; // r = 26
+  const circumference = 2 * Math.PI * 26;
   circle.style.strokeDasharray = `${circumference}`;
   circle.style.strokeDashoffset = circumference - (clamped / 100) * circumference;
 }
 
-// INTERACTIVE STUDY PLAN RENDERER
+// STUDY PLAN MODULE RENDERER
 function changeStudyPlanPhase(phaseIdx) {
   activePhaseIdx = phaseIdx;
   document.getElementById('active-week-label').textContent = `Phase ${phaseIdx + 1}`;
@@ -184,19 +353,14 @@ function changeStudyPlanPhase(phaseIdx) {
 
 function renderStudyPlanModules() {
   const container = document.getElementById('study-plan-modules-container');
-  if (!container) return;
+  if (!container || !currentStudent) return;
   container.innerHTML = '';
 
   const phases = currentStudent.phases || [];
   const currentPhase = phases[activePhaseIdx] || phases[0];
 
-  if (!currentPhase || !currentPhase.milestones || currentPhase.milestones.length === 0) {
-    container.innerHTML = `
-      <div class="p-6 text-center theme-card-inner rounded-2xl space-y-2">
-        <p class="theme-text-sub">No milestones generated yet.</p>
-        <button onclick="openOnboardingModal()" class="btn-brand px-4 py-1.5 rounded-xl text-xs">✨ Generate with Gemini</button>
-      </div>
-    `;
+  if (!currentPhase || !currentPhase.milestones) {
+    container.innerHTML = `<div class="p-4 text-center theme-text-sub">No milestones mapped yet.</div>`;
     return;
   }
 
@@ -210,7 +374,7 @@ function renderStudyPlanModules() {
         <span class="w-6 h-6 rounded-full bg-white/10 dynamic-accent-text font-bold flex items-center justify-center text-xs shrink-0">${idx + 1}</span>
         <div>
           <div class="study-module-title text-xs leading-snug ${m.completed ? 'line-through opacity-60' : ''}">${m.title}</div>
-          <div class="study-module-desc text-[11px] mt-0.5">${m.desc || `${m.hours} focused exercise`}</div>
+          <div class="study-module-desc text-[11px] mt-0.5">${m.desc || `${m.hours} structured spec`}</div>
         </div>
       </div>
       <div class="flex items-center gap-2 shrink-0">
@@ -223,13 +387,18 @@ function renderStudyPlanModules() {
   });
 }
 
-// ROADMAP MODAL BUILDER
+// ROADMAP MODAL
+function openRoadmapModal() {
+  renderRoadmapModal();
+  openModal('modal-roadmap');
+}
+
 function renderRoadmapModal() {
   const container = document.getElementById('roadmap-phases-container');
-  if (!container) return;
+  if (!container || !currentStudent) return;
   container.innerHTML = '';
 
-  document.getElementById('roadmap-track-name').textContent = currentStudent.career_goal || 'Selected Target Role';
+  document.getElementById('roadmap-track-name').textContent = currentStudent.career_goal || 'Selected Target Goal';
   const phases = currentStudent.phases || [];
 
   phases.forEach((phase, pIdx) => {
@@ -244,7 +413,7 @@ function renderRoadmapModal() {
             <input type="checkbox" ${m.completed ? 'checked' : ''} onchange="toggleMilestoneState('${m.id}')" class="w-4 h-4 rounded text-purple-600 focus:ring-0 cursor-pointer">
             <div>
               <div class="font-bold text-xs theme-text-title ${m.completed ? 'line-through opacity-50' : ''}">${m.title}</div>
-              <div class="text-[10px] theme-text-sub">${m.hours} • ${m.desc || 'Milestone goal'}</div>
+              <div class="text-[10px] theme-text-sub">${m.hours} • ${m.desc || 'Milestone target'}</div>
             </div>
           </label>
           <span class="font-mono text-amber-500 font-bold text-xs shrink-0">+${m.xp || 100} XP</span>
@@ -263,192 +432,72 @@ function renderRoadmapModal() {
   });
 }
 
-// DYNAMIC TELEMETRY CALCULATION ON COURSE COMPLETION
+// PROGRESS CALCULATION
 async function toggleMilestoneState(mId) {
-  let totalMilestones = 0;
-  let completedMilestones = 0;
+  let total = 0, completed = 0;
 
   currentStudent.phases.forEach(phase => {
     phase.milestones.forEach(m => {
-      totalMilestones++;
+      total++;
       if (m.id === mId) {
         m.completed = !m.completed;
-        const deltaXP = m.xp || 100;
-        if (m.completed) {
-          currentStudent.xp = (currentStudent.xp || 0) + deltaXP;
-        } else {
-          currentStudent.xp = Math.max(0, (currentStudent.xp || 0) - deltaXP);
-        }
+        const delta = m.xp || 100;
+        currentStudent.xp = m.completed ? (currentStudent.xp || 0) + delta : Math.max(0, (currentStudent.xp || 0) - delta);
       }
-      if (m.completed) completedMilestones++;
+      if (m.completed) completed++;
     });
   });
 
-  const completionRatio = completedMilestones / (totalMilestones || 1);
-  const mastery = Math.round(completionRatio * 100);
+  const ratio = completed / (total || 1);
+  const mastery = Math.round(ratio * 100);
   currentStudent.curriculum_mastery = mastery;
   currentStudent.concept_deficits = Math.max(0, 100 - mastery);
-  currentStudent.readiness = Math.min(100, Math.round(20 + completionRatio * 80));
+  currentStudent.readiness = Math.min(100, Math.round(25 + ratio * 75));
   currentStudent.level = Math.floor((currentStudent.xp || 0) / 1000) + 1;
 
-  // Dynamically push student polygon outward on radar
   if (currentStudent.radar && currentStudent.radar.candidate) {
     currentStudent.radar.candidate = currentStudent.radar.candidate.map((val, idx) => {
       const target = currentStudent.radar.benchmark ? currentStudent.radar.benchmark[idx] : 85;
-      return Math.min(target, Math.round(30 + completionRatio * 60));
+      return Math.min(target, Math.round(30 + ratio * 60));
     });
   }
 
-  saveStudentState();
+  localStorage.setItem('alignx_student_active', JSON.stringify(currentStudent));
+  if (supabase && currentStudent.email) {
+    try {
+      await supabase.from('students').upsert(currentStudent, { onConflict: 'email' });
+    } catch (e) {
+      console.warn("Supabase update error:", e);
+    }
+  }
+
   updateDashboardUI();
 }
 
-// SAVE STATE TO SUPABASE & LOCAL STORAGE
-async function saveStudentState() {
-  localStorage.setItem('alignx_student_active', JSON.stringify(currentStudent));
-
-  if (supabase && currentStudent.email && !currentStudent.email.includes("guest@")) {
-    try {
-      await supabase.from('students').upsert({
-        email: currentStudent.email,
-        name: currentStudent.name,
-        academic_level: currentStudent.academic_level,
-        career_goal: currentStudent.career_goal,
-        current_knowledge: currentStudent.current_knowledge,
-        tenure: currentStudent.tenure,
-        github: currentStudent.github,
-        readiness: currentStudent.readiness,
-        curriculum_mastery: currentStudent.curriculum_mastery,
-        concept_deficits: currentStudent.concept_deficits,
-        target_pace: currentStudent.target_pace,
-        radar: currentStudent.radar,
-        phases: currentStudent.phases,
-        xp: currentStudent.xp,
-        level: currentStudent.level
-      }, { onConflict: 'email' });
-    } catch (err) {
-      console.warn("Supabase upsert error:", err.message);
-    }
-  }
-}
-
-// ONBOARDING SUBMISSION (GOOGLE GEMINI POWERED)
-async function handleOnboardingSubmit(e) {
-  e.preventDefault();
-  const btn = document.getElementById('btn-generate-roadmap');
-  btn.disabled = true;
-  btn.innerHTML = `<span class="animate-spin">↻</span> Generating Architecture with Gemini...`;
-
-  const payload = {
-    name: document.getElementById('in-name').value.trim(),
-    academicLevel: document.getElementById('in-academic-level').value.trim(),
-    careerGoal: document.getElementById('in-career-goal').value.trim(),
-    currentKnowledge: document.getElementById('in-current-knowledge').value.trim(),
-    tenure: document.getElementById('in-tenure').value,
-    github: document.getElementById('in-github').value.trim()
-  };
-
-  try {
-    const res = await fetch('/api/roadmap', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const aiData = await res.json();
-
-    if (aiData.error) throw new Error(aiData.error);
-
-    currentStudent = {
-      ...currentStudent,
-      name: payload.name,
-      academic_level: payload.academicLevel,
-      career_goal: payload.careerGoal,
-      current_knowledge: payload.currentKnowledge,
-      tenure: payload.tenure,
-      github: payload.github,
-      readiness: aiData.readiness || 25,
-      curriculum_mastery: aiData.curriculumMastery || 20,
-      concept_deficits: aiData.conceptDeficits || 80,
-      target_pace: aiData.targetPace || 75,
-      radar: aiData.radar || currentStudent.radar,
-      phases: aiData.phases || currentStudent.phases
-    };
-
-    await saveStudentState();
-    closeModal('modal-onboarding');
-    updateDashboardUI();
-    alert(`Personalized roadmap for "${payload.careerGoal}" generated successfully!`);
-  } catch (err) {
-    alert("Could not reach Gemini backend: " + err.message + ". Check GEMINI_API_KEY in Vercel.");
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = `<span>✨ Synthesize Custom Roadmap via Gemini</span>`;
-  }
-}
-
-// AUTHENTICATION MODAL SUBMIT
-async function handleAuthSubmit(e) {
-  e.preventDefault();
-  const email = document.getElementById('auth-email').value.trim();
-  closeModal('modal-auth');
-
-  if (supabase) {
-    try {
-      const { data, error } = await supabase.from('students').select('*').eq('email', email).single();
-      if (data && !error) {
-        currentStudent = data;
-        saveStudentState();
-        updateDashboardUI();
-        alert(`Welcome back, ${data.name}! Synchronized profile from Supabase.`);
-        return;
-      }
-    } catch (err) {
-      console.warn("Supabase fetch failed:", err);
-    }
-  }
-
-  // If new user, set email and prompt for custom background
-  currentStudent.email = email;
-  openOnboardingModal();
-}
-
-function openOnboardingModal() {
-  document.getElementById('in-name').value = currentStudent.name || '';
-  document.getElementById('in-academic-level').value = currentStudent.academic_level || '';
-  document.getElementById('in-career-goal').value = currentStudent.career_goal || '';
-  document.getElementById('in-current-knowledge').value = currentStudent.current_knowledge || '';
-  document.getElementById('in-github').value = currentStudent.github || '';
-  openModal('modal-onboarding');
-}
-
-function openAuthModal() {
-  openModal('modal-auth');
-}
-
 function quickSwitchGoal(goalName) {
+  if (!currentStudent) return;
   currentStudent.career_goal = goalName;
   closeMenu('menu-tracks');
-  openOnboardingModal();
+  updateDashboardUI();
 }
 
 // RADAR MATRIX VISUALIZER
 function renderRadar() {
   const canvas = document.getElementById('competency-radar-canvas');
-  if (!canvas) return;
+  if (!canvas || !currentStudent) return;
   const ctx = canvas.getContext('2d');
   const w = canvas.width, h = canvas.height;
   const cx = w / 2, cy = h / 2, radius = 95;
 
-  const cats = currentStudent.radar?.categories || ["Domain 1", "Domain 2", "Domain 3", "Domain 4", "Domain 5", "Domain 6"];
-  const vals = currentStudent.radar?.candidate || [30, 30, 30, 30, 30, 30];
-  const bench = currentStudent.radar?.benchmark || [85, 85, 80, 90, 75, 80];
+  const cats = currentStudent.radar?.categories || ["Frontend", "Backend APIs", "System Design", "Databases", "DevOps", "Testing"];
+  const vals = currentStudent.radar?.candidate || [85, 78, 42, 70, 35, 60];
+  const bench = currentStudent.radar?.benchmark || [90, 85, 80, 85, 75, 75];
   const n = cats.length;
 
   ctx.clearRect(0, 0, w, h);
   const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-main').trim() || '#C084FC';
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
 
-  // Concentric Web
   for (let l = 1; l <= 4; l++) {
     const r = (radius / 4) * l;
     ctx.beginPath();
@@ -462,7 +511,6 @@ function renderRadar() {
     ctx.stroke();
   }
 
-  // Spokes & Labels
   for (let i = 0; i < n; i++) {
     const a = (Math.PI * 2 / n) * i - Math.PI / 2;
     ctx.beginPath();
@@ -476,7 +524,7 @@ function renderRadar() {
     ctx.fillText(cats[i], cx + (radius + 26) * Math.cos(a), cy + (radius + 12) * Math.sin(a));
   }
 
-  // Industry Benchmark Polygon (Dashed)
+  // Industry Benchmark
   ctx.beginPath();
   for (let i = 0; i < n; i++) {
     const a = (Math.PI * 2 / n) * i - Math.PI / 2;
@@ -512,7 +560,7 @@ function renderRadar() {
   ctx.fill();
 }
 
-// AI TUTOR HANDLER (CALLS /api/chat)
+// AI TUTOR HANDLER
 async function handleTutorSend(e) {
   e.preventDefault();
   const inEl = document.getElementById('tutor-input');
@@ -540,12 +588,12 @@ async function handleTutorSend(e) {
     box.innerHTML += `<div class="p-2.5 rounded-xl theme-card-inner theme-text-title leading-relaxed">${(data.reply || 'Insight verified.').replace(/\n/g, '<br/>')}</div>`;
   } catch (err) {
     typing.remove();
-    box.innerHTML += `<div class="p-2.5 rounded-xl theme-card-inner theme-text-title"><strong>Tutor:</strong> Make sure your GEMINI_API_KEY is configured in Vercel. For ${currentStudent.career_goal}, prioritize your Phase 1 foundational milestones!</div>`;
+    box.innerHTML += `<div class="p-2.5 rounded-xl theme-card-inner theme-text-title"><strong>Tutor:</strong> Focus on your active phase milestones for ${currentStudent?.career_goal || 'your target goal'}!</div>`;
   }
   box.scrollTop = box.scrollHeight;
 }
 
-// ADAPTIVE THEME SWITCHER
+// THEME SWITCHER
 function setAccentTheme(themeName) {
   document.documentElement.setAttribute('data-theme', themeName);
   localStorage.setItem('alignx_accent', themeName);
@@ -568,19 +616,21 @@ function setAccentTheme(themeName) {
     light: "#7C3AED"
   };
 
-  document.getElementById('active-theme-label').textContent = themeLabels[themeName] || "Cyber Purple";
-  document.getElementById('active-theme-dot').style.backgroundColor = themeColors[themeName] || "#C084FC";
+  const lbl = document.getElementById('active-theme-label');
+  const dot = document.getElementById('active-theme-dot');
+  if (lbl) lbl.textContent = themeLabels[themeName] || "Cyber Purple";
+  if (dot) dot.style.backgroundColor = themeColors[themeName] || "#C084FC";
 
   renderStudyPlanModules();
   renderRadar();
 }
 
-// ENDLESS MCQ STUDIO
+// MCQ STUDIO
 function startEndlessMCQSession() {
   mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [] };
   document.getElementById('mcq-correct-counter').textContent = '0';
   document.getElementById('mcq-wrong-counter').textContent = '0';
-  document.getElementById('mcq-badge-track').textContent = currentStudent.career_goal || 'General Track';
+  document.getElementById('mcq-badge-track').textContent = currentStudent?.career_goal || 'General';
   openModal('modal-mcq');
   generateNextMCQ();
 }
@@ -678,11 +728,11 @@ function finishMCQSession() {
 
 // GITHUB TELEMETRY
 async function fetchGitHubRepos() {
-  const u = (document.getElementById('in-github-scan').value || currentStudent.github || 'adityarp2008').trim();
+  const u = (document.getElementById('in-github-scan').value || currentStudent?.github || 'adityarp2008').trim();
   const c = document.getElementById('github-repos-container');
   if (!u) return;
 
-  c.innerHTML = '<div class="p-3 theme-text-sub">Querying GitHub public API...</div>';
+  c.innerHTML = '<div class="p-3 theme-text-sub">Querying GitHub API...</div>';
   try {
     const res = await fetch(`https://api.github.com/users/${u}/repos?sort=updated&per_page=6`);
     const data = await res.json();
@@ -715,7 +765,7 @@ async function fetchGitHubRepos() {
   }
 }
 
-// UI NAVIGATION HELPERS
+// UTILITIES
 function toggleNavSidebar() { document.getElementById('nav-drawer')?.classList.toggle('-translate-x-full'); }
 function toggleTutorChat() { document.getElementById('drawer-ai-tutor')?.classList.toggle('translate-x-full'); }
 function toggleMenu(id, e) { if (e) e.stopPropagation(); document.getElementById(id)?.classList.toggle('hidden'); }
@@ -727,15 +777,15 @@ function openModal(id) {
 function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
 
 function openNotesModal() {
-  document.getElementById('notes-modal-title').textContent = `${currentStudent.career_goal} - Blueprint`;
+  document.getElementById('notes-modal-title').textContent = `${currentStudent?.career_goal || 'Engineering'} - Architecture Blueprint`;
   const container = document.getElementById('notes-container');
   container.innerHTML = `
     <div class="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-600 dark:text-blue-300 font-semibold mb-2">
-      🚀 Target Curriculum Specifications for ${currentStudent.career_goal}
+      🚀 Active Curricula Specs for ${currentStudent?.career_goal || 'Selected Track'}
     </div>
     <div class="p-3.5 rounded-xl theme-card-inner space-y-1">
-      <div class="font-bold theme-text-title">Background Assessment</div>
-      <p class="theme-text-sub text-[11px] leading-relaxed">${currentStudent.current_knowledge || 'Undergraduate'}</p>
+      <div class="font-bold theme-text-title">Current Domain Knowledge Profile</div>
+      <p class="theme-text-sub text-[11px] leading-relaxed">${currentStudent?.current_knowledge || 'Undergraduate student'}</p>
     </div>
   `;
   openModal('modal-notes');
