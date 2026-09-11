@@ -208,7 +208,7 @@ window.goToProfilerStep = function() {
 
 window.submitSignIn = async function() {
   const emailInput = document.getElementById('signin-email');
-  const email = emailInput ? emailInput.value.trim() : "aditya@joyuniversity.edu.in";
+  const email = emailInput ? emailInput.value.trim() : "";
   const btn = document.getElementById('btn-submit-signin');
   
   if (btn) {
@@ -266,13 +266,13 @@ window.submitProfilerForm = async function() {
     btn.innerHTML = `<span class="animate-spin">↻</span> Gemini is architecting your roadmap...`;
   }
 
-  const nameVal = document.getElementById('prof-name-input')?.value.trim() || 'Aditya Pandey';
+  const nameVal = document.getElementById('prof-name-input')?.value.trim() || 'Scholar';
   const emailVal = window.pendingRegistrationEmail || (nameVal.toLowerCase().replace(/\s+/g, '') + "@alignx.edu");
-  const levelVal = document.getElementById('prof-level-input')?.value.trim() || '1st semester';
+  const levelVal = document.getElementById('prof-level-input')?.value.trim() || 'Undergraduate';
   const goalVal = document.getElementById('prof-goal-input')?.value.trim() || 'AI Engineer';
-  const knowVal = document.getElementById('prof-know-input')?.value.trim() || 'basic html css and python';
-  const tenureVal = document.getElementById('prof-tenure-input')?.value || '12 Months Comprehensive';
-  const ghVal = document.getElementById('prof-github-input')?.value.trim() || 'adityarp2008';
+  const knowVal = document.getElementById('prof-know-input')?.value.trim() || 'Basics';
+  const tenureVal = document.getElementById('prof-tenure-input')?.value.trim() || '12 Months';
+  const ghVal = document.getElementById('prof-github-input')?.value.trim() || '';
 
   const payload = {
     email: emailVal,
@@ -504,14 +504,14 @@ function updateDashboardUI() {
   const termEl = document.getElementById('nav-academic-term');
   const goalEl = document.getElementById('drawer-user-goal');
 
-  if (roleEl) roleEl.textContent = s.career_goal || 'Entrepreneur';
-  if (ghEl) ghEl.textContent = s.github ? `@${s.github}` : '@adityarp2008';
-  if (uNameEl) uNameEl.textContent = s.name || 'Aditya Pandey';
-  if (dNameEl) dNameEl.textContent = s.name || 'Aditya Pandey';
-  if (termEl) termEl.textContent = s.academic_level || '1st semester';
-  if (goalEl) goalEl.textContent = s.career_goal || 'Entrepreneur';
+  if (roleEl) roleEl.textContent = s.career_goal || 'Goal Unset';
+  if (ghEl) ghEl.textContent = s.github ? `@${s.github}` : '@student';
+  if (uNameEl) uNameEl.textContent = s.name || 'Student Scholar';
+  if (dNameEl) dNameEl.textContent = s.name || 'Student Scholar';
+  if (termEl) termEl.textContent = s.academic_level || 'Education Profile';
+  if (goalEl) goalEl.textContent = s.career_goal || 'Target Goal';
 
-  const initials = (s.name || 'AP').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  const initials = (s.name || 'ST').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   const initEl = document.getElementById('nav-avatar-initials');
   const lvlBadge = document.getElementById('nav-level-badge');
   if (initEl) initEl.textContent = initials;
@@ -694,7 +694,7 @@ function renderRadar() {
   const w = canvas.width, h = canvas.height;
   const cx = w / 2, cy = h / 2, radius = 95;
 
-  const cats = window.currentStudent.radar?.categories || ["Domain 1", "Domain 2", "Domain 3", "Domain 4", "Domain 5", "Domain 6"];
+  const cats = window.currentStudent.radar?.categories || ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6"];
   const vals = window.currentStudent.radar?.candidate || [30, 20, 15, 10, 25, 15];
   const bench = window.currentStudent.radar?.benchmark || [90, 85, 85, 80, 80, 75];
   const n = cats.length;
@@ -810,7 +810,6 @@ window.handleTutorSend = async function(e) {
 
     const reply = data.reply || (data.details ? `Tutor error: ${data.details}` : "Insight verified.");
     
-    // Render formatted response with proper paragraph and bullet spacing
     const formattedReply = reply
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\n\n/g, '<br><br>')
@@ -872,7 +871,6 @@ window.openNotesModal = function() {
           ${escapeHtml(m.desc || 'Comprehensive core competence required for career benchmarks.')}
         </p>
 
-        <!-- Deep-dive Reading Guide -->
         <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1.5 text-[11px]">
           <div class="font-semibold dynamic-accent-text flex items-center gap-1.5">
             <span>📚 Core Reading & Concepts to Master:</span>
@@ -888,7 +886,6 @@ window.openNotesModal = function() {
   });
 
   container.innerHTML = `
-    <!-- Active Header Capsule -->
     <div class="p-4 rounded-2xl bg-gradient-to-r from-purple-900/30 via-indigo-900/20 to-transparent border border-purple-500/30 space-y-1.5">
       <div class="flex items-center justify-between">
         <span class="text-[10px] font-mono font-extrabold uppercase tracking-wider dynamic-accent-text">Syllabus Deep-Dive Specification</span>
@@ -900,12 +897,10 @@ window.openNotesModal = function() {
       </p>
     </div>
 
-    <!-- Milestones Detailed Breakdown -->
     <div class="space-y-3 pt-1">
       ${milestoneDetailsHTML || '<p class="theme-text-sub">No milestones mapped in this phase.</p>'}
     </div>
 
-    <!-- Recommended External Research Guide -->
     <div class="p-3.5 rounded-2xl theme-card-inner border border-white/10 space-y-2 text-xs">
       <div class="font-bold theme-text-title flex items-center gap-2">
         <span>🔍</span>
@@ -970,7 +965,7 @@ window.startEndlessMCQSession = function() {
   const bdg = document.getElementById('mcq-badge-track');
   if (corr) corr.textContent = '0';
   if (wrng) wrng.textContent = '0';
-  if (bdg) bdg.textContent = window.currentStudent?.career_goal || 'Entrepreneur';
+  if (bdg) bdg.textContent = window.currentStudent?.career_goal || 'Specialist Track';
   openModal('modal-mcq');
   generateNextMCQ();
 };
@@ -1072,9 +1067,12 @@ window.finishMCQSession = function() {
 
 // GITHUB TELEMETRY
 window.fetchGitHubRepos = async function() {
-  const u = (document.getElementById('in-github-scan').value || window.currentStudent?.github || 'adityarp2008').trim();
+  const u = (document.getElementById('in-github-scan').value || window.currentStudent?.github || '').trim();
   const c = document.getElementById('github-repos-container');
-  if (!u) return;
+  if (!u) {
+    c.innerHTML = '<div class="p-3 text-rose-400">Please enter a GitHub username to scan.</div>';
+    return;
+  }
 
   c.innerHTML = '<div class="p-3 theme-text-sub">Querying GitHub API...</div>';
   try {
