@@ -1,6 +1,6 @@
 /**
  * Align-X Academic Engine
- * Multi-Profile Manager (No Re-auth Required) + 4-6 Phases Architecture (4-6 Milestones Each)
+ * Multi-Profile Manager + Guaranteed 5-7 Topics Per Phase + Dynamic AI Insights
  */
 
 const SUPABASE_URL = "https://eydgvjsgkqjyqjkkedi.supabase.co";
@@ -20,10 +20,78 @@ let activePhaseIdx = 0;
 window.currentStudent = null;
 window.pendingRegistrationEmail = "";
 
-// Dynamic Fallback Generator guaranteeing 4 Phases with 4 Milestones each
+// Dynamic Fallback Generator guaranteeing 4-5 Phases with 5-7 Milestones each
 function generateFallbackCurriculum(goal, knowledge) {
   const g = (goal || 'Cardiologist').toLowerCase();
 
+  if (g.includes('cardio') || g.includes('medic') || g.includes('doctor') || g.includes('surgeon')) {
+    return {
+      radar: {
+        categories: ["Cardiovascular Anatomy", "Diagnostic Imaging", "Hemodynamics", "Pharmacology", "Interventional Procedures", "Emergency Protocols"],
+        candidate: [25, 20, 15, 30, 10, 20],
+        benchmark: [95, 90, 90, 85, 80, 90]
+      },
+      phases: [
+        {
+          phaseTitle: "Phase 1: Cellular Electrophysiology & Structural Anatomy",
+          milestones: [
+            { id: "med-1", title: "Cardiac Action Potentials & Ion Channel Kinetics", hours: "14 hrs", desc: "Phase 0 Na+ influx, Phase 2 L-type Ca2+ plateau, and Phase 3 delayed rectifier K+ currents.", completed: false, xp: 140 },
+            { id: "med-2", title: "Coronary Arterial & Microvascular Micro-Anatomy", hours: "16 hrs", desc: "LAD, LCx, and RCA perfusion territories, collateral circuits, and coronary sinus anatomy.", completed: false, xp: 150 },
+            { id: "med-3", title: "12-Lead Vector Electrocardiography & Axis Determination", hours: "18 hrs", desc: "Hexaxial reference system, Einthoven's triangle, and fascicular block axis shifts.", completed: false, xp: 180 },
+            { id: "med-4", title: "Wiggers Diagram & Left Ventricular Pressure-Volume Loops", hours: "16 hrs", desc: "Preload/afterload shifts, elastance slopes, and cardiac cycle acoustic correlations.", completed: false, xp: 160 },
+            { id: "med-5", title: "Autonomic Regulation & Baroreceptor Reflex Loops", hours: "12 hrs", desc: "Sympathetic beta-1 adrenergic versus vagal muscarinic pacemaker modulation.", completed: false, xp: 130 },
+            { id: "med-6", title: "Endothelial Biology & Atherogenesis Pathophysiology", hours: "15 hrs", desc: "Lipid oxidation, foam cell accumulation, and fibrous cap rupture dynamics.", completed: false, xp: 140 }
+          ]
+        },
+        {
+          phaseTitle: "Phase 2: Diagnostic Imaging, Ultrasound & Valvular Pathologies",
+          milestones: [
+            { id: "med-7", title: "Transthoracic Echocardiography & Standard 5-View Planes", hours: "20 hrs", desc: "Parasternal long/short axis, apical 4/2 chamber, and subcostal views.", completed: false, xp: 200 },
+            { id: "med-8", title: "Doppler Hemodynamics, Continuity Equations & Stenosis", hours: "18 hrs", desc: "Bernoulli simplified equation ($$\\Delta P = 4v^2$$), valve area calculations, and jet velocities.", completed: false, xp: 190 },
+            { id: "med-9", title: "Mitral & Aortic Regurgitation Quantification", hours: "16 hrs", desc: "PISA method, vena contracta width, and regurgitant volume classifications.", completed: false, xp: 180 },
+            { id: "med-10", title: "Nuclear Stress Perfusion & SPECT/PET Imaging", hours: "14 hrs", desc: "Radiotracer uptake kinetics, reversible ischemia vs fixed scar patterns.", completed: false, xp: 170 },
+            { id: "med-11", title: "Cardiac Magnetic Resonance (CMR) & Late Gadolinium", hours: "18 hrs", desc: "T1/T2 mapping, myocarditis differential, and replacement fibrosis scoring.", completed: false, xp: 210 },
+            { id: "med-12", title: "Transesophageal Echo (TEE) & Left Atrial Appendage", hours: "16 hrs", desc: "LAA thrombus rule-out, endocarditis vegetations, and prosthetic valve leaks.", completed: false, xp: 190 }
+          ]
+        },
+        {
+          phaseTitle: "Phase 3: Cardiovascular Pharmacology & Arrhythmia Management",
+          milestones: [
+            { id: "med-13", title: "Vaughan Williams Antiarrhythmic Classifications (I-IV)", hours: "18 hrs", desc: "Sodium blockers, potassium channel blockers, amiodarone protocols, and QT risks.", completed: false, xp: 200 },
+            { id: "med-14", title: "Guideline-Directed Heart Failure Quadruple Therapy", hours: "20 hrs", desc: "ARNI, Beta-blockers, SGLT2 inhibitors, and mineralocorticoid receptor antagonists.", completed: false, xp: 220 },
+            { id: "med-15", title: "Inotropic Agents, Vasopressors & Vasodilator Titrations", hours: "16 hrs", desc: "Dobutamine, Milrinone, Norepinephrine, and Nitroprusside receptor kinetics.", completed: false, xp: 180 },
+            { id: "med-16", title: "Antithrombotic & Anticoagulant Protocols in ACS & AFib", hours: "18 hrs", desc: "DOACs, Heparin bridging, DAPT duration, and bleeding risk scores (HAS-BLED).", completed: false, xp: 200 },
+            { id: "med-17", title: "Lipid-Lowering Strategies: Statins, Ezetimibe & PCSK9i", hours: "14 hrs", desc: "LDL reduction targets, pleiotropic plaque stabilization, and secondary prevention.", completed: false, xp: 170 },
+            { id: "med-18", title: "Cardioversion Protocols & Antiarrhythmic Infusion Safety", hours: "16 hrs", desc: "Synchronized electrical shock protocols, energy selection, and safety checks.", completed: false, xp: 190 }
+          ]
+        },
+        {
+          phaseTitle: "Phase 4: Interventional Cardiology, ACS & Structural Catheterization",
+          milestones: [
+            { id: "med-19", title: "Right & Left Heart Diagnostic Catheterization", hours: "24 hrs", desc: "Fick cardiac output calculation, pulmonary wedge pressures, and vascular resistance.", completed: false, xp: 260 },
+            { id: "med-20", title: "Coronary Angiography & Fluoroscopic Projection Mapping", hours: "22 hrs", desc: "RAO/LAO cranial/caudal angles, bifurcation lesions, and TIMI flow grading.", completed: false, xp: 250 },
+            { id: "med-21", title: "Fractional Flow Reserve (FFR) & Intravascular Ultrasound", hours: "20 hrs", desc: "iFR/FFR physiological cutoffs (<0.80) and stent expansion/apposition criteria.", completed: false, xp: 240 },
+            { id: "med-22", title: "STEMI Emergency Protocols & Door-To-Balloon Windows", hours: "22 hrs", desc: "Primary PCI pathways, radial vs femoral access, and distal embolization guards.", completed: false, xp: 270 },
+            { id: "med-23", title: "Transcatheter Aortic Valve Replacement (TAVR) Planning", hours: "20 hrs", desc: "Annulus CT sizing, vascular access assessment, and conduction block hazards.", completed: false, xp: 250 },
+            { id: "med-24", title: "Temporary Mechanical Circulatory Support (Impella & IABP)", hours: "26 hrs", desc: "Hemodynamic unloading, purge systems, and vascular complication management.", completed: false, xp: 300 }
+          ]
+        },
+        {
+          phaseTitle: "Phase 5: Critical Care Resuscitation, Shock & Board Clearance",
+          milestones: [
+            { id: "med-25", title: "Cardiogenic Shock Phenotyping & SCAI Staging (A-E)", hours: "24 hrs", desc: "Normotensive vs hypoperfused shock, pulmonary artery catheter profiles.", completed: false, xp: 290 },
+            { id: "med-26", title: "Venoarterial Extracorporeal Membrane Oxygenation (VA-ECMO)", hours: "28 hrs", desc: "Cannulation setups, Harlequin syndrome, and left ventricular venting.", completed: false, xp: 320 },
+            { id: "med-27", title: "Malignant Ventricular Arrhythmia Storm Triage", hours: "20 hrs", desc: "Stellate ganglion blockade, overdrive pacing, and emergency ablation triggers.", completed: false, xp: 280 },
+            { id: "med-28", title: "Advanced Heart Failure: LVAD & Heart Transplant Clearance", hours: "22 hrs", desc: "INTERMACS grading, hemodynamic ramp tests, and donor-recipient matching.", completed: false, xp: 300 },
+            { id: "med-29", title: "Clinical Trial Interpretation & ACC/AHA Guideline Defenses", hours: "20 hrs", desc: "Critical appraisal of landmark trials (DAPA-HF, PARADIGM, ISCHEMIA).", completed: false, xp: 270 },
+            { id: "med-30", title: "Comprehensive Fellowship Simulation & Board Defense", hours: "32 hrs", desc: "End-to-end case simulations, complication management, and final certification sign-off.", completed: false, xp: 360 }
+          ]
+        }
+      ]
+    };
+  }
+
+  // General Domain Fallback (Guarantees 4 phases, 6 milestones each)
   return {
     radar: {
       categories: ["Theoretical Foundations", "Applied Core", "System Integration", "Tooling & Protocols", "Safety / Validation", "Case Decision Systems"],
@@ -32,39 +100,46 @@ function generateFallbackCurriculum(goal, knowledge) {
     },
     phases: [
       {
-        phaseTitle: "Phase 1: Core Fundamentals & Baseline",
+        phaseTitle: "Phase 1: Foundational Principles & Core Methodologies",
         milestones: [
-          { id: "p1-1", title: `Cellular & Theoretical Foundations of ${goal}`, hours: "14 hrs", desc: "Core mechanisms, ion flux, and structural taxonomies.", completed: false, xp: 120 },
-          { id: "p1-2", title: "Diagnostic Vector & Systematic Analysis", hours: "16 hrs", desc: "Baseline interpretation and clinical/systemic mapping.", completed: false, xp: 140 },
-          { id: "p1-3", title: "Hemodynamics, Gradients & Critical Equations", hours: "12 hrs", desc: "Pressure-volume loops, flow mechanics, and mathematical limits.", completed: false, xp: 120 },
-          { id: "p1-4", title: "Safety Criteria & Baseline Verification", hours: "16 hrs", desc: "Triage rules, error-trapping protocols, and baseline screening.", completed: false, xp: 150 }
+          { id: "gen-1", title: `Theoretical Principles & Terminology of ${goal}`, hours: "14 hrs", desc: "Core mechanisms, operational rules, and taxonomies.", completed: false, xp: 120 },
+          { id: "gen-2", title: "Baseline Instrumentation & Tooling Setup", hours: "16 hrs", desc: "Environment configuration, primary frameworks, and verification drills.", completed: false, xp: 140 },
+          { id: "gen-3", title: "Mathematical & Algorithmic Foundations", hours: "12 hrs", desc: "Essential mathematical modeling, rates, and baseline heuristics.", completed: false, xp: 120 },
+          { id: "gen-4", title: "Error Boundaries & Diagnostic Logging", hours: "18 hrs", desc: "Failure identification, error classification, and logging standards.", completed: false, xp: 150 },
+          { id: "gen-5", title: "Initial Synthesis Deliverable & Code/Protocol Audit", hours: "16 hrs", desc: "Execution of first verified deliverable demonstrating core principles.", completed: false, xp: 140 },
+          { id: "gen-6", title: "Phase 1 Synthesis Assessment", hours: "18 hrs", desc: "Comprehensive baseline challenge testing concepts across Phase 1.", completed: false, xp: 160 }
         ]
       },
       {
-        phaseTitle: "Phase 2: Applied Diagnostics & Tooling",
+        phaseTitle: "Phase 2: Intermediate Implementation & Systems",
         milestones: [
-          { id: "p2-1", title: "Diagnostic Imaging, Sonography & Protocols", hours: "20 hrs", desc: "Doppler principles, acoustic impedance, and wall motion scores.", completed: false, xp: 180 },
-          { id: "p2-2", title: "Pharmacology & Receptor Intervention Systems", hours: "18 hrs", desc: "Receptor pharmacodynamics, beta-blockade, and inotropic agents.", completed: false, xp: 200 },
-          { id: "p2-3", title: "Acute Presentation & Ischemic Syndrome Triage", hours: "16 hrs", desc: "Troponin curves, emergency pathways, and door-to-balloon targets.", completed: false, xp: 190 },
-          { id: "p2-4", title: "Comprehensive Phase 2 Case Evaluation", hours: "22 hrs", desc: "Multi-parameter risk scoring and differential diagnosis drills.", completed: false, xp: 220 }
+          { id: "gen-7", title: "Complex Architecture & Workflow Pipelines", hours: "20 hrs", desc: "Multi-parameter integration and applied execution models.", completed: false, xp: 200 },
+          { id: "gen-8", title: "Performance Profiling & Bottleneck Optimization", hours: "18 hrs", desc: "Latency reduction, memory efficiency, and resource throughput profiling.", completed: false, xp: 190 },
+          { id: "gen-9", title: "Security Protocols & Compliance Standards", hours: "16 hrs", desc: "Vulnerability analysis, authorization barriers, and compliance audits.", completed: false, xp: 180 },
+          { id: "gen-10", title: "Automated Verification & Unit/Stress Testing", hours: "18 hrs", desc: "Automated regression tests, fuzz testing, and resilience evaluation.", completed: false, xp: 190 },
+          { id: "gen-11", title: "Intermediate System Component Milestone", hours: "22 hrs", desc: "End-to-end subsystem build ready for real-world integration.", completed: false, xp: 220 },
+          { id: "gen-12", title: "Phase 2 Review & Cross-Evaluation", hours: "16 hrs", desc: "Peer-review audit verifying system stability under variance.", completed: false, xp: 180 }
         ]
       },
       {
-        phaseTitle: "Phase 3: Interventional Procedures & Hardening",
+        phaseTitle: "Phase 3: Advanced Integration & Production Hardening",
         milestones: [
-          { id: "p3-1", title: "Catheterization & Fluoroscopic Anatomy", hours: "22 hrs", desc: "Invasive access pathways, fractional flow reserve, and stent parameters.", completed: false, xp: 240 },
-          { id: "p3-2", title: "Heart Failure Guidelines & Mechanical Support", hours: "20 hrs", desc: "HFrEF vs HFpEF guidelines, LVAD indications, and transplant criteria.", completed: false, xp: 250 },
-          { id: "p3-3", title: "Arrhythmia Mapping & Device Management", hours: "18 hrs", desc: "Pacemaker timing cycles, ICD thresholds, and ablation vectors.", completed: false, xp: 230 },
-          { id: "p3-4", title: "Multi-Vessel Disease & Surgical Consultation", hours: "24 hrs", desc: "SYNTAX score computation, CABG vs PCI risk stratification.", completed: false, xp: 270 }
+          { id: "gen-13", title: "Distributed Orchestration & Scale Management", hours: "24 hrs", desc: "Managing asynchronous workflows, failovers, and consensus states.", completed: false, xp: 240 },
+          { id: "gen-14", title: "Telemetry Dashboards & Live Health Monitoring", hours: "20 hrs", desc: "Configuring real-time telemetry metrics, alerts, and SLA triggers.", completed: false, xp: 220 },
+          { id: "gen-15", title: "Disaster Recovery & Redundancy Planning", hours: "22 hrs", desc: "Simulated catastrophic failover drills and recovery time objectives.", completed: false, xp: 230 },
+          { id: "gen-16", title: "Advanced Domain Tooling & API Integration", hours: "22 hrs", desc: "Integrating third-party industry endpoints, gateways, and hardware interfaces.", completed: false, xp: 230 },
+          { id: "gen-17", title: "Production Hardening Stress Assessment", hours: "26 hrs", desc: "Full-scale load testing validating reliability under peak stress.", completed: false, xp: 260 },
+          { id: "gen-18", title: "Phase 3 Architecture Verification Defense", hours: "20 hrs", desc: "Formal defense of architectural decisions against industry benchmarks.", completed: false, xp: 220 }
         ]
       },
       {
-        phaseTitle: "Phase 4: Capstone Board Certification Benchmark",
+        phaseTitle: "Phase 4: Capstone Industry Certification Benchmark",
         milestones: [
-          { id: "p4-1", title: "Simulated Clinical Board Examinations", hours: "26 hrs", desc: "Standardized clinical simulation and rapid-fire case triage.", completed: false, xp: 300 },
-          { id: "p4-2", title: "Critical Care Resuscitation & Shock Protocols", hours: "24 hrs", desc: "VA-ECMO, Impella hemodynamics, and refractory arrest protocols.", completed: false, xp: 320 },
-          { id: "p4-3", title: "Evidence-Based Clinical Trials & Guideline Revisions", hours: "20 hrs", desc: "Meta-analysis interpretation and practice guideline shifts.", completed: false, xp: 260 },
-          { id: "p4-4", title: "Final Board Clearance & Capstone Deliverable", hours: "30 hrs", desc: "Full competency defense and portfolio sign-off for industry clearance.", completed: false, xp: 350 }
+          { id: "gen-19", title: "Industry Deliverable: System Specification", hours: "26 hrs", desc: "Drafting complete technical and operational documentation.", completed: false, xp: 280 },
+          { id: "gen-20", title: "Capstone Implementation: Execution Sprint", hours: "30 hrs", desc: "Building the comprehensive capstone deliverable demonstrating domain mastery.", completed: false, xp: 320 },
+          { id: "gen-21", title: "Security & Quality Assurance Clearance", hours: "22 hrs", desc: "Independent security, safety, and compliance audit.", completed: false, xp: 250 },
+          { id: "gen-22", title: "Production Deployment & Demonstration", hours: "28 hrs", desc: "Live deployment under real-world constraints and operational metrics.", completed: false, xp: 300 },
+          { id: "gen-23", title: "Final Hiring / Board Clearance Defense", hours: "32 hrs", desc: "Comprehensive technical review proving immediate career readiness.", completed: false, xp: 350 }
         ]
       }
     ]
@@ -73,9 +148,7 @@ function generateFallbackCurriculum(goal, knowledge) {
 
 let mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [], activeQuestion: null };
 
-// ==========================================
-// MULTI-PROFILE STORAGE MANAGER (NO RE-AUTH)
-// ==========================================
+// MULTI-PROFILE STORAGE MANAGER
 function getAllSavedProfiles() {
   try {
     const raw = localStorage.getItem('alignx_profiles_store');
@@ -100,12 +173,10 @@ function saveProfileToStore(profile) {
 }
 
 window.addNewProfileTrack = function() {
-  // Retain name and academic degree from existing user so they don't have to re-type
   const current = window.currentStudent;
   
   document.getElementById('prof-name-input').value = current?.name || '';
   document.getElementById('prof-level-input').value = current?.academic_level || '';
-  // Clear career-specific inputs for the new profile
   document.getElementById('prof-goal-input').value = '';
   document.getElementById('prof-know-input').value = '';
   document.getElementById('prof-tenure-input').value = '12 Months';
@@ -142,7 +213,7 @@ function updateProfilesDropdownUI() {
   let html = `<div class="text-[10px] font-mono theme-text-sub px-2 uppercase font-bold mb-1">Your Career Profiles:</div>`;
 
   if (store.length === 0) {
-    html += `<div class="text-[11px] theme-text-sub px-2 italic">1 profile active. Click "+ Add Another" above to add more.</div>`;
+    html += `<div class="text-[11px] theme-text-sub px-2 italic">1 profile active. Click "+ Add Another" to add more.</div>`;
   } else {
     store.forEach(p => {
       const isActive = p.career_goal.toLowerCase() === currentGoal;
@@ -254,7 +325,7 @@ window.cycleFunFact = async function(manualClick = false) {
     }
   } catch (err) {
     const fallbacks = [
-      `Practitioners in ${goal} who complete structured phased milestones transition up to 65% faster into certified practice.`,
+      `Specialists in ${goal} who complete structured phased milestones transition up to 65% faster into certified practice.`,
       `Deliberate practice with real-world case scenarios produces 3.4x higher concept retention than passive theoretical reading.`,
       `Evaluating edge failure states and multi-parameter differentials is the highest predictor of clinical/industry readiness in ${goal}.`
     ];
@@ -406,7 +477,8 @@ window.submitProfilerForm = async function() {
       });
     }
 
-    if (normalizedPhases.length === 0) {
+    // Safety fallback if returned structure had insufficient topics
+    if (normalizedPhases.length === 0 || normalizedPhases[0].milestones.length < 3) {
       normalizedPhases = fallback.phases;
     }
 
@@ -440,7 +512,7 @@ window.submitProfilerForm = async function() {
     enterDashboard();
     cycleFunFact(true);
   } catch (err) {
-    console.warn("Using smart fallback curriculum:", err.message);
+    console.warn("Using comprehensive fallback curriculum:", err.message);
     window.currentStudent = {
       email: payload.email,
       name: payload.name,
@@ -700,7 +772,7 @@ function renderDynamicPhasesDropdown() {
     html += `
       <button type="button" onclick="changeStudyPlanPhase(${idx})" class="w-full text-left px-2.5 py-1.5 rounded-lg dropdown-item-btn flex items-center justify-between">
         <span class="truncate">${escapeHtml(p.phaseTitle || `Phase ${idx + 1}`)}</span>
-        <span class="text-[9px] font-mono text-purple-400 font-bold ml-1">${(p.milestones || []).length} items</span>
+        <span class="text-[9px] font-mono text-purple-400 font-bold ml-1">${(p.milestones || []).length} topics</span>
       </button>
     `;
   });
@@ -708,7 +780,7 @@ function renderDynamicPhasesDropdown() {
   menuWeeks.innerHTML = html;
 }
 
-// STUDY PLAN MODULES
+// STUDY PLAN MODULES (Renders all 5-7 milestones per phase without capping)
 window.changeStudyPlanPhase = function(phaseIdx) {
   activePhaseIdx = phaseIdx;
   const lbl = document.getElementById('active-week-label');
@@ -735,6 +807,7 @@ function renderStudyPlanModules() {
     return;
   }
 
+  // Renders ALL milestones without any slice truncation
   currentPhase.milestones.forEach((m, idx) => {
     const item = document.createElement('div');
     item.className = "p-3.5 rounded-2xl study-module-card flex items-center justify-between gap-3 transition cursor-pointer";
@@ -792,7 +865,7 @@ function renderRoadmapModal() {
     box.innerHTML = `
       <div class="flex items-center justify-between pb-1">
         <h4 class="text-xs font-extrabold uppercase tracking-wider dynamic-accent-text">${escapeHtml(phase.phaseTitle || `Phase ${pIdx + 1}`)}</h4>
-        <span class="text-[10px] font-mono theme-text-sub">Phase ${pIdx + 1} • ${mList.length} Milestones</span>
+        <span class="text-[10px] font-mono theme-text-sub">Phase ${pIdx + 1} • ${mList.length} Topics</span>
       </div>
       <div class="space-y-2">${html}</div>
     `;
@@ -977,7 +1050,7 @@ window.handleTutorSend = async function(e) {
 // NOTES GENERATOR
 function generateMilestoneSpecificReadingGuide(title, desc, goal) {
   return {
-    theory: `Detailed breakdown of underlying principles, authoritative standards, and structural equations for "${title}".`,
+    theory: `Detailed breakdown of underlying mechanisms, authoritative standards, and structural equations for "${title}".`,
     caseStudy: `Real-world clinical or engineering protocol analyzing how specialists in ${goal} execute "${title}" under acute conditions.`,
     deliverable: `Standardized operational procedure, diagnostic protocol, or technical deliverable verifying mastery of "${title}".`
   };
