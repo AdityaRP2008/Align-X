@@ -17,7 +17,7 @@
   <canvas id="glow-spotlight-canvas"></canvas>
 
   <!-- ======================================================== -->
-  <!-- 1. AUTH GATEWAY & PROFILER VIEW (Fully Fluid on Mobile)  -->
+  <!-- 1. AUTH GATEWAY & PROFILER VIEW                          -->
   <!-- ======================================================== -->
   <main id="auth-view" class="relative z-40 w-full max-w-lg my-auto px-2 sm:px-4 py-4 sm:py-8 flex flex-col items-center">
     
@@ -51,7 +51,7 @@
           <label class="block theme-text-title mb-1.5 font-semibold">Password</label>
           <div class="relative flex items-center">
             <input type="password" id="signin-password" required placeholder="Enter password" class="w-full theme-card-inner rounded-xl pl-3.5 pr-10 py-2.5 theme-text-title focus:outline-none">
-            <button type="button" onclick="togglePasswordVisibility('signin-password', 'eye-icon-signin')" class="absolute right-3 text-slate-400 hover:text-white transition cursor-pointer p-1" title="Toggle password visibility">
+            <button type="button" onclick="togglePasswordVisibility('signin-password', 'eye-icon-signin')" class="absolute right-3 text-slate-400 hover:text-white transition cursor-pointer p-1">
               <svg id="eye-icon-signin" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -77,7 +77,7 @@
           </div>
           <div class="relative flex items-center">
             <input type="password" id="reg-password" oninput="checkPasswordStrength(this.value)" required placeholder="Create strong password" class="w-full theme-card-inner rounded-xl pl-3.5 pr-10 py-2.5 theme-text-title focus:outline-none">
-            <button type="button" onclick="togglePasswordVisibility('reg-password', 'eye-icon-reg')" class="absolute right-3 text-slate-400 hover:text-white transition cursor-pointer p-1" title="Toggle password visibility">
+            <button type="button" onclick="togglePasswordVisibility('reg-password', 'eye-icon-reg')" class="absolute right-3 text-slate-400 hover:text-white transition cursor-pointer p-1">
               <svg id="eye-icon-reg" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -162,14 +162,14 @@
   </main>
 
   <!-- ======================================================== -->
-  <!-- 2. MAIN DASHBOARD VIEW (Responsive Mobile Architecture)   -->
+  <!-- 2. MAIN DASHBOARD VIEW                                   -->
   <!-- ======================================================== -->
   <div id="app-view" style="display: none;" class="relative z-20 w-full max-w-[1600px] flex flex-col gap-4 sm:gap-6 pb-28 sm:pb-24 px-1.5 sm:px-4 pt-2 sm:pt-4">
 
-    <!-- Top Navigation Bar: Wraps gracefully on phone screens -->
+    <!-- Top Navigation Bar -->
     <header class="w-full study-card px-3 sm:px-6 py-2.5 sm:py-3 rounded-2xl flex flex-wrap items-center justify-between gap-2.5 sm:gap-4">
       
-      <!-- Left side: Drawer trigger, Logo & Goal Selector -->
+      <!-- Left: Logo & Multi-Profile Track Switcher -->
       <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
         <button type="button" onclick="toggleNavSidebar()" class="text-slate-400 hover:text-white p-1 rounded-lg transition cursor-pointer" title="Open Drawer Menu">
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -186,25 +186,36 @@
           <span class="text-xs sm:text-sm font-black tracking-tight theme-text-title hidden sm:inline">Align-X</span>
         </div>
 
+        <!-- Target Track Dropdown with Multi-Profile Switching List -->
         <div class="relative" id="dropdown-track-wrapper">
-          <button type="button" onclick="toggleMenu('menu-tracks', event)" class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 rounded-xl border border-white/10 text-[11px] sm:text-xs font-medium theme-card-inner transition cursor-pointer max-w-[170px] sm:max-w-xs truncate">
+          <button type="button" onclick="toggleMenu('menu-tracks', event)" class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 rounded-xl border border-white/10 text-[11px] sm:text-xs font-medium theme-card-inner transition cursor-pointer max-w-[190px] sm:max-w-xs truncate">
             <span class="theme-text-sub hidden sm:inline">Target:</span>
             <span id="nav-current-role" class="dynamic-accent-text font-bold truncate">Goal Unset</span>
             <svg class="w-3 h-3 opacity-60 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
           </button>
           
-          <div id="menu-tracks" class="hidden absolute left-0 top-full mt-2 w-64 rounded-xl dropdown-menu-pane p-1.5 text-xs space-y-1 shadow-2xl">
-            <button type="button" onclick="openProfileModifier(); closeMenu('menu-tracks');" class="w-full text-left px-3 py-2 rounded-lg dropdown-item-btn font-semibold dynamic-accent-text">✨ Update Goal & Knowledge Profile</button>
-            <button type="button" onclick="openRoadmapModal(); closeMenu('menu-tracks');" class="w-full text-left px-3 py-2 rounded-lg dropdown-item-btn">📚 View Phased Roadmap</button>
-            <button type="button" onclick="openGapModal(); closeMenu('menu-tracks');" class="w-full text-left px-3 py-2 rounded-lg dropdown-item-btn font-semibold text-rose-400">⚠️ Analyze Career Gaps & Deficits</button>
+          <div id="menu-tracks" class="hidden absolute left-0 top-full mt-2 w-72 rounded-xl dropdown-menu-pane p-2 text-xs space-y-1.5 shadow-2xl">
+            <!-- Add New Target Profile Button (No Signout needed) -->
+            <button type="button" onclick="addNewProfileTrack(); closeMenu('menu-tracks');" class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-purple-500/15 border border-purple-500/30 font-bold dynamic-accent-text hover:bg-purple-500/25 transition">
+              <span>➕ Add Another Career Profile</span>
+              <span class="text-[9px] font-mono uppercase bg-purple-500/20 px-1.5 py-0.5 rounded">New Goal</span>
+            </button>
+
+            <!-- Dynamic List of Saved Profiles -->
+            <div class="border-t border-white/10 pt-1.5 space-y-1" id="profiles-switch-list">
+              <div class="text-[10px] font-mono theme-text-sub px-2 uppercase font-bold">Switch Profile:</div>
+            </div>
+
+            <div class="border-t border-white/10 pt-1.5 space-y-1">
+              <button type="button" onclick="openRoadmapModal(); closeMenu('menu-tracks');" class="w-full text-left px-3 py-1.5 rounded-lg dropdown-item-btn">📚 View Phased Roadmap</button>
+              <button type="button" onclick="openGapModal(); closeMenu('menu-tracks');" class="w-full text-left px-3 py-1.5 rounded-lg dropdown-item-btn text-rose-400 font-semibold">⚠️ Analyze Career Gaps & Deficits</button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Right side: Theme, Avatar & Logout -->
+      <!-- Right: Theme, Avatar, & Logout -->
       <div class="flex items-center gap-1.5 sm:gap-3">
-        
-        <!-- Theme Menu -->
         <div class="relative" id="dropdown-theme-wrapper">
           <button type="button" onclick="toggleMenu('menu-themes', event)" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-white/10 text-xs font-medium theme-card-inner transition cursor-pointer">
             <span class="w-2.5 h-2.5 rounded-full" id="active-theme-dot" style="background-color: var(--accent-main);"></span>
@@ -262,7 +273,7 @@
       </div>
     </header>
 
-    <!-- AI Generated Dynamic Fact Capsule: Stacks vertically on phone -->
+    <!-- AI Generated Dynamic Fact Capsule -->
     <section class="p-3 sm:p-3.5 rounded-2xl study-card flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 text-xs bg-gradient-to-r from-white/[0.03] via-transparent to-transparent relative z-10">
       <div class="flex items-start sm:items-center gap-2.5">
         <span class="text-base shrink-0">💡</span>
@@ -281,7 +292,7 @@
       </button>
     </section>
 
-    <!-- 4 Telemetry Dials: 1 col on mobile, 2 col on tablet, 4 col on desktop -->
+    <!-- 4 Telemetry Dials -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 relative z-10">
       <div class="study-card p-4 sm:p-5 rounded-2xl flex items-center justify-between">
         <div>
@@ -338,27 +349,24 @@
     <!-- Main 2-Column Core -->
     <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-stretch relative z-10">
       
-      <!-- Left Column: Study Plan -->
+      <!-- Left Column: Study Plan (Renders 4-6 Phases Dynamically) -->
       <div class="lg:col-span-6 study-card p-4 sm:p-6 rounded-2xl sm:rounded-3xl flex flex-col justify-between space-y-4">
         <div class="flex items-center justify-between pb-3 border-b border-white/10">
           <div class="flex items-center gap-2">
             <span class="text-base sm:text-lg">🗓️</span>
             <div>
               <h3 class="text-xs sm:text-sm font-bold theme-text-title tracking-wide">Study Plan</h3>
-              <p class="text-[10px] sm:text-[11px] theme-text-sub">Follow your milestones step-by-step.</p>
+              <p class="text-[10px] sm:text-[11px] theme-text-sub">Comprehensive multi-phase milestones.</p>
             </div>
           </div>
 
+          <!-- Dynamic Phase Dropdown populated based on total generated phases -->
           <div class="relative" id="dropdown-week-wrapper">
             <button type="button" onclick="toggleMenu('menu-weeks', event)" class="px-2.5 sm:px-3 py-1.5 rounded-xl theme-card-inner border border-white/10 text-[11px] sm:text-xs font-mono theme-text-title flex items-center gap-1.5 sm:gap-2 transition cursor-pointer">
               <span id="active-week-label">Phase 1</span>
               <svg class="w-3 h-3 opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </button>
-            <div id="menu-weeks" class="hidden absolute right-0 top-full mt-2 w-44 rounded-xl dropdown-menu-pane p-1.5 text-xs space-y-1 shadow-2xl">
-              <button type="button" onclick="changeStudyPlanPhase(0)" class="w-full text-left px-2.5 py-1.5 rounded-lg dropdown-item-btn">Phase 1: Foundations</button>
-              <button type="button" onclick="changeStudyPlanPhase(1)" class="w-full text-left px-2.5 py-1.5 rounded-lg dropdown-item-btn">Phase 2: Core Domain</button>
-              <button type="button" onclick="changeStudyPlanPhase(2)" class="w-full text-left px-2.5 py-1.5 rounded-lg dropdown-item-btn">Phase 3: Production</button>
-            </div>
+            <div id="menu-weeks" class="hidden absolute right-0 top-full mt-2 w-52 rounded-xl dropdown-menu-pane p-1.5 text-xs space-y-1 shadow-2xl max-h-64 overflow-y-auto"></div>
           </div>
         </div>
 
@@ -433,7 +441,7 @@
 
   </div>
 
-  <!-- Floating Action Buttons: Sized for phone screens -->
+  <!-- Floating Action Buttons -->
   <button type="button" id="btn-floating-center" onclick="openRoadmapModal()" class="floating-center-btn cursor-pointer" style="display: none;" title="Open Career Sprint Roadmap">
     <span>🚀</span>
     <span>Career Sprint</span>
@@ -445,7 +453,7 @@
     <span>Tutor</span>
   </button>
 
-  <!-- Navigation Drawer: Full height with comfortable mobile touch targets -->
+  <!-- Navigation Drawer -->
   <aside id="nav-drawer" class="fixed inset-y-0 left-0 w-72 sm:w-80 max-w-[85vw] dropdown-menu-pane border-r backdrop-blur-2xl z-[120] transform -translate-x-full transition-transform duration-300 flex flex-col justify-between p-4 sm:p-6 shadow-2xl">
     <div class="space-y-4 sm:space-y-6">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
@@ -462,8 +470,14 @@
       </div>
 
       <nav class="space-y-1.5 sm:space-y-2 text-xs font-semibold">
+        <!-- Add Another Profile from Sidebar -->
+        <button type="button" onclick="addNewProfileTrack(); toggleNavSidebar();" class="w-full flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-purple-500/20 border border-purple-500/40 dynamic-accent-text transition cursor-pointer font-bold">
+          <span class="flex items-center gap-2"><span>➕</span> <span>Add New Career Profile</span></span>
+          <span class="text-[9px] font-mono uppercase bg-purple-500/30 px-1.5 py-0.5 rounded">New</span>
+        </button>
+
         <button type="button" onclick="openProfileModifier(); toggleNavSidebar();" class="w-full flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 dynamic-accent-text transition cursor-pointer">
-          <span class="flex items-center gap-2"><span>✨</span> <span>Update Career Goal</span></span>
+          <span class="flex items-center gap-2"><span>✨</span> <span>Update Current Profile</span></span>
           <span class="text-[9px] font-mono dynamic-accent-text font-bold">Edit</span>
         </button>
 
@@ -488,7 +502,7 @@
         </button>
 
         <button type="button" onclick="startEndlessRiddleSession(); toggleNavSidebar();" class="w-full flex items-center justify-between p-2.5 sm:p-3 rounded-xl hover:bg-white/5 theme-text-title transition cursor-pointer">
-          <span class="flex items-center gap-2.5"><span>🧩</span> <span>Mind Riddles</span></span>
+          <span class="flex items-center gap-2"><span>🧩</span> <span>Mind Riddles</span></span>
           <span class="text-[9px] font-mono dynamic-accent-text font-bold">Logic</span>
         </button>
 
@@ -506,7 +520,7 @@
   </aside>
 
   <!-- ======================================================== -->
-  <!-- MODALS (Full viewport-aware max-h-[92vh] for phones)    -->
+  <!-- MODALS                                                   -->
   <!-- ======================================================== -->
 
   <!-- Career Gap & Deficits Modal -->
@@ -688,9 +702,9 @@
     </div>
   </div>
 
-  <!-- AI Tutor Drawer: Responsive width for small screens -->
+  <!-- AI Tutor Drawer -->
   <div id="drawer-ai-tutor" class="fixed right-0 top-0 bottom-0 w-full sm:w-[400px] dropdown-menu-pane border-l backdrop-blur-2xl z-[130] transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
-    <div class="p-3.5 sm:p-4 border-b border-white/10 flex items-center justify-between bg-purple-500/10">
+    <div class="p-4 border-b border-white/10 flex items-center justify-between bg-purple-500/10">
       <div class="flex items-center gap-2">
         <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-purple-600 via-indigo-600 to-fuchsia-500 flex items-center justify-center p-1">
           <svg class="w-full h-full text-white" viewBox="0 0 48 48" fill="none" stroke="currentColor">
@@ -699,20 +713,20 @@
           </svg>
         </div>
         <h3 class="text-xs font-bold theme-text-title flex items-center gap-1.5">
-          <span>Align-X AI Tutor</span>
+          <span>Align-X AI Tutor (Gemini)</span>
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
         </h3>
       </div>
-      <button type="button" onclick="toggleTutorChat()" class="theme-text-sub hover:text-white cursor-pointer p-1">✕</button>
+      <button type="button" onclick="toggleTutorChat()" class="theme-text-sub hover:text-white cursor-pointer">✕</button>
     </div>
-    <div id="tutor-chat-messages" class="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-3 text-xs">
+    <div id="tutor-chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 text-xs">
       <div class="p-3 rounded-xl theme-card-inner theme-text-title leading-relaxed">
         🎓 Hello! I am your Align-X AI Tutor, powered by Google Gemini. Ask me any question about your curriculum, technical concepts, or clinical cases.
       </div>
     </div>
     <form onsubmit="event.preventDefault(); handleTutorSend(event); return false;" class="p-3 border-t border-white/10 flex gap-2 theme-card-inner">
       <input type="text" id="tutor-input" placeholder="Ask AI tutor..." required class="flex-1 bg-transparent border border-white/10 rounded-xl px-3 py-2 text-xs theme-text-title focus:outline-none">
-      <button type="submit" class="btn-brand px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold cursor-pointer">Send</button>
+      <button type="submit" class="btn-brand px-4 py-2 rounded-xl text-xs font-bold cursor-pointer">Send</button>
     </form>
   </div>
 
@@ -732,12 +746,12 @@
 
       if (step === 'signin') {
         if (fIn) fIn.style.display = 'block';
-        if (bIn) bIn.className = 'py-2 sm:py-2.5 rounded-lg sm:rounded-xl transition btn-brand shadow-sm cursor-pointer';
-        if (bReg) bReg.className = 'py-2 sm:py-2.5 rounded-lg sm:rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer';
+        if (bIn) bIn.className = 'py-2.5 rounded-xl transition btn-brand shadow-sm cursor-pointer';
+        if (bReg) bReg.className = 'py-2.5 rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer';
       } else if (step === 'register') {
         if (fReg) fReg.style.display = 'block';
-        if (bReg) bReg.className = 'py-2 sm:py-2.5 rounded-lg sm:rounded-xl transition btn-brand shadow-sm cursor-pointer';
-        if (bIn) bIn.className = 'py-2 sm:py-2.5 rounded-lg sm:rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer';
+        if (bReg) bReg.className = 'py-2.5 rounded-xl transition btn-brand shadow-sm cursor-pointer';
+        if (bIn) bIn.className = 'py-2.5 rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer';
       } else if (step === 'profiler') {
         if (fProf) fProf.style.display = 'block';
         if (tabBar) tabBar.style.display = 'none';
