@@ -1,6 +1,6 @@
 /**
  * Align-X Academic Engine
- * Live Gemini AI Insights + Topic-Tailored Notes + Goal-Specific Endless AI MCQs + Endless Riddles
+ * Multi-Profile Manager (No Re-auth Required) + 4-6 Phases Architecture (4-6 Milestones Each)
  */
 
 const SUPABASE_URL = "https://eydgvjsgkqjyqjkkedi.supabase.co";
@@ -20,44 +20,9 @@ let activePhaseIdx = 0;
 window.currentStudent = null;
 window.pendingRegistrationEmail = "";
 
-// Dynamic fallback curriculum generator based on goal and knowledge
+// Dynamic Fallback Generator guaranteeing 4 Phases with 4 Milestones each
 function generateFallbackCurriculum(goal, knowledge) {
   const g = (goal || 'Cardiologist').toLowerCase();
-  
-  if (g.includes('cardio') || g.includes('medic') || g.includes('doctor') || g.includes('surgeon')) {
-    return {
-      radar: {
-        categories: ["Cardiovascular Anatomy", "Diagnostic Imaging", "Hemodynamics", "Pharmacology", "Interventional Procedures", "Emergency Protocols"],
-        candidate: [25, 20, 15, 30, 10, 20],
-        benchmark: [95, 90, 90, 85, 80, 90]
-      },
-      phases: [
-        {
-          phaseTitle: "Phase 1: Cardiovascular Anatomy & Cellular Physiology",
-          milestones: [
-            { id: "med-1", title: "Cardiac Action Potentials & Ion Channels", hours: "14 hrs", desc: "Action potential phases 0-4, ion channel conductances, and resting membrane gradients.", completed: false, xp: 140 },
-            { id: "med-2", title: "Mastering 12-Lead ECG Interpretation", hours: "18 hrs", desc: "Systematic vector analysis, bundle branch blocks, and ischemia vectors.", completed: false, xp: 180 },
-            { id: "med-3", title: "Hemodynamic Principles and Pressure-Volume Loops", hours: "16 hrs", desc: "Wiggers diagram mastery, preload/afterload curve shifts, and auscultatory timing.", completed: false, xp: 160 }
-          ]
-        },
-        {
-          phaseTitle: "Phase 2: Diagnostic Imaging & Cardiovascular Pharmacology",
-          milestones: [
-            { id: "med-4", title: "Echocardiography Fundamentals & Doppler Ultrasound", hours: "20 hrs", desc: "Identify valvular stenosis, regurgitation, and wall motion abnormalities via 2D and Doppler echo views.", completed: false, xp: 200 },
-            { id: "med-5", title: "Cardiovascular Pharmacology & Drug Mechanisms", hours: "18 hrs", desc: "Prescribe and manage dosages for beta-blockers, ACE inhibitors, antiarrhythmics, and inotropic agents.", completed: false, xp: 220 },
-            { id: "med-6", title: "Coronary Artery Disease & Acute Coronary Syndromes", hours: "16 hrs", desc: "Differentiate STEMI from NSTEMI protocols, triage acute chest pain, and map out emergency interventions.", completed: false, xp: 240 }
-          ]
-        },
-        {
-          phaseTitle: "Phase 3: Invasive Cardiology & Clinical Decision Systems",
-          milestones: [
-            { id: "med-7", title: "Cardiac Catheterization & Angiography Protocols", hours: "22 hrs", desc: "Fluoroscopic coronary anatomy, fractional flow reserve (FFR), and stent deployment parameters.", completed: false, xp: 300 },
-            { id: "med-8", title: "Heart Failure Management & Mechanical Support", hours: "20 hrs", desc: "HFrEF vs HFpEF guidelines, left ventricular assist devices (LVAD), and transplant indications.", completed: false, xp: 320 }
-          ]
-        }
-      ]
-    };
-  }
 
   return {
     radar: {
@@ -67,23 +32,39 @@ function generateFallbackCurriculum(goal, knowledge) {
     },
     phases: [
       {
-        phaseTitle: "Phase 1: Core Fundamentals & Prerequisite Competency",
+        phaseTitle: "Phase 1: Core Fundamentals & Baseline",
         milestones: [
-          { id: "gen-1", title: "Master Theoretical Principles & Terminology", hours: "10 hrs", desc: "Understand foundational taxonomies, formulas, and operational rules.", completed: false, xp: 120 },
-          { id: "gen-2", title: "Applied Practical Drills & Diagnostic Baseline", hours: "12 hrs", desc: "Execute baseline exercises to detect gaps against target benchmarks.", completed: false, xp: 150 }
+          { id: "p1-1", title: `Cellular & Theoretical Foundations of ${goal}`, hours: "14 hrs", desc: "Core mechanisms, ion flux, and structural taxonomies.", completed: false, xp: 120 },
+          { id: "p1-2", title: "Diagnostic Vector & Systematic Analysis", hours: "16 hrs", desc: "Baseline interpretation and clinical/systemic mapping.", completed: false, xp: 140 },
+          { id: "p1-3", title: "Hemodynamics, Gradients & Critical Equations", hours: "12 hrs", desc: "Pressure-volume loops, flow mechanics, and mathematical limits.", completed: false, xp: 120 },
+          { id: "p1-4", title: "Safety Criteria & Baseline Verification", hours: "16 hrs", desc: "Triage rules, error-trapping protocols, and baseline screening.", completed: false, xp: 150 }
         ]
       },
       {
-        phaseTitle: "Phase 2: Intermediate Implementation & Systems",
+        phaseTitle: "Phase 2: Applied Diagnostics & Tooling",
         milestones: [
-          { id: "gen-3", title: "Core Architecture & Methodological Execution", hours: "16 hrs", desc: "Build comprehensive end-to-end projects demonstrating domain mastery.", completed: false, xp: 220 },
-          { id: "gen-4", title: "Testing, Stress Scenarios & Edge Cases", hours: "14 hrs", desc: "Evaluate failure states and optimize performance under adverse criteria.", completed: false, xp: 240 }
+          { id: "p2-1", title: "Diagnostic Imaging, Sonography & Protocols", hours: "20 hrs", desc: "Doppler principles, acoustic impedance, and wall motion scores.", completed: false, xp: 180 },
+          { id: "p2-2", title: "Pharmacology & Receptor Intervention Systems", hours: "18 hrs", desc: "Receptor pharmacodynamics, beta-blockade, and inotropic agents.", completed: false, xp: 200 },
+          { id: "p2-3", title: "Acute Presentation & Ischemic Syndrome Triage", hours: "16 hrs", desc: "Troponin curves, emergency pathways, and door-to-balloon targets.", completed: false, xp: 190 },
+          { id: "p2-4", title: "Comprehensive Phase 2 Case Evaluation", hours: "22 hrs", desc: "Multi-parameter risk scoring and differential diagnosis drills.", completed: false, xp: 220 }
         ]
       },
       {
-        phaseTitle: "Phase 3: Production Mastery & Capstone Benchmark",
+        phaseTitle: "Phase 3: Interventional Procedures & Hardening",
         milestones: [
-          { id: "gen-5", title: "Industry-Standard Production Deliverable", hours: "20 hrs", desc: "Deploy final peer-reviewed deliverable ready for hiring evaluation.", completed: false, xp: 300 }
+          { id: "p3-1", title: "Catheterization & Fluoroscopic Anatomy", hours: "22 hrs", desc: "Invasive access pathways, fractional flow reserve, and stent parameters.", completed: false, xp: 240 },
+          { id: "p3-2", title: "Heart Failure Guidelines & Mechanical Support", hours: "20 hrs", desc: "HFrEF vs HFpEF guidelines, LVAD indications, and transplant criteria.", completed: false, xp: 250 },
+          { id: "p3-3", title: "Arrhythmia Mapping & Device Management", hours: "18 hrs", desc: "Pacemaker timing cycles, ICD thresholds, and ablation vectors.", completed: false, xp: 230 },
+          { id: "p3-4", title: "Multi-Vessel Disease & Surgical Consultation", hours: "24 hrs", desc: "SYNTAX score computation, CABG vs PCI risk stratification.", completed: false, xp: 270 }
+        ]
+      },
+      {
+        phaseTitle: "Phase 4: Capstone Board Certification Benchmark",
+        milestones: [
+          { id: "p4-1", title: "Simulated Clinical Board Examinations", hours: "26 hrs", desc: "Standardized clinical simulation and rapid-fire case triage.", completed: false, xp: 300 },
+          { id: "p4-2", title: "Critical Care Resuscitation & Shock Protocols", hours: "24 hrs", desc: "VA-ECMO, Impella hemodynamics, and refractory arrest protocols.", completed: false, xp: 320 },
+          { id: "p4-3", title: "Evidence-Based Clinical Trials & Guideline Revisions", hours: "20 hrs", desc: "Meta-analysis interpretation and practice guideline shifts.", completed: false, xp: 260 },
+          { id: "p4-4", title: "Final Board Clearance & Capstone Deliverable", hours: "30 hrs", desc: "Full competency defense and portfolio sign-off for industry clearance.", completed: false, xp: 350 }
         ]
       }
     ]
@@ -91,6 +72,91 @@ function generateFallbackCurriculum(goal, knowledge) {
 }
 
 let mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [], activeQuestion: null };
+
+// ==========================================
+// MULTI-PROFILE STORAGE MANAGER (NO RE-AUTH)
+// ==========================================
+function getAllSavedProfiles() {
+  try {
+    const raw = localStorage.getItem('alignx_profiles_store');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveProfileToStore(profile) {
+  if (!profile || !profile.career_goal) return;
+  const store = getAllSavedProfiles();
+  const existingIdx = store.findIndex(p => p.career_goal.toLowerCase() === profile.career_goal.toLowerCase());
+  
+  if (existingIdx >= 0) {
+    store[existingIdx] = profile;
+  } else {
+    store.push(profile);
+  }
+  localStorage.setItem('alignx_profiles_store', JSON.stringify(store));
+  updateProfilesDropdownUI();
+}
+
+window.addNewProfileTrack = function() {
+  // Retain name and academic degree from existing user so they don't have to re-type
+  const current = window.currentStudent;
+  
+  document.getElementById('prof-name-input').value = current?.name || '';
+  document.getElementById('prof-level-input').value = current?.academic_level || '';
+  // Clear career-specific inputs for the new profile
+  document.getElementById('prof-goal-input').value = '';
+  document.getElementById('prof-know-input').value = '';
+  document.getElementById('prof-tenure-input').value = '12 Months';
+  document.getElementById('prof-github-input').value = current?.github || '';
+
+  document.getElementById('profiler-step-heading').textContent = "Add Another Career Profile";
+  document.getElementById('profiler-back-label').textContent = "Back to Dashboard";
+
+  document.getElementById('auth-view').style.display = 'flex';
+  document.getElementById('app-view').style.display = 'none';
+  showAuthStep('profiler');
+};
+
+window.switchToProfile = function(careerGoalName) {
+  const store = getAllSavedProfiles();
+  const found = store.find(p => p.career_goal.toLowerCase() === careerGoalName.toLowerCase());
+  if (found) {
+    window.currentStudent = found;
+    activePhaseIdx = 0;
+    localStorage.setItem('alignx_student_active', JSON.stringify(found));
+    enterDashboard();
+    cycleFunFact(true);
+    closeMenu('menu-tracks');
+  }
+};
+
+function updateProfilesDropdownUI() {
+  const list = document.getElementById('profiles-switch-list');
+  if (!list) return;
+
+  const store = getAllSavedProfiles();
+  const currentGoal = (window.currentStudent?.career_goal || '').toLowerCase();
+
+  let html = `<div class="text-[10px] font-mono theme-text-sub px-2 uppercase font-bold mb-1">Your Career Profiles:</div>`;
+
+  if (store.length === 0) {
+    html += `<div class="text-[11px] theme-text-sub px-2 italic">1 profile active. Click "+ Add Another" above to add more.</div>`;
+  } else {
+    store.forEach(p => {
+      const isActive = p.career_goal.toLowerCase() === currentGoal;
+      html += `
+        <button type="button" onclick="switchToProfile('${escapeHtml(p.career_goal)}')" class="w-full text-left px-3 py-1.5 rounded-lg flex items-center justify-between transition ${isActive ? 'bg-purple-500/20 text-purple-300 font-bold' : 'dropdown-item-btn'}">
+          <span class="truncate">${escapeHtml(p.career_goal)}</span>
+          <span class="text-[9px] font-mono ${isActive ? 'dynamic-accent-text' : 'theme-text-sub'}">${p.curriculum_mastery || 0}% verified</span>
+        </button>
+      `;
+    });
+  }
+
+  list.innerHTML = html;
+}
 
 // Endless Riddles Bank
 const endlessRiddlesBank = [
@@ -139,20 +205,6 @@ const endlessRiddlesBank = [
     ],
     correct: 0,
     explanation: "Standard conservation of volume: 5L - 3L = 2L. Transfer 2L into 3L. Refill 5L, pour 1L to fill 3L jug, leaving precisely 4L."
-  },
-  {
-    q: "What can travel around the entire world while staying in a single corner?",
-    category: "Wordplay Logic",
-    options: ["A Postcard Stamp", "An Airplane Pilot", "The Equator"],
-    correct: 0,
-    explanation: "A postage stamp stays in the corner of an envelope as it travels across continents."
-  },
-  {
-    q: "A doctor gives you three pills and tells you to take one every half hour. How long will the pills last?",
-    category: "Temporal Sequence",
-    options: ["60 minutes", "90 minutes", "30 minutes"],
-    correct: 0,
-    explanation: "You take Pill 1 at minute 0, Pill 2 at minute 30, and Pill 3 at minute 60 (total time = 60 minutes)."
   }
 ];
 
@@ -162,9 +214,7 @@ let riddleSession = {
   answered: false
 };
 
-// ==========================================================
-// DYNAMIC AI FACT & INSIGHT CONTROLLER (GEMINI POWERED)
-// ==========================================================
+// DYNAMIC AI FACT CONTROLLER
 let isFactLoading = false;
 
 window.cycleFunFact = async function(manualClick = false) {
@@ -203,7 +253,11 @@ window.cycleFunFact = async function(manualClick = false) {
       throw new Error("Empty response");
     }
   } catch (err) {
-    const fallbacks = getFallbackFacts(goal);
+    const fallbacks = [
+      `Practitioners in ${goal} who complete structured phased milestones transition up to 65% faster into certified practice.`,
+      `Deliberate practice with real-world case scenarios produces 3.4x higher concept retention than passive theoretical reading.`,
+      `Evaluating edge failure states and multi-parameter differentials is the highest predictor of clinical/industry readiness in ${goal}.`
+    ];
     factEl.textContent = fallbacks[Math.floor(Math.random() * fallbacks.length)];
   } finally {
     factEl.style.opacity = '1';
@@ -212,39 +266,7 @@ window.cycleFunFact = async function(manualClick = false) {
   }
 };
 
-function getFallbackFacts(goal) {
-  const g = (goal || '').toLowerCase();
-  if (g.includes('cardio') || g.includes('medic') || g.includes('doctor')) {
-    return [
-      "The cardiac conduction system transfers action potentials through Purkinje fibers at up to 4 meters per second—faster than any other muscle tissue in the human body.",
-      "Fractional Flow Reserve (FFR) cutoffs below 0.80 indicate hemodynamically significant coronary stenosis that mandates revascularization over medical therapy alone.",
-      "The Frank-Starling mechanism dictates that increased ventricular end-diastolic volume stretches cardiac sarcomeres to optimal actin-myosin overlap, amplifying stroke volume."
-    ];
-  }
-  if (g.includes('ai') || g.includes('machine learning') || g.includes('data')) {
-    return [
-      "Transformer self-attention computes query-key matrix dot products with quadratic O(N²) memory complexity, which FlashAttention mitigates by tiling GPU SRAM IO.",
-      "Residual connections (ResNets) solve the vanishing gradient problem by enabling gradient vectors to skip directly across layers during backpropagation.",
-      "Quantizing 16-bit floating-point LLM weights to 4-bit NormalFloat (NF4) reduces VRAM consumption by 70% with negligible perplexity degradation."
-    ];
-  }
-  if (g.includes('entrepreneur') || g.includes('startup') || g.includes('business')) {
-    return [
-      "Startups that maintain a CAC-to-LTV payback window under 12 months require up to 60% less venture dilution to achieve positive operating cash flows.",
-      "Net Burn Runway under 6 months triggers a critical fundraising hazard zone where investor term-sheet leverage and valuation multiples decline by over 40%.",
-      "Validating problem severity via 20 qualitative customer interviews before writing code eliminates 75% of early product-market fit failure risks."
-    ];
-  }
-  return [
-    `Specialists in ${goal} who benchmark milestones against verified production standards shorten career gap transition velocity by up to 65%.`,
-    `Structured milestone deliberate practice produces 3.4x higher concept retention than passive theoretical reading.`,
-    `Evaluating edge scenarios and error failure boundaries is the single highest predictor of professional hiring clearance in ${goal}.`
-  ];
-}
-
-// ==========================================
-// COURSE MODIFICATION & PRE-POPULATION
-// ==========================================
+// PROFILE MODIFIER PRE-POPULATION
 window.openProfileModifier = function() {
   const s = window.currentStudent;
 
@@ -277,9 +299,7 @@ window.handleProfilerBackButton = function() {
   }
 };
 
-// ==========================================
 // AUTH & PROFILER CONTROLLERS
-// ==========================================
 window.submitSignIn = async function() {
   const emailInput = document.getElementById('signin-email');
   const email = emailInput ? emailInput.value.trim() : "";
@@ -300,6 +320,7 @@ window.submitSignIn = async function() {
     if (result && result.student && result.student.phases && result.student.phases.length > 0) {
       window.currentStudent = result.student;
       localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
+      saveProfileToStore(window.currentStudent);
       if (btn) { btn.disabled = false; btn.textContent = "Sign In →"; }
       enterDashboard();
       return;
@@ -314,6 +335,7 @@ window.submitSignIn = async function() {
       const parsed = JSON.parse(localData);
       if (parsed.email && parsed.email.toLowerCase() === email.toLowerCase() && parsed.career_goal && parsed.phases && parsed.phases.length > 0) {
         window.currentStudent = parsed;
+        saveProfileToStore(window.currentStudent);
         if (btn) { btn.disabled = false; btn.textContent = "Sign In →"; }
         enterDashboard();
         return;
@@ -375,8 +397,8 @@ window.submitProfilerForm = async function() {
         const milestones = Array.isArray(rawList) ? rawList.map((m, mIdx) => ({
           id: m.id || `m-${pIdx}-${mIdx}`,
           title: m.title || m.name || `Milestone ${mIdx + 1}`,
-          desc: m.desc || m.description || `${m.hours || '10 hrs'} structured practice`,
-          hours: m.hours || '10 hrs',
+          desc: m.desc || m.description || `${m.hours || '14 hrs'} structured practice`,
+          hours: m.hours || '14 hrs',
           completed: Boolean(m.completed),
           xp: Number(m.xp) || 120
         })) : [];
@@ -384,7 +406,7 @@ window.submitProfilerForm = async function() {
       });
     }
 
-    if (normalizedPhases.length === 0 || !normalizedPhases[0].milestones || normalizedPhases[0].milestones.length === 0) {
+    if (normalizedPhases.length === 0) {
       normalizedPhases = fallback.phases;
     }
 
@@ -413,6 +435,8 @@ window.submitProfilerForm = async function() {
     }).catch(e => console.warn('Background Supabase save:', e));
 
     localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
+    saveProfileToStore(window.currentStudent);
+    activePhaseIdx = 0;
     enterDashboard();
     cycleFunFact(true);
   } catch (err) {
@@ -436,6 +460,8 @@ window.submitProfilerForm = async function() {
     };
 
     localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
+    saveProfileToStore(window.currentStudent);
+    activePhaseIdx = 0;
     enterDashboard();
     cycleFunFact(true);
   } finally {
@@ -449,19 +475,13 @@ window.submitProfilerForm = async function() {
 // MODAL CONTROLLERS
 window.openModal = function(id) {
   const el = document.getElementById(id);
-  if (el) {
-    el.style.display = 'flex';
-  }
-  if (id === 'modal-capabilities') {
-    setTimeout(renderRadar, 50);
-  }
+  if (el) el.style.display = 'flex';
+  if (id === 'modal-capabilities') setTimeout(renderRadar, 50);
 };
 
 window.closeModal = function(id) {
   const el = document.getElementById(id);
-  if (el) {
-    el.style.display = 'none';
-  }
+  if (el) el.style.display = 'none';
 };
 
 window.openRoadmapModal = function() {
@@ -472,30 +492,22 @@ window.openRoadmapModal = function() {
 window.toggleMenu = function(id, e) {
   if (e) e.stopPropagation();
   const el = document.getElementById(id);
-  if (el) {
-    el.classList.toggle('hidden');
-  }
+  if (el) el.classList.toggle('hidden');
 };
 
 window.closeMenu = function(id) {
   const el = document.getElementById(id);
-  if (el) {
-    el.classList.add('hidden');
-  }
+  if (el) el.classList.add('hidden');
 };
 
 window.toggleNavSidebar = function() {
   const drawer = document.getElementById('nav-drawer');
-  if (drawer) {
-    drawer.classList.toggle('-translate-x-full');
-  }
+  if (drawer) drawer.classList.toggle('-translate-x-full');
 };
 
 window.toggleTutorChat = function() {
   const drawer = document.getElementById('drawer-ai-tutor');
-  if (drawer) {
-    drawer.classList.toggle('translate-x-full');
-  }
+  if (drawer) drawer.classList.toggle('translate-x-full');
 };
 
 window.handleLogout = function() {
@@ -504,9 +516,7 @@ window.handleLogout = function() {
   showAuthGateway();
 };
 
-// ==========================================
 // APP LIFECYCLE
-// ==========================================
 window.addEventListener('DOMContentLoaded', () => {
   const savedTheme = localStorage.getItem('alignx_accent') || 'purple';
   setAccentTheme(savedTheme);
@@ -518,6 +528,7 @@ window.addEventListener('DOMContentLoaded', () => {
       const parsed = JSON.parse(savedSession);
       if (parsed && parsed.phases && parsed.phases.length > 0) {
         window.currentStudent = parsed;
+        saveProfileToStore(window.currentStudent);
         recalculateMetrics();
         enterDashboard();
         cycleFunFact(false);
@@ -531,7 +542,6 @@ window.addEventListener('DOMContentLoaded', () => {
     showAuthGateway();
   }
 
-  // Auto-refresh dynamic fact periodically
   setInterval(() => {
     if (window.currentStudent && document.getElementById('app-view')?.style.display !== 'none') {
       cycleFunFact(false);
@@ -571,10 +581,10 @@ function enterDashboard() {
   if (appView) appView.style.display = 'flex';
   if (cBtn) cBtn.style.display = 'flex';
   if (tBtn) tBtn.style.display = 'flex';
+  updateProfilesDropdownUI();
   updateDashboardUI();
 }
 
-// METRICS RECALCULATION
 function recalculateMetrics() {
   if (!window.currentStudent) return;
   let total = 0, completed = 0;
@@ -601,7 +611,6 @@ function recalculateMetrics() {
   }
 }
 
-// DASHBOARD UI UPDATES
 function updateDashboardUI() {
   if (!window.currentStudent) return;
   recalculateMetrics();
@@ -664,6 +673,7 @@ function updateDashboardUI() {
   if (xpLabel) xpLabel.textContent = `${s.xp || 0} / 1000 XP`;
   if (xpBar) xpBar.style.width = `${Math.min(100, ((s.xp || 0) % 1000) / 10)}%`;
 
+  renderDynamicPhasesDropdown();
   renderStudyPlanModules();
   renderRoadmapModal();
   renderRadar();
@@ -676,6 +686,26 @@ function updateRadialMeter(circleId, percentage) {
   const circumference = 2 * Math.PI * 26;
   circle.style.strokeDasharray = `${circumference}`;
   circle.style.strokeDashoffset = circumference - (clamped / 100) * circumference;
+}
+
+// RENDER ALL PHASES INTO DROPDOWN MENU
+function renderDynamicPhasesDropdown() {
+  const menuWeeks = document.getElementById('menu-weeks');
+  if (!menuWeeks || !window.currentStudent) return;
+
+  const phases = window.currentStudent.phases || [];
+  let html = '';
+
+  phases.forEach((p, idx) => {
+    html += `
+      <button type="button" onclick="changeStudyPlanPhase(${idx})" class="w-full text-left px-2.5 py-1.5 rounded-lg dropdown-item-btn flex items-center justify-between">
+        <span class="truncate">${escapeHtml(p.phaseTitle || `Phase ${idx + 1}`)}</span>
+        <span class="text-[9px] font-mono text-purple-400 font-bold ml-1">${(p.milestones || []).length} items</span>
+      </button>
+    `;
+  });
+
+  menuWeeks.innerHTML = html;
 }
 
 // STUDY PLAN MODULES
@@ -714,8 +744,8 @@ function renderStudyPlanModules() {
       <div class="flex items-center gap-3">
         <span class="w-6 h-6 rounded-full bg-white/10 dynamic-accent-text font-bold flex items-center justify-center text-xs shrink-0">${idx + 1}</span>
         <div>
-          <div class="study-module-title text-xs leading-snug ${m.completed ? 'line-through opacity-60' : ''}">${m.title}</div>
-          <div class="study-module-desc text-[11px] mt-0.5">${m.desc || `${m.hours} structured spec`}</div>
+          <div class="study-module-title text-xs leading-snug ${m.completed ? 'line-through opacity-60' : ''}">${escapeHtml(m.title)}</div>
+          <div class="study-module-desc text-[11px] mt-0.5">${escapeHtml(m.desc || `${m.hours} structured spec`)}</div>
         </div>
       </div>
       <div class="flex items-center gap-2 shrink-0">
@@ -750,8 +780,8 @@ function renderRoadmapModal() {
           <label class="flex items-center gap-3 cursor-pointer">
             <input type="checkbox" ${m.completed ? 'checked' : ''} onchange="toggleMilestoneState('${m.id}')" class="w-4 h-4 rounded text-purple-600 focus:ring-0 cursor-pointer">
             <div>
-              <div class="font-bold text-xs theme-text-title ${m.completed ? 'line-through opacity-50' : ''}">${m.title}</div>
-              <div class="text-[10px] theme-text-sub">${m.hours} • ${m.desc || 'Milestone target'}</div>
+              <div class="font-bold text-xs theme-text-title ${m.completed ? 'line-through opacity-50' : ''}">${escapeHtml(m.title)}</div>
+              <div class="text-[10px] theme-text-sub">${m.hours} • ${escapeHtml(m.desc || 'Milestone target')}</div>
             </div>
           </label>
           <span class="font-mono text-amber-500 font-bold text-xs shrink-0">+${m.xp || 100} XP</span>
@@ -761,8 +791,8 @@ function renderRoadmapModal() {
 
     box.innerHTML = `
       <div class="flex items-center justify-between pb-1">
-        <h4 class="text-xs font-extrabold uppercase tracking-wider dynamic-accent-text">${phase.phaseTitle || `Phase ${pIdx + 1}`}</h4>
-        <span class="text-[10px] font-mono theme-text-sub">Phase ${pIdx + 1}</span>
+        <h4 class="text-xs font-extrabold uppercase tracking-wider dynamic-accent-text">${escapeHtml(phase.phaseTitle || `Phase ${pIdx + 1}`)}</h4>
+        <span class="text-[10px] font-mono theme-text-sub">Phase ${pIdx + 1} • ${mList.length} Milestones</span>
       </div>
       <div class="space-y-2">${html}</div>
     `;
@@ -786,6 +816,7 @@ async function toggleMilestoneState(mId) {
   recalculateMetrics();
 
   localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
+  saveProfileToStore(window.currentStudent);
 
   fetch('/api/auth', {
     method: 'POST',
@@ -802,7 +833,7 @@ function renderRadar() {
   if (!canvas || !window.currentStudent) return;
   const ctx = canvas.getContext('2d');
   const w = canvas.width, h = canvas.height;
-  const cx = w / 2, cy = h / 2, radius = 95;
+  const cx = w / 2, cy = h / 2, radius = 90;
 
   const cats = window.currentStudent.radar?.categories || ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5", "Skill 6"];
   const vals = window.currentStudent.radar?.candidate || [30, 20, 15, 10, 25, 15];
@@ -834,9 +865,9 @@ function renderRadar() {
     ctx.strokeStyle = isLight ? "rgba(15, 23, 42, 0.08)" : "rgba(255, 255, 255, 0.08)";
     ctx.stroke();
     ctx.fillStyle = isLight ? "#475569" : "#94A3B8";
-    ctx.font = "11px sans-serif";
+    ctx.font = "10px sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText(cats[i], cx + (radius + 26) * Math.cos(a), cy + (radius + 12) * Math.sin(a));
+    ctx.fillText(cats[i], cx + (radius + 24) * Math.cos(a), cy + (radius + 12) * Math.sin(a));
   }
 
   // Benchmark
@@ -945,43 +976,9 @@ window.handleTutorSend = async function(e) {
 
 // NOTES GENERATOR
 function generateMilestoneSpecificReadingGuide(title, desc, goal) {
-  const t = (title || '').toLowerCase();
-  
-  if (t.includes('echocardiography') || t.includes('ultrasound') || t.includes('imaging')) {
-    return {
-      theory: "Physical acoustic impedance differences, Doppler shift equation ($$f_d = \\frac{2 f_0 v \\cos\\theta}{c}$$), Nyquist limits, and wall motion score indexing (WMSI).",
-      caseStudy: "Diagnosing severe aortic stenosis vs regurgitation in bicuspid aortic valves using transesophageal echocardiography (TEE) peak jet velocity and mean pressure gradients.",
-      deliverable: "Standardized 5-view transthoracic echo protocol mapping with left ventricular ejection fraction (LVEF) calculations via Simpson's biplane method."
-    };
-  }
-  
-  if (t.includes('pharmacology') || t.includes('drug') || t.includes('dose')) {
-    return {
-      theory: "Receptor pharmacodynamics (Beta-1/Beta-2 adrenergic antagonism, Renin-Angiotensin-Aldosterone cascade inhibition, and Vaughan Williams Class I-IV antiarrhythmic mechanisms).",
-      caseStudy: "Titrating Quadruple Therapy (ARNI, SGLT2i, Beta-Blocker, MRA) in decompensated heart failure with preserved renal function and hypotension considerations.",
-      deliverable: "Emergency dosing reference card for intravenous vasodilators, inotropes (Dobutamine, Milrinone), and antiarrhythmics (Amiodarone)."
-    };
-  }
-
-  if (t.includes('coronary') || t.includes('artery') || t.includes('stemi') || t.includes('infarct')) {
-    return {
-      theory: "Atherosclerotic plaque rupture cascade, platelet aggregation pathways (GPIIb/IIIa), subendocardial ischemia versus transmural necrosis pathology.",
-      caseStudy: "Managing acute ST-elevation myocardial infarction with cardiogenic shock, door-to-balloon time benchmarks (<90 min), and dual antiplatelet loading protocols.",
-      deliverable: "High-risk acute chest pain triage pathway decision tree with troponin kinetics and Killip classification grading."
-    };
-  }
-
-  if (t.includes('electrophysiology') || t.includes('ecg') || t.includes('action potential') || t.includes('arrhythmia')) {
-    return {
-      theory: "Cellular ionic flux (Na+ fast channels in Phase 0, transient outward K+ in Phase 1, L-type Ca2+ plateau in Phase 2, rapid delayed rectifier K+ in Phase 3, Na+/K+ ATPase in Phase 4).",
-      caseStudy: "12-Lead ECG localization: differentiating anterior LAD occlusions (V1-V4) from RCA inferior infarcts (II, III, aVF) and identifying reciprocal ST-depression.",
-      deliverable: "Systematic 7-step vector analysis checklist for bundle branch blocks, QT prolongation risk scoring, and emergency cardioversion indications."
-    };
-  }
-
   return {
-    theory: `Authoritative clinical/technical foundations, mathematical formulas, and structural rules for "${title}".`,
-    caseStudy: `Real-world clinical or production protocol analyzing how specialists in ${goal} execute "${title}" under acute conditions.`,
+    theory: `Detailed breakdown of underlying principles, authoritative standards, and structural equations for "${title}".`,
+    caseStudy: `Real-world clinical or engineering protocol analyzing how specialists in ${goal} execute "${title}" under acute conditions.`,
     deliverable: `Standardized operational procedure, diagnostic protocol, or technical deliverable verifying mastery of "${title}".`
   };
 }
@@ -1037,7 +1034,7 @@ window.openNotesModal = function() {
     <div class="p-4 rounded-2xl bg-gradient-to-r from-purple-900/30 via-indigo-900/20 to-transparent border border-purple-500/30 space-y-1.5">
       <div class="flex items-center justify-between">
         <span class="text-[10px] font-mono font-extrabold uppercase tracking-wider dynamic-accent-text">Syllabus Deep-Dive Specification</span>
-        <span class="px-2.5 py-0.5 rounded-full bg-purple-500/20 dynamic-accent-text text-[10px] font-bold">Phase ${activePhaseIdx + 1} of 3</span>
+        <span class="px-2.5 py-0.5 rounded-full bg-purple-500/20 dynamic-accent-text text-[10px] font-bold">Phase ${activePhaseIdx + 1}</span>
       </div>
       <h4 class="text-sm font-bold theme-text-title">${escapeHtml(phaseTitle)}</h4>
       <p class="theme-text-sub text-[11px] leading-relaxed">
@@ -1148,9 +1145,7 @@ window.bridgeGap = function(milestoneId) {
   setTimeout(openGapModal, 100);
 };
 
-// ==========================================================
-// ENDLESS GENERIC MIND RIDDLE STUDIO CONTROLLER
-// ==========================================
+// ENDLESS RIDDLES STUDIO
 window.startEndlessRiddleSession = function() {
   riddleSession = {
     currentIdx: Math.floor(Math.random() * endlessRiddlesBank.length),
@@ -1235,9 +1230,7 @@ window.nextRiddle = function() {
   renderCurrentRiddle();
 };
 
-// ==========================================================
 // GOAL-SPECIFIC ENDLESS AI MCQ STUDIO
-// ==========================================
 window.startEndlessMCQSession = function() {
   mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [], activeQuestion: null };
   const corr = document.getElementById('mcq-correct-counter');
@@ -1297,7 +1290,17 @@ window.generateNextMCQ = async function() {
     renderMCQQuestion(aiMCQ);
   } catch (err) {
     console.warn("AI MCQ synthesis fallback engaged:", err.message);
-    const fallbackQuestion = generateOfflineGoalMCQ(goal, currentTopic, mcqSession.total);
+    const fallbackQuestion = {
+      q: `For a specialist in ${goal}, which core principle is critical when executing ${currentTopic}?`,
+      topic: currentTopic,
+      options: [
+        `Systematically identify underlying dependencies, reduce variance, and document edge cases.`,
+        `Bypass baseline testing protocols to deploy directly to end users.`,
+        `Rely exclusively on subjective intuition rather than verified performance telemetry.`
+      ],
+      correct: 0,
+      explanation: `Disciplined execution in ${goal} requires verifying constraints, measuring baseline performance, and documenting edge scenarios.`
+    };
     mcqSession.activeQuestion = fallbackQuestion;
     renderMCQQuestion(fallbackQuestion);
   }
@@ -1321,61 +1324,6 @@ function renderMCQQuestion(qObj) {
     btn.onclick = () => handleMCQChoice(idx, qObj);
     container.appendChild(btn);
   });
-}
-
-function generateOfflineGoalMCQ(goal, topic, count) {
-  const g = (goal || '').toLowerCase();
-  
-  if (g.includes('cardio') || g.includes('medic') || g.includes('doctor')) {
-    const bank = [
-      {
-        q: "Which ion channel conductance phase of the cardiac myocyte action potential is responsible for the rapid, transient Phase 1 repolarization?",
-        topic: "Cardiac Electrophysiology",
-        options: [
-          "Inactivation of fast inward Na+ channels with transient outward K+ (I_to) activation.",
-          "Opening of L-type Ca2+ slow inward channels.",
-          "Delayed rectifier K+ (I_Kr) repolarizing outflow."
-        ],
-        correct: 0,
-        explanation: "Phase 1 repolarization is driven by the rapid inactivation of Phase 0 fast Na+ channels combined with the activation of transient outward K+ currents (I_to)."
-      },
-      {
-        q: "In Wiggers pressure-volume loops, acute aortic valve regurgitation causes which primary hemodynamic variation?",
-        topic: "Hemodynamics & Valvular Mechanics",
-        options: [
-          "Widened pulse pressure with steep diastolic runoff into the left ventricle, eliminating true isovolumetric relaxation.",
-          "Isolated elevation of peak systolic aortic pressure without changes in end-diastolic volume.",
-          "Premature closure of the tricuspid valve during early isovolumetric contraction."
-        ],
-        correct: 0,
-        explanation: "Aortic regurgitation leaks blood retrograde from the aorta into the left ventricle during diastole, widening pulse pressure and preventing a true isovolumetric relaxation phase."
-      },
-      {
-        q: "In 12-Lead ECG interpretation, persistent ST-segment elevation in leads V1-V4 indicates infarction of which anatomical territory?",
-        topic: "Clinical ECG Interpretation",
-        options: [
-          "Anteroseptal myocardial infarction (Left Anterior Descending Artery).",
-          "Inferior wall myocardial infarction (Right Coronary Artery).",
-          "Posterior wall infarction (Left Circumflex Artery)."
-        ],
-        correct: 0,
-        explanation: "Leads V1-V4 look directly at the anterior and septal walls of the left ventricle, perfused by the Left Anterior Descending (LAD) coronary artery."
-      }
-    ];
-    return bank[count % bank.length];
-  }
-
-  return {
-    q: `For a specialist in ${goal}, which core principle is critical when mastering ${topic}?`,
-    topic: topic,
-    options: [
-      `Systematically identify underlying dependencies, reduce variance, and document edge cases.`,
-      `Bypass baseline testing protocols to deploy directly to end users.`,
-      `Rely exclusively on subjective intuition rather than verified performance telemetry.`
-    ],
-    correct: 0,
-    explanation: `Disciplined execution in ${goal} requires verifying constraints, measuring baseline performance, and documenting edge scenarios.`
-  };
 }
 
 function handleMCQChoice(selectedIdx, qObj) {
