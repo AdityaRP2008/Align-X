@@ -1,7 +1,20 @@
 /**
  * Align-X Academic Engine
- * Guaranteed Global Handler Binding + Gemini Synthesis + Supabase Persistence
+ * Live Gemini Chatbot + Detailed Phase-Based Reading Notes + Dynamic Telemetry
  */
+
+const SUPABASE_URL = "https://eydgvjsgkqjyqjkkedi.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5ZGd2anNna3FqeXFqa2tlZGkiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc1NzQ4OTc1MCwiZXhwIjoyMDczMDY1NzUwfQ.f11c7dG38yT7CwhL6f6f9lKkEee9r8r_placeholder";
+
+let supabaseClient = null;
+if (window.supabase && typeof window.supabase.createClient === 'function') {
+  try {
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    window.supabase = supabaseClient;
+  } catch (e) {
+    console.warn("Supabase running local mode.");
+  }
+}
 
 let activePhaseIdx = 0;
 window.currentStudent = null;
@@ -11,6 +24,41 @@ window.pendingRegistrationEmail = "";
 function generateFallbackCurriculum(goal, knowledge) {
   const g = (goal || 'AI Engineer').toLowerCase();
   
+  if (g.includes('entrepreneur') || g.includes('business') || g.includes('startup') || g.includes('founder')) {
+    return {
+      radar: {
+        categories: ["Market Validation", "Financial Modeling", "Product / MVP", "Customer Discovery", "Unit Economics", "Growth & Sales"],
+        candidate: [30, 25, 20, 35, 15, 20],
+        benchmark: [90, 85, 85, 90, 80, 85]
+      },
+      phases: [
+        {
+          phaseTitle: "Phase 1: Problem Identification & Niche Selection",
+          milestones: [
+            { id: "ent-1", title: "Problem Identification & Niche Selection", hours: "10 hrs", desc: "Identify high-margin market gaps and customer pain points.", completed: false, xp: 120 },
+            { id: "ent-2", title: "Lean Customer Discovery & Surveys", hours: "12 hrs", desc: "Conduct primary market research and interview 20+ prospective customers.", completed: false, xp: 160 },
+            { id: "ent-3", title: "Minimum Viable Product (MVP) Blueprint", hours: "14 hrs", desc: "Design a low-cost, high-value MVP scope to test product-market fit.", completed: false, xp: 180 }
+          ]
+        },
+        {
+          phaseTitle: "Phase 2: Financial Modeling & Unit Economics",
+          milestones: [
+            { id: "ent-4", title: "Cash Burn & Runway Analysis", hours: "10 hrs", desc: "Model Gross Burn, Net Burn, and 18-month survival runway.", completed: false, xp: 200 },
+            { id: "ent-5", title: "CAC to LTV Ratio Calculation", hours: "8 hrs", desc: "Ensure customer acquisition cost is at least 3x recovered over lifetime.", completed: false, xp: 220 },
+            { id: "ent-6", title: "Pricing Model & Margin Architecture", hours: "10 hrs", desc: "Validate recurring subscription vs transaction fee economics.", completed: false, xp: 240 }
+          ]
+        },
+        {
+          phaseTitle: "Phase 3: Go-To-Market & Capital Scaling",
+          milestones: [
+            { id: "ent-7", title: "Outbound Sales Funnel & Lead Gen", hours: "16 hrs", desc: "Build automated cold email, LinkedIn, and conversion funnels.", completed: false, xp: 280 },
+            { id: "ent-8", title: "Pitch Deck & Seed Capital Readiness", hours: "14 hrs", desc: "10-slide investor narrative covering TAM, traction, and financial pro-forma.", completed: false, xp: 300 }
+          ]
+        }
+      ]
+    };
+  }
+
   if (g.includes('ai') || g.includes('machine learning') || g.includes('data')) {
     return {
       radar: {
@@ -82,6 +130,17 @@ function generateFallbackCurriculum(goal, knowledge) {
 // Continuous MCQ Bank
 const endlessMCQBank = [
   {
+    q: "In financial modeling for startups, what does 'Net Cash Burn' measure?",
+    topic: "Venture Finance",
+    options: [
+      "Total operating costs minus total gross revenue in a given monthly window.",
+      "The legal salary drawn by equity partners before depreciation.",
+      "The total amount of venture debt available in credit lines."
+    ],
+    correct: 0,
+    explanation: "Net Cash Burn = Total Cash Outflows (Salaries, Servers, Rent) - Cash Inflows (Revenues). It dictates how many months of runway the startup has before bank balance hits zero."
+  },
+  {
     q: "Why do relational database engines (PostgreSQL, InnoDB) prefer B+ Trees over standard Red-Black Binary Trees for disk index storage?",
     topic: "Database Internals",
     options: [
@@ -93,26 +152,15 @@ const endlessMCQBank = [
     explanation: "Disks read and write in block pages (4KB-8KB). Because B+ Trees have huge fanouts, tree depth stays at 3-4 levels, requiring only 3-4 disk block seeks."
   },
   {
-    q: "When implementing an atomic rate limiter across multiple auto-scaled Node.js instances, which architecture guarantees zero race conditions?",
+    q: "When implementing an atomic rate limiter across multiple auto-scaled instances, which architecture guarantees zero race conditions?",
     topic: "Distributed Systems",
     options: [
       "Using Redis running an atomic Lua script (Token Bucket algorithm).",
-      "Storing requests in a local Node.js in-memory Map.",
+      "Storing requests in a local in-memory Map.",
       "Executing a SQL query: SELECT COUNT(*) WHERE created_at > NOW() - INTERVAL '1 minute'."
     ],
     correct: 0,
     explanation: "Redis executes Lua scripts atomically in a single event loop iteration without distributed lock contention across multiple pods."
-  },
-  {
-    q: "In the JavaScript V8 engine event loop, what executes first immediately following the current synchronous call stack?",
-    topic: "JavaScript Runtime",
-    options: [
-      "Macro-tasks scheduled via setTimeout.",
-      "Micro-task queue jobs (Promise.then, queueMicrotask).",
-      "I/O polling callbacks."
-    ],
-    correct: 1,
-    explanation: "The microtask queue is completely drained immediately after the synchronous execution stack empties, BEFORE macrotasks run."
   }
 ];
 
@@ -248,7 +296,6 @@ window.submitProfilerForm = async function() {
 
     if (aiData.error) throw new Error(aiData.error);
 
-    // Normalize phases to ensure milestones are always structured properly
     let normalizedPhases = [];
     if (Array.isArray(aiData.phases) && aiData.phases.length > 0) {
       normalizedPhases = aiData.phases.map((p, pIdx) => {
@@ -257,10 +304,10 @@ window.submitProfilerForm = async function() {
         const milestones = Array.isArray(rawList) ? rawList.map((m, mIdx) => ({
           id: m.id || `m-${pIdx}-${mIdx}`,
           title: m.title || m.name || `Milestone ${mIdx + 1}`,
-          desc: m.desc || m.description || `${m.hours || '6 hrs'} structured practice`,
-          hours: m.hours || '6 hrs',
+          desc: m.desc || m.description || `${m.hours || '8 hrs'} structured practice`,
+          hours: m.hours || '8 hrs',
           completed: Boolean(m.completed),
-          xp: Number(m.xp) || 100
+          xp: Number(m.xp) || 120
         })) : [];
         return { phaseTitle: title, milestones };
       });
@@ -288,7 +335,6 @@ window.submitProfilerForm = async function() {
       level: 1
     };
 
-    // Save to Supabase via server route
     fetch('/api/auth', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -327,7 +373,7 @@ window.submitProfilerForm = async function() {
   }
 };
 
-// MODAL CONTROLLERS (Uses display: flex/none to guarantee no invisible overlay click blocking)
+// MODAL CONTROLLERS
 window.openModal = function(id) {
   const el = document.getElementById(id);
   if (el) {
@@ -458,12 +504,12 @@ function updateDashboardUI() {
   const termEl = document.getElementById('nav-academic-term');
   const goalEl = document.getElementById('drawer-user-goal');
 
-  if (roleEl) roleEl.textContent = s.career_goal || 'AI Engineer';
-  if (ghEl) ghEl.textContent = s.github ? `@${s.github}` : '@student';
+  if (roleEl) roleEl.textContent = s.career_goal || 'Entrepreneur';
+  if (ghEl) ghEl.textContent = s.github ? `@${s.github}` : '@adityarp2008';
   if (uNameEl) uNameEl.textContent = s.name || 'Aditya Pandey';
   if (dNameEl) dNameEl.textContent = s.name || 'Aditya Pandey';
-  if (termEl) termEl.textContent = s.academic_level || 'Active Student';
-  if (goalEl) goalEl.textContent = s.career_goal || 'Target Goal';
+  if (termEl) termEl.textContent = s.academic_level || '1st semester';
+  if (goalEl) goalEl.textContent = s.career_goal || 'Entrepreneur';
 
   const initials = (s.name || 'AP').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   const initEl = document.getElementById('nav-avatar-initials');
@@ -648,7 +694,7 @@ function renderRadar() {
   const w = canvas.width, h = canvas.height;
   const cx = w / 2, cy = h / 2, radius = 95;
 
-  const cats = window.currentStudent.radar?.categories || ["Python", "Algorithms", "Machine Learning", "Deep Learning", "Math/Stats", "Data Pipelines"];
+  const cats = window.currentStudent.radar?.categories || ["Domain 1", "Domain 2", "Domain 3", "Domain 4", "Domain 5", "Domain 6"];
   const vals = window.currentStudent.radar?.candidate || [30, 20, 15, 10, 25, 15];
   const bench = window.currentStudent.radar?.benchmark || [90, 85, 85, 80, 80, 75];
   const n = cats.length;
@@ -719,7 +765,9 @@ function renderRadar() {
   ctx.fill();
 }
 
-// AI TUTOR HANDLER (CALLS /api/chat)
+// ==========================================
+// DYNAMIC AI TUTOR (WITH FULL GEMINI REPLIES)
+// ==========================================
 window.handleTutorSend = async function(e) {
   if (e && e.preventDefault) e.preventDefault();
   const inEl = document.getElementById('tutor-input');
@@ -727,13 +775,26 @@ window.handleTutorSend = async function(e) {
   const msg = inEl ? inEl.value.trim() : '';
   if (!msg) return;
 
-  box.innerHTML += `<div class="p-2.5 rounded-xl bg-purple-600/20 text-purple-700 dark:text-purple-200 ml-6 text-right font-medium">${msg}</div>`;
+  // Add User Message Bubble
+  box.innerHTML += `
+    <div class="flex justify-end">
+      <div class="p-3 rounded-2xl bg-purple-600/30 text-purple-200 border border-purple-500/30 max-w-[85%] text-left font-medium leading-relaxed">
+        ${escapeHtml(msg)}
+      </div>
+    </div>
+  `;
   inEl.value = '';
 
-  const typing = document.createElement('div');
-  typing.className = "p-2.5 rounded-xl theme-card-inner theme-text-sub italic";
-  typing.textContent = "Gemini is analyzing your syllabus...";
-  box.appendChild(typing);
+  // Add Typing Indicator
+  const typingId = 'typing-' + Date.now();
+  box.innerHTML += `
+    <div id="${typingId}" class="flex justify-start">
+      <div class="p-3 rounded-2xl theme-card-inner theme-text-sub text-xs italic flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
+        <span>Gemini is synthesizing answer for ${escapeHtml(window.currentStudent?.career_goal || 'your role')}...</span>
+      </div>
+    </div>
+  `;
   box.scrollTop = box.scrollHeight;
 
   try {
@@ -742,15 +803,132 @@ window.handleTutorSend = async function(e) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: msg, studentContext: window.currentStudent })
     });
+    
     const data = await res.json();
-    typing.remove();
-    box.innerHTML += `<div class="p-2.5 rounded-xl theme-card-inner theme-text-title leading-relaxed">${(data.reply || 'Insight verified.').replace(/\n/g, '<br/>')}</div>`;
+    const typingEl = document.getElementById(typingId);
+    if (typingEl) typingEl.remove();
+
+    const reply = data.reply || (data.details ? `Tutor error: ${data.details}` : "Insight verified.");
+    
+    // Render formatted response with proper paragraph and bullet spacing
+    const formattedReply = reply
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>');
+
+    box.innerHTML += `
+      <div class="flex justify-start">
+        <div class="p-3.5 rounded-2xl theme-card-inner theme-text-title border border-white/10 max-w-[95%] text-xs leading-relaxed space-y-2">
+          ${formattedReply}
+        </div>
+      </div>
+    `;
   } catch (err) {
-    typing.remove();
-    box.innerHTML += `<div class="p-2.5 rounded-xl theme-card-inner theme-text-title"><strong>Tutor:</strong> Focus on your active phase milestones for ${window.currentStudent?.career_goal || 'your target goal'}!</div>`;
+    const typingEl = document.getElementById(typingId);
+    if (typingEl) typingEl.remove();
+
+    box.innerHTML += `
+      <div class="flex justify-start">
+        <div class="p-3 rounded-2xl theme-card-inner text-rose-300 border border-rose-500/20 text-xs">
+          <strong>Tutor Alert:</strong> Could not connect to Gemini API. Error: ${escapeHtml(err.message)}
+        </div>
+      </div>
+    `;
   }
   box.scrollTop = box.scrollHeight;
 };
+
+// ==========================================
+// DETAILED "WHAT TO READ & MASTER" NOTES MODAL
+// ==========================================
+window.openNotesModal = function() {
+  const currentPhase = (window.currentStudent?.phases || [])[activePhaseIdx] || (window.currentStudent?.phases || [])[0];
+  const phaseTitle = currentPhase?.phaseTitle || `Phase ${activePhaseIdx + 1}`;
+  const goal = window.currentStudent?.career_goal || 'Specialist';
+  
+  const titleEl = document.getElementById('notes-modal-title');
+  if (titleEl) {
+    titleEl.textContent = `${phaseTitle} • What to Read & Master`;
+  }
+  
+  const container = document.getElementById('notes-container');
+  if (!container) return;
+
+  const milestones = currentPhase?.milestones || [];
+  
+  let milestoneDetailsHTML = '';
+  milestones.forEach((m, idx) => {
+    milestoneDetailsHTML += `
+      <div class="p-4 rounded-2xl theme-card-inner space-y-2.5 border border-white/10">
+        <div class="flex items-center justify-between">
+          <span class="font-bold theme-text-title flex items-center gap-2 text-xs">
+            <span class="w-5 h-5 rounded-full bg-purple-500/20 dynamic-accent-text flex items-center justify-center font-bold text-[10px]">${idx + 1}</span>
+            <span>${escapeHtml(m.title)}</span>
+          </span>
+          <span class="font-mono text-[10px] text-amber-400 font-bold">${m.hours} Study Target</span>
+        </div>
+        
+        <p class="theme-text-sub text-[11px] leading-relaxed">
+          ${escapeHtml(m.desc || 'Comprehensive core competence required for career benchmarks.')}
+        </p>
+
+        <!-- Deep-dive Reading Guide -->
+        <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1.5 text-[11px]">
+          <div class="font-semibold dynamic-accent-text flex items-center gap-1.5">
+            <span>📚 Core Reading & Concepts to Master:</span>
+          </div>
+          <ul class="list-disc list-inside space-y-1 theme-text-sub">
+            <li><strong>Theoretical Foundations:</strong> Master the underlying mechanics, formulas, and definitions.</li>
+            <li><strong>Industry Case Studies:</strong> Analyze how real-world teams implement this to mitigate risk or increase velocity.</li>
+            <li><strong>Hands-on Deliverable:</strong> Write a concise specification document, executable script, or prototype validating this topic.</li>
+          </ul>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = `
+    <!-- Active Header Capsule -->
+    <div class="p-4 rounded-2xl bg-gradient-to-r from-purple-900/30 via-indigo-900/20 to-transparent border border-purple-500/30 space-y-1.5">
+      <div class="flex items-center justify-between">
+        <span class="text-[10px] font-mono font-extrabold uppercase tracking-wider dynamic-accent-text">Syllabus Deep-Dive Specification</span>
+        <span class="px-2.5 py-0.5 rounded-full bg-purple-500/20 dynamic-accent-text text-[10px] font-bold">Phase ${activePhaseIdx + 1} of 3</span>
+      </div>
+      <h4 class="text-sm font-bold theme-text-title">${escapeHtml(phaseTitle)}</h4>
+      <p class="theme-text-sub text-[11px] leading-relaxed">
+        Curriculum reading blueprint configured for <strong>${escapeHtml(goal)}</strong> candidates with background in <em>"${escapeHtml(window.currentStudent?.current_knowledge || 'Undergraduate')}"</em>.
+      </p>
+    </div>
+
+    <!-- Milestones Detailed Breakdown -->
+    <div class="space-y-3 pt-1">
+      ${milestoneDetailsHTML || '<p class="theme-text-sub">No milestones mapped in this phase.</p>'}
+    </div>
+
+    <!-- Recommended External Research Guide -->
+    <div class="p-3.5 rounded-2xl theme-card-inner border border-white/10 space-y-2 text-xs">
+      <div class="font-bold theme-text-title flex items-center gap-2">
+        <span>🔍</span>
+        <span>Recommended Learning Path:</span>
+      </div>
+      <p class="theme-text-sub text-[11px] leading-relaxed">
+        Focus your time on building tangible outputs for each milestone above. You can ask your <strong>AI Tutor</strong> (in the bottom right) anytime for explanations, code reviews, or business breakdowns of any concept in this phase.
+      </p>
+    </div>
+  `;
+
+  openModal('modal-notes');
+};
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
 // THEME SWITCHER
 window.setAccentTheme = function(themeName) {
@@ -792,7 +970,7 @@ window.startEndlessMCQSession = function() {
   const bdg = document.getElementById('mcq-badge-track');
   if (corr) corr.textContent = '0';
   if (wrng) wrng.textContent = '0';
-  if (bdg) bdg.textContent = window.currentStudent?.career_goal || 'AI Engineer';
+  if (bdg) bdg.textContent = window.currentStudent?.career_goal || 'Entrepreneur';
   openModal('modal-mcq');
   generateNextMCQ();
 };
@@ -929,23 +1107,6 @@ window.fetchGitHubRepos = async function() {
   } catch(e) {
     c.innerHTML = '<div class="text-rose-500 p-3">Error connecting to GitHub API.</div>';
   }
-};
-
-window.openNotesModal = function() {
-  document.getElementById('notes-modal-title').textContent = `${window.currentStudent?.career_goal || 'AI Engineer'} - Architecture Blueprint`;
-  const container = document.getElementById('notes-container');
-  if (container) {
-    container.innerHTML = `
-      <div class="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-600 dark:text-blue-300 font-semibold mb-2">
-        🚀 Active Curricula Specs for ${window.currentStudent?.career_goal || 'AI Engineer'}
-      </div>
-      <div class="p-3.5 rounded-xl theme-card-inner space-y-1">
-        <div class="font-bold theme-text-title">Current Knowledge Profile</div>
-        <p class="theme-text-sub text-[11px] leading-relaxed">${window.currentStudent?.current_knowledge || 'Basic HTML, CSS, and Python'}</p>
-      </div>
-    `;
-  }
-  openModal('modal-notes');
 };
 
 function cycleFunFact() {
