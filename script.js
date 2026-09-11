@@ -1,6 +1,6 @@
 /**
  * Align-X Academic Engine
- * Multi-Profile Manager + Guaranteed 5-7 Topics Per Phase + Dynamic AI Insights
+ * Backlog Telemetry + Daily/Weekly AI Challenges + Randomized MCQs & Riddles
  */
 
 const SUPABASE_URL = "https://eydgvjsgkqjyqjkkedi.supabase.co";
@@ -19,82 +19,26 @@ if (window.supabase && typeof window.supabase.createClient === 'function') {
 let activePhaseIdx = 0;
 window.currentStudent = null;
 window.pendingRegistrationEmail = "";
+let currentMCQMode = 'general'; // 'general', 'daily', or 'weekly'
 
-// Dynamic Fallback Generator guaranteeing 4-5 Phases with 5-7 Milestones each
-function generateFallbackCurriculum(goal, knowledge) {
-  const g = (goal || 'Cardiologist').toLowerCase();
-
-  if (g.includes('cardio') || g.includes('medic') || g.includes('doctor') || g.includes('surgeon')) {
-    return {
-      radar: {
-        categories: ["Cardiovascular Anatomy", "Diagnostic Imaging", "Hemodynamics", "Pharmacology", "Interventional Procedures", "Emergency Protocols"],
-        candidate: [25, 20, 15, 30, 10, 20],
-        benchmark: [95, 90, 90, 85, 80, 90]
-      },
-      phases: [
-        {
-          phaseTitle: "Phase 1: Cellular Electrophysiology & Structural Anatomy",
-          milestones: [
-            { id: "med-1", title: "Cardiac Action Potentials & Ion Channel Kinetics", hours: "14 hrs", desc: "Phase 0 Na+ influx, Phase 2 L-type Ca2+ plateau, and Phase 3 delayed rectifier K+ currents.", completed: false, xp: 140 },
-            { id: "med-2", title: "Coronary Arterial & Microvascular Micro-Anatomy", hours: "16 hrs", desc: "LAD, LCx, and RCA perfusion territories, collateral circuits, and coronary sinus anatomy.", completed: false, xp: 150 },
-            { id: "med-3", title: "12-Lead Vector Electrocardiography & Axis Determination", hours: "18 hrs", desc: "Hexaxial reference system, Einthoven's triangle, and fascicular block axis shifts.", completed: false, xp: 180 },
-            { id: "med-4", title: "Wiggers Diagram & Left Ventricular Pressure-Volume Loops", hours: "16 hrs", desc: "Preload/afterload shifts, elastance slopes, and cardiac cycle acoustic correlations.", completed: false, xp: 160 },
-            { id: "med-5", title: "Autonomic Regulation & Baroreceptor Reflex Loops", hours: "12 hrs", desc: "Sympathetic beta-1 adrenergic versus vagal muscarinic pacemaker modulation.", completed: false, xp: 130 },
-            { id: "med-6", title: "Endothelial Biology & Atherogenesis Pathophysiology", hours: "15 hrs", desc: "Lipid oxidation, foam cell accumulation, and fibrous cap rupture dynamics.", completed: false, xp: 140 }
-          ]
-        },
-        {
-          phaseTitle: "Phase 2: Diagnostic Imaging, Ultrasound & Valvular Pathologies",
-          milestones: [
-            { id: "med-7", title: "Transthoracic Echocardiography & Standard 5-View Planes", hours: "20 hrs", desc: "Parasternal long/short axis, apical 4/2 chamber, and subcostal views.", completed: false, xp: 200 },
-            { id: "med-8", title: "Doppler Hemodynamics, Continuity Equations & Stenosis", hours: "18 hrs", desc: "Bernoulli simplified equation ($$\\Delta P = 4v^2$$), valve area calculations, and jet velocities.", completed: false, xp: 190 },
-            { id: "med-9", title: "Mitral & Aortic Regurgitation Quantification", hours: "16 hrs", desc: "PISA method, vena contracta width, and regurgitant volume classifications.", completed: false, xp: 180 },
-            { id: "med-10", title: "Nuclear Stress Perfusion & SPECT/PET Imaging", hours: "14 hrs", desc: "Radiotracer uptake kinetics, reversible ischemia vs fixed scar patterns.", completed: false, xp: 170 },
-            { id: "med-11", title: "Cardiac Magnetic Resonance (CMR) & Late Gadolinium", hours: "18 hrs", desc: "T1/T2 mapping, myocarditis differential, and replacement fibrosis scoring.", completed: false, xp: 210 },
-            { id: "med-12", title: "Transesophageal Echo (TEE) & Left Atrial Appendage", hours: "16 hrs", desc: "LAA thrombus rule-out, endocarditis vegetations, and prosthetic valve leaks.", completed: false, xp: 190 }
-          ]
-        },
-        {
-          phaseTitle: "Phase 3: Cardiovascular Pharmacology & Arrhythmia Management",
-          milestones: [
-            { id: "med-13", title: "Vaughan Williams Antiarrhythmic Classifications (I-IV)", hours: "18 hrs", desc: "Sodium blockers, potassium channel blockers, amiodarone protocols, and QT risks.", completed: false, xp: 200 },
-            { id: "med-14", title: "Guideline-Directed Heart Failure Quadruple Therapy", hours: "20 hrs", desc: "ARNI, Beta-blockers, SGLT2 inhibitors, and mineralocorticoid receptor antagonists.", completed: false, xp: 220 },
-            { id: "med-15", title: "Inotropic Agents, Vasopressors & Vasodilator Titrations", hours: "16 hrs", desc: "Dobutamine, Milrinone, Norepinephrine, and Nitroprusside receptor kinetics.", completed: false, xp: 180 },
-            { id: "med-16", title: "Antithrombotic & Anticoagulant Protocols in ACS & AFib", hours: "18 hrs", desc: "DOACs, Heparin bridging, DAPT duration, and bleeding risk scores (HAS-BLED).", completed: false, xp: 200 },
-            { id: "med-17", title: "Lipid-Lowering Strategies: Statins, Ezetimibe & PCSK9i", hours: "14 hrs", desc: "LDL reduction targets, pleiotropic plaque stabilization, and secondary prevention.", completed: false, xp: 170 },
-            { id: "med-18", title: "Cardioversion Protocols & Antiarrhythmic Infusion Safety", hours: "16 hrs", desc: "Synchronized electrical shock protocols, energy selection, and safety checks.", completed: false, xp: 190 }
-          ]
-        },
-        {
-          phaseTitle: "Phase 4: Interventional Cardiology, ACS & Structural Catheterization",
-          milestones: [
-            { id: "med-19", title: "Right & Left Heart Diagnostic Catheterization", hours: "24 hrs", desc: "Fick cardiac output calculation, pulmonary wedge pressures, and vascular resistance.", completed: false, xp: 260 },
-            { id: "med-20", title: "Coronary Angiography & Fluoroscopic Projection Mapping", hours: "22 hrs", desc: "RAO/LAO cranial/caudal angles, bifurcation lesions, and TIMI flow grading.", completed: false, xp: 250 },
-            { id: "med-21", title: "Fractional Flow Reserve (FFR) & Intravascular Ultrasound", hours: "20 hrs", desc: "iFR/FFR physiological cutoffs (<0.80) and stent expansion/apposition criteria.", completed: false, xp: 240 },
-            { id: "med-22", title: "STEMI Emergency Protocols & Door-To-Balloon Windows", hours: "22 hrs", desc: "Primary PCI pathways, radial vs femoral access, and distal embolization guards.", completed: false, xp: 270 },
-            { id: "med-23", title: "Transcatheter Aortic Valve Replacement (TAVR) Planning", hours: "20 hrs", desc: "Annulus CT sizing, vascular access assessment, and conduction block hazards.", completed: false, xp: 250 },
-            { id: "med-24", title: "Temporary Mechanical Circulatory Support (Impella & IABP)", hours: "26 hrs", desc: "Hemodynamic unloading, purge systems, and vascular complication management.", completed: false, xp: 300 }
-          ]
-        },
-        {
-          phaseTitle: "Phase 5: Critical Care Resuscitation, Shock & Board Clearance",
-          milestones: [
-            { id: "med-25", title: "Cardiogenic Shock Phenotyping & SCAI Staging (A-E)", hours: "24 hrs", desc: "Normotensive vs hypoperfused shock, pulmonary artery catheter profiles.", completed: false, xp: 290 },
-            { id: "med-26", title: "Venoarterial Extracorporeal Membrane Oxygenation (VA-ECMO)", hours: "28 hrs", desc: "Cannulation setups, Harlequin syndrome, and left ventricular venting.", completed: false, xp: 320 },
-            { id: "med-27", title: "Malignant Ventricular Arrhythmia Storm Triage", hours: "20 hrs", desc: "Stellate ganglion blockade, overdrive pacing, and emergency ablation triggers.", completed: false, xp: 280 },
-            { id: "med-28", title: "Advanced Heart Failure: LVAD & Heart Transplant Clearance", hours: "22 hrs", desc: "INTERMACS grading, hemodynamic ramp tests, and donor-recipient matching.", completed: false, xp: 300 },
-            { id: "med-29", title: "Clinical Trial Interpretation & ACC/AHA Guideline Defenses", hours: "20 hrs", desc: "Critical appraisal of landmark trials (DAPA-HF, PARADIGM, ISCHEMIA).", completed: false, xp: 270 },
-            { id: "med-30", title: "Comprehensive Fellowship Simulation & Board Defense", hours: "32 hrs", desc: "End-to-end case simulations, complication management, and final certification sign-off.", completed: false, xp: 360 }
-          ]
-        }
-      ]
-    };
+// Fisher-Yates Shuffle Algorithm to guarantee true randomization of options & answer indexes
+function shuffleOptionsAndFixAnswer(options, correctIdx) {
+  const indexed = options.map((opt, i) => ({ opt, isCorrect: i === correctIdx }));
+  for (let i = indexed.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indexed[i], indexed[j]] = [indexed[j], indexed[i]];
   }
+  return {
+    shuffledOptions: indexed.map(item => item.opt),
+    newCorrectIdx: indexed.findIndex(item => item.isCorrect)
+  };
+}
 
-  // General Domain Fallback (Guarantees 4 phases, 6 milestones each)
+// Fallback curriculum
+function generateFallbackCurriculum(goal, knowledge) {
   return {
     radar: {
-      categories: ["Theoretical Foundations", "Applied Core", "System Integration", "Tooling & Protocols", "Safety / Validation", "Case Decision Systems"],
+      categories: ["Core Theory", "Applied Workflows", "System Design", "Diagnostic Protocols", "Safety Checks", "Verification Clearance"],
       candidate: [20, 15, 10, 15, 10, 10],
       benchmark: [90, 85, 85, 80, 80, 75]
     },
@@ -102,44 +46,30 @@ function generateFallbackCurriculum(goal, knowledge) {
       {
         phaseTitle: "Phase 1: Foundational Principles & Core Methodologies",
         milestones: [
-          { id: "gen-1", title: `Theoretical Principles & Terminology of ${goal}`, hours: "14 hrs", desc: "Core mechanisms, operational rules, and taxonomies.", completed: false, xp: 120 },
-          { id: "gen-2", title: "Baseline Instrumentation & Tooling Setup", hours: "16 hrs", desc: "Environment configuration, primary frameworks, and verification drills.", completed: false, xp: 140 },
-          { id: "gen-3", title: "Mathematical & Algorithmic Foundations", hours: "12 hrs", desc: "Essential mathematical modeling, rates, and baseline heuristics.", completed: false, xp: 120 },
-          { id: "gen-4", title: "Error Boundaries & Diagnostic Logging", hours: "18 hrs", desc: "Failure identification, error classification, and logging standards.", completed: false, xp: 150 },
-          { id: "gen-5", title: "Initial Synthesis Deliverable & Code/Protocol Audit", hours: "16 hrs", desc: "Execution of first verified deliverable demonstrating core principles.", completed: false, xp: 140 },
-          { id: "gen-6", title: "Phase 1 Synthesis Assessment", hours: "18 hrs", desc: "Comprehensive baseline challenge testing concepts across Phase 1.", completed: false, xp: 160 }
+          { id: "p1-1", title: `Cellular & Theoretical Foundations of ${goal}`, hours: "14 hrs", desc: "Core operational rules, structural mechanisms, and taxonomies.", completed: false, xp: 120 },
+          { id: "p1-2", title: "Diagnostic Vector & Baseline Analysis", hours: "16 hrs", desc: "Systematic vector analysis and primary diagnostic drills.", completed: false, xp: 140 },
+          { id: "p1-3", title: "Hemodynamics, Gradients & Critical Equations", hours: "12 hrs", desc: "Pressure-volume loops, flow mechanics, and mathematical limits.", completed: false, xp: 120 },
+          { id: "p1-4", title: "Safety Criteria & Baseline Verification", hours: "16 hrs", desc: "Triage rules, error-trapping protocols, and baseline screening.", completed: false, xp: 150 },
+          { id: "p1-5", title: "Initial Synthesis Deliverable & Audit", hours: "18 hrs", desc: "Execution of first verified deliverable demonstrating core principles.", completed: false, xp: 160 }
         ]
       },
       {
         phaseTitle: "Phase 2: Intermediate Implementation & Systems",
         milestones: [
-          { id: "gen-7", title: "Complex Architecture & Workflow Pipelines", hours: "20 hrs", desc: "Multi-parameter integration and applied execution models.", completed: false, xp: 200 },
-          { id: "gen-8", title: "Performance Profiling & Bottleneck Optimization", hours: "18 hrs", desc: "Latency reduction, memory efficiency, and resource throughput profiling.", completed: false, xp: 190 },
-          { id: "gen-9", title: "Security Protocols & Compliance Standards", hours: "16 hrs", desc: "Vulnerability analysis, authorization barriers, and compliance audits.", completed: false, xp: 180 },
-          { id: "gen-10", title: "Automated Verification & Unit/Stress Testing", hours: "18 hrs", desc: "Automated regression tests, fuzz testing, and resilience evaluation.", completed: false, xp: 190 },
-          { id: "gen-11", title: "Intermediate System Component Milestone", hours: "22 hrs", desc: "End-to-end subsystem build ready for real-world integration.", completed: false, xp: 220 },
-          { id: "gen-12", title: "Phase 2 Review & Cross-Evaluation", hours: "16 hrs", desc: "Peer-review audit verifying system stability under variance.", completed: false, xp: 180 }
+          { id: "p2-1", title: "Diagnostic Imaging, Sonography & Protocols", hours: "20 hrs", desc: "Doppler principles, acoustic impedance, and wall motion scores.", completed: false, xp: 180 },
+          { id: "p2-2", title: "Pharmacology & Receptor Intervention Systems", hours: "18 hrs", desc: "Receptor pharmacodynamics, beta-blockade, and inotropic agents.", completed: false, xp: 200 },
+          { id: "p2-3", title: "Acute Presentation & Syndrome Triage", hours: "16 hrs", desc: "Emergency pathways, acute presentation, and critical targets.", completed: false, xp: 190 },
+          { id: "p2-4", title: "Multi-parameter Risk Scoring Drills", hours: "22 hrs", desc: "Integrated multi-parameter risk calculation under variance.", completed: false, xp: 220 },
+          { id: "p2-5", title: "Comprehensive Phase 2 Case Evaluation", hours: "20 hrs", desc: "Differential diagnosis drills and systemic documentation.", completed: false, xp: 210 }
         ]
       },
       {
-        phaseTitle: "Phase 3: Advanced Integration & Production Hardening",
+        phaseTitle: "Phase 3: Production & Benchmark Clearance",
         milestones: [
-          { id: "gen-13", title: "Distributed Orchestration & Scale Management", hours: "24 hrs", desc: "Managing asynchronous workflows, failovers, and consensus states.", completed: false, xp: 240 },
-          { id: "gen-14", title: "Telemetry Dashboards & Live Health Monitoring", hours: "20 hrs", desc: "Configuring real-time telemetry metrics, alerts, and SLA triggers.", completed: false, xp: 220 },
-          { id: "gen-15", title: "Disaster Recovery & Redundancy Planning", hours: "22 hrs", desc: "Simulated catastrophic failover drills and recovery time objectives.", completed: false, xp: 230 },
-          { id: "gen-16", title: "Advanced Domain Tooling & API Integration", hours: "22 hrs", desc: "Integrating third-party industry endpoints, gateways, and hardware interfaces.", completed: false, xp: 230 },
-          { id: "gen-17", title: "Production Hardening Stress Assessment", hours: "26 hrs", desc: "Full-scale load testing validating reliability under peak stress.", completed: false, xp: 260 },
-          { id: "gen-18", title: "Phase 3 Architecture Verification Defense", hours: "20 hrs", desc: "Formal defense of architectural decisions against industry benchmarks.", completed: false, xp: 220 }
-        ]
-      },
-      {
-        phaseTitle: "Phase 4: Capstone Industry Certification Benchmark",
-        milestones: [
-          { id: "gen-19", title: "Industry Deliverable: System Specification", hours: "26 hrs", desc: "Drafting complete technical and operational documentation.", completed: false, xp: 280 },
-          { id: "gen-20", title: "Capstone Implementation: Execution Sprint", hours: "30 hrs", desc: "Building the comprehensive capstone deliverable demonstrating domain mastery.", completed: false, xp: 320 },
-          { id: "gen-21", title: "Security & Quality Assurance Clearance", hours: "22 hrs", desc: "Independent security, safety, and compliance audit.", completed: false, xp: 250 },
-          { id: "gen-22", title: "Production Deployment & Demonstration", hours: "28 hrs", desc: "Live deployment under real-world constraints and operational metrics.", completed: false, xp: 300 },
-          { id: "gen-23", title: "Final Hiring / Board Clearance Defense", hours: "32 hrs", desc: "Comprehensive technical review proving immediate career readiness.", completed: false, xp: 350 }
+          { id: "p3-1", title: "Interventional Procedures & Access Pathways", hours: "24 hrs", desc: "Access parameters, device deployment, and catheterization rules.", completed: false, xp: 260 },
+          { id: "p3-2", title: "Failure Management & Support Guidelines", hours: "22 hrs", desc: "Mechanical circulatory support, hemodynamic ramp tests, and guidelines.", completed: false, xp: 280 },
+          { id: "p3-3", title: "Quality Assurance & Independent Compliance Audit", hours: "20 hrs", desc: "Formal defense of architectural decisions against industry benchmarks.", completed: false, xp: 250 },
+          { id: "p3-4", title: "Final Hiring / Board Clearance Capstone", hours: "30 hrs", desc: "Comprehensive technical review proving immediate career readiness.", completed: false, xp: 350 }
         ]
       }
     ]
@@ -174,7 +104,6 @@ function saveProfileToStore(profile) {
 
 window.addNewProfileTrack = function() {
   const current = window.currentStudent;
-  
   document.getElementById('prof-name-input').value = current?.name || '';
   document.getElementById('prof-level-input').value = current?.academic_level || '';
   document.getElementById('prof-goal-input').value = '';
@@ -229,7 +158,7 @@ function updateProfilesDropdownUI() {
   list.innerHTML = html;
 }
 
-// Endless Riddles Bank
+// 8 Diverse Logic Riddles (Randomized dynamically across A, B, and C)
 const endlessRiddlesBank = [
   {
     q: "A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much does the ball cost?",
@@ -250,39 +179,54 @@ const endlessRiddlesBank = [
     category: "Classic Enigma",
     options: ["An Echo", "A Shadow", "A Cloud"],
     correct: 0,
-    explanation: "An echo reflects sound (speaks and hears without organs) and travels on sound waves through air."
+    explanation: "An echo reflects sound waves through the air without physical biological organs."
   },
   {
     q: "If five machines take 5 minutes to make 5 widgets, how long would it take 100 machines to make 100 widgets?",
     category: "Operational Rate",
-    options: ["100 minutes", "5 minutes", "1 minute"],
-    correct: 1,
-    explanation: "Each individual machine takes 5 minutes to create 1 widget. Running 100 machines concurrently takes 5 minutes to make 100 widgets."
+    options: ["100 minutes", "50 minutes", "5 minutes"],
+    correct: 2,
+    explanation: "Each machine takes 5 minutes to make 1 widget. Running 100 machines concurrently takes 5 minutes to produce 100 widgets."
   },
   {
     q: "The person who makes it has no need of it; the person who buys it has no use for it. The person who uses it can neither see nor feel it. What is it?",
     category: "Abstract Deduction",
-    options: ["A Coffin", "A Poison", "A Secret"],
-    correct: 0,
-    explanation: "A coffin is built to sell, bought for another, and used after death."
+    options: ["A Secret", "A Lock", "A Coffin"],
+    correct: 2,
+    explanation: "A coffin is built to sell, purchased for a deceased loved one, and used without conscious perception."
   },
   {
     q: "You have a 3-liter jug and a 5-liter jug with an unlimited water supply. How do you measure exactly 4 liters?",
-    category: "Quorum Problem",
+    category: "Volume Conservation",
     options: [
-      "Fill 5L, pour into 3L (leaving 2L in 5L). Empty 3L, pour the 2L into 3L. Fill 5L and top off the 3L (which needs 1L), leaving 4L in the 5L jug.",
-      "Fill the 3L jug twice and pour directly into the 5L jug.",
-      "Fill the 5L jug halfway by eyesight estimation."
+      "Fill 5L, pour into 3L (2L left in 5L). Empty 3L, pour the 2L into 3L. Fill 5L and top off the 3L jug (needs 1L), leaving 4L in 5L jug.",
+      "Fill 3L twice and empty 2L by visual estimation.",
+      "Fill 5L jug completely and pour out exactly one-fifth."
     ],
     correct: 0,
-    explanation: "Standard conservation of volume: 5L - 3L = 2L. Transfer 2L into 3L. Refill 5L, pour 1L to fill 3L jug, leaving precisely 4L."
+    explanation: "Step-by-step arithmetic: 5 - 3 = 2L. Place 2L in 3L jug. Refill 5L, pour 1L to fill 3L jug, leaving exactly 4L."
+  },
+  {
+    q: "What can travel around the entire globe while remaining confined to a single corner?",
+    category: "Wordplay Logic",
+    options: ["The Equator", "A Postage Stamp", "A Compass Needle"],
+    correct: 1,
+    explanation: "A postage stamp stays fixed to the corner of an envelope as it travels across continents."
+  },
+  {
+    q: "A doctor gives you three pills and tells you to take one every half hour. How long will the pills last?",
+    category: "Temporal Sequence",
+    options: ["90 minutes", "60 minutes", "30 minutes"],
+    correct: 1,
+    explanation: "You take Pill 1 at minute 0, Pill 2 at minute 30, and Pill 3 at minute 60 (total duration = 60 minutes)."
   }
 ];
 
 let riddleSession = {
   currentIdx: 0,
   score: 0,
-  answered: false
+  answered: false,
+  activeRiddle: null
 };
 
 // DYNAMIC AI FACT CONTROLLER
@@ -325,9 +269,9 @@ window.cycleFunFact = async function(manualClick = false) {
     }
   } catch (err) {
     const fallbacks = [
-      `Specialists in ${goal} who complete structured phased milestones transition up to 65% faster into certified practice.`,
-      `Deliberate practice with real-world case scenarios produces 3.4x higher concept retention than passive theoretical reading.`,
-      `Evaluating edge failure states and multi-parameter differentials is the highest predictor of clinical/industry readiness in ${goal}.`
+      `Specialists in ${goal} who benchmark milestones against production standards shorten career gap transition velocity by up to 65%.`,
+      `Structured milestone deliberate practice produces 3.4x higher concept retention than passive reading.`,
+      `Evaluating failure states and edge boundaries is the single highest predictor of professional hiring clearance in ${goal}.`
     ];
     factEl.textContent = fallbacks[Math.floor(Math.random() * fallbacks.length)];
   } finally {
@@ -477,8 +421,7 @@ window.submitProfilerForm = async function() {
       });
     }
 
-    // Safety fallback if returned structure had insufficient topics
-    if (normalizedPhases.length === 0 || normalizedPhases[0].milestones.length < 3) {
+    if (normalizedPhases.length === 0) {
       normalizedPhases = fallback.phases;
     }
 
@@ -657,6 +600,7 @@ function enterDashboard() {
   updateDashboardUI();
 }
 
+// METRICS RECALCULATION (Tracks Active Backlogs cleanly)
 function recalculateMetrics() {
   if (!window.currentStudent) return;
   let total = 0, completed = 0;
@@ -696,19 +640,21 @@ function updateDashboardUI() {
     });
   });
 
+  const backlogsCount = totalMilestones - completedMilestones;
+
   const roleEl = document.getElementById('nav-current-role');
-  const ghEl = document.getElementById('nav-github-label');
   const uNameEl = document.getElementById('nav-user-name');
   const dNameEl = document.getElementById('drawer-user-name');
   const termEl = document.getElementById('nav-academic-term');
   const goalEl = document.getElementById('drawer-user-goal');
+  const backlogBadge = document.getElementById('sidebar-backlog-badge');
 
   if (roleEl) roleEl.textContent = s.career_goal || 'Goal Unset';
-  if (ghEl) ghEl.textContent = s.github ? `@${s.github}` : '@student';
   if (uNameEl) uNameEl.textContent = s.name || 'Student Scholar';
   if (dNameEl) dNameEl.textContent = s.name || 'Student Scholar';
   if (termEl) termEl.textContent = s.academic_level || 'Education Profile';
   if (goalEl) goalEl.textContent = s.career_goal || 'Target Goal';
+  if (backlogBadge) backlogBadge.textContent = `${backlogsCount} Left`;
 
   const initials = (s.name || 'ST').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   const initEl = document.getElementById('nav-avatar-initials');
@@ -716,15 +662,19 @@ function updateDashboardUI() {
   if (initEl) initEl.textContent = initials;
   if (lvlBadge) lvlBadge.textContent = `L${s.level || 1}`;
 
+  // Dial 1: Curriculum Mastery
   document.getElementById('meter-current-val').innerHTML = `${s.curriculum_mastery}% <span class="text-xs font-normal theme-text-sub">/100%</span>`;
   document.getElementById('meter-current-sub').textContent = `${completedMilestones} of ${totalMilestones} verified`;
 
-  document.getElementById('meter-gap-val').innerHTML = `${s.concept_deficits}% <span class="text-xs font-normal theme-text-sub">untested</span>`;
-  document.getElementById('meter-gap-sub').textContent = `${totalMilestones - completedMilestones} syllabus topics left`;
+  // Dial 2: Active Backlogs
+  document.getElementById('meter-gap-val').innerHTML = `${s.concept_deficits}% <span class="text-xs font-normal theme-text-sub">backlogs</span>`;
+  document.getElementById('meter-gap-sub').textContent = `${backlogsCount} syllabus items pending`;
 
+  // Dial 3: Career Readiness
   document.getElementById('meter-readiness-val').innerHTML = `${s.readiness}% <span class="text-xs font-normal theme-text-sub">score</span>`;
   document.getElementById('meter-readiness-sub').textContent = s.readiness === 0 ? 'Course unstarted' : 'Verified clearance';
 
+  // Dial 4: Study Sprint Pace
   document.getElementById('meter-time-val').innerHTML = `${s.target_pace}% <span class="text-xs font-normal theme-text-sub">pace</span>`;
   document.getElementById('meter-time-sub').textContent = s.target_pace === 0 ? 'Sprint unstarted' : 'Active velocity';
 
@@ -780,7 +730,7 @@ function renderDynamicPhasesDropdown() {
   menuWeeks.innerHTML = html;
 }
 
-// STUDY PLAN MODULES (Renders all 5-7 milestones per phase without capping)
+// STUDY PLAN MODULES
 window.changeStudyPlanPhase = function(phaseIdx) {
   activePhaseIdx = phaseIdx;
   const lbl = document.getElementById('active-week-label');
@@ -807,22 +757,21 @@ function renderStudyPlanModules() {
     return;
   }
 
-  // Renders ALL milestones without any slice truncation
   currentPhase.milestones.forEach((m, idx) => {
     const item = document.createElement('div');
-    item.className = "p-3.5 rounded-2xl study-module-card flex items-center justify-between gap-3 transition cursor-pointer";
+    item.className = "p-3 sm:p-3.5 rounded-2xl study-module-card flex items-center justify-between gap-3 transition cursor-pointer";
     const statusClass = m.completed ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30' : 'bg-slate-500/10 text-slate-500 border border-slate-500/20';
 
     item.innerHTML = `
-      <div class="flex items-center gap-3">
-        <span class="w-6 h-6 rounded-full bg-white/10 dynamic-accent-text font-bold flex items-center justify-center text-xs shrink-0">${idx + 1}</span>
-        <div>
-          <div class="study-module-title text-xs leading-snug ${m.completed ? 'line-through opacity-60' : ''}">${escapeHtml(m.title)}</div>
-          <div class="study-module-desc text-[11px] mt-0.5">${escapeHtml(m.desc || `${m.hours} structured spec`)}</div>
+      <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+        <span class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white/10 dynamic-accent-text font-bold flex items-center justify-center text-[11px] sm:text-xs shrink-0">${idx + 1}</span>
+        <div class="min-w-0">
+          <div class="study-module-title text-xs leading-snug truncate ${m.completed ? 'line-through opacity-60' : ''}">${escapeHtml(m.title)}</div>
+          <div class="study-module-desc text-[10px] sm:text-[11px] mt-0.5 truncate">${escapeHtml(m.desc || `${m.hours} structured spec`)}</div>
         </div>
       </div>
-      <div class="flex items-center gap-2 shrink-0">
-        <span class="px-2.5 py-1 rounded-full ${statusClass} font-bold text-[10px]">${m.completed ? 'Completed ✓' : 'In Progress'}</span>
+      <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <span class="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full ${statusClass} font-bold text-[9px] sm:text-[10px]">${m.completed ? 'Done ✓' : 'Pending'}</span>
         <span class="theme-text-sub text-xs">›</span>
       </div>
     `;
@@ -843,29 +792,29 @@ function renderRoadmapModal() {
 
   phases.forEach((phase, pIdx) => {
     const box = document.createElement('div');
-    box.className = "p-4 rounded-2xl theme-card-inner space-y-3";
+    box.className = "p-3 sm:p-4 rounded-2xl theme-card-inner space-y-2.5 sm:space-y-3";
     
     let html = '';
     const mList = phase.milestones || [];
     mList.forEach(m => {
       html += `
-        <div class="p-3 rounded-xl theme-card-inner flex items-center justify-between gap-3">
-          <label class="flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" ${m.completed ? 'checked' : ''} onchange="toggleMilestoneState('${m.id}')" class="w-4 h-4 rounded text-purple-600 focus:ring-0 cursor-pointer">
-            <div>
-              <div class="font-bold text-xs theme-text-title ${m.completed ? 'line-through opacity-50' : ''}">${escapeHtml(m.title)}</div>
-              <div class="text-[10px] theme-text-sub">${m.hours} • ${escapeHtml(m.desc || 'Milestone target')}</div>
+        <div class="p-2.5 sm:p-3 rounded-xl theme-card-inner flex items-center justify-between gap-2.5 sm:gap-3">
+          <label class="flex items-center gap-2.5 sm:gap-3 cursor-pointer min-w-0">
+            <input type="checkbox" ${m.completed ? 'checked' : ''} onchange="toggleMilestoneState('${m.id}')" class="w-4 h-4 rounded text-purple-600 focus:ring-0 cursor-pointer shrink-0">
+            <div class="min-w-0">
+              <div class="font-bold text-xs theme-text-title truncate ${m.completed ? 'line-through opacity-50' : ''}">${escapeHtml(m.title)}</div>
+              <div class="text-[10px] theme-text-sub truncate">${m.hours} • ${escapeHtml(m.desc || 'Milestone target')}</div>
             </div>
           </label>
-          <span class="font-mono text-amber-500 font-bold text-xs shrink-0">+${m.xp || 100} XP</span>
+          <span class="font-mono text-amber-500 font-bold text-[11px] sm:text-xs shrink-0">+${m.xp || 100} XP</span>
         </div>
       `;
     });
 
     box.innerHTML = `
       <div class="flex items-center justify-between pb-1">
-        <h4 class="text-xs font-extrabold uppercase tracking-wider dynamic-accent-text">${escapeHtml(phase.phaseTitle || `Phase ${pIdx + 1}`)}</h4>
-        <span class="text-[10px] font-mono theme-text-sub">Phase ${pIdx + 1} • ${mList.length} Topics</span>
+        <h4 class="text-xs font-extrabold uppercase tracking-wider dynamic-accent-text truncate">${escapeHtml(phase.phaseTitle || `Phase ${pIdx + 1}`)}</h4>
+        <span class="text-[10px] font-mono theme-text-sub shrink-0 ml-1">Phase ${pIdx + 1} • ${mList.length} Topics</span>
       </div>
       <div class="space-y-2">${html}</div>
     `;
@@ -979,7 +928,7 @@ function renderRadar() {
   ctx.fill();
 }
 
-// AI TUTOR HANDLER
+// AI TUTOR HANDLER (Strict Out-of-Context Protection)
 window.handleTutorSend = async function(e) {
   if (e && e.preventDefault) e.preventDefault();
   const inEl = document.getElementById('tutor-input');
@@ -989,7 +938,7 @@ window.handleTutorSend = async function(e) {
 
   box.innerHTML += `
     <div class="flex justify-end">
-      <div class="p-3 rounded-2xl bg-purple-600/30 text-purple-200 border border-purple-500/30 max-w-[85%] text-left font-medium leading-relaxed">
+      <div class="p-3 rounded-2xl bg-purple-600/30 text-purple-200 border border-purple-500/30 max-w-[88%] text-left font-medium leading-relaxed">
         ${escapeHtml(msg)}
       </div>
     </div>
@@ -1001,7 +950,7 @@ window.handleTutorSend = async function(e) {
     <div id="${typingId}" class="flex justify-start">
       <div class="p-3 rounded-2xl theme-card-inner theme-text-sub text-xs italic flex items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-purple-400 animate-ping"></span>
-        <span>Gemini is synthesizing answer for ${escapeHtml(window.currentStudent?.career_goal || 'your role')}...</span>
+        <span>Evaluating syllabus context...</span>
       </div>
     </div>
   `;
@@ -1018,7 +967,7 @@ window.handleTutorSend = async function(e) {
     const typingEl = document.getElementById(typingId);
     if (typingEl) typingEl.remove();
 
-    const reply = data.reply || (data.details ? `Tutor error: ${data.details}` : "Insight verified.");
+    const reply = data.reply || (data.details ? `Tutor error: ${data.details}` : "I can only answer questions related to your career syllabus.");
     
     const formattedReply = reply
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -1039,7 +988,7 @@ window.handleTutorSend = async function(e) {
     box.innerHTML += `
       <div class="flex justify-start">
         <div class="p-3 rounded-2xl theme-card-inner text-rose-300 border border-rose-500/20 text-xs">
-          <strong>Tutor Alert:</strong> Could not connect to Gemini API. Error: ${escapeHtml(err.message)}
+          <strong>Tutor Alert:</strong> Connection error. Please ask an academic topic related to your goals.
         </div>
       </div>
     `;
@@ -1050,7 +999,7 @@ window.handleTutorSend = async function(e) {
 // NOTES GENERATOR
 function generateMilestoneSpecificReadingGuide(title, desc, goal) {
   return {
-    theory: `Detailed breakdown of underlying mechanisms, authoritative standards, and structural equations for "${title}".`,
+    theory: `Detailed breakdown of underlying principles, authoritative standards, and structural equations for "${title}".`,
     caseStudy: `Real-world clinical or engineering protocol analyzing how specialists in ${goal} execute "${title}" under acute conditions.`,
     deliverable: `Standardized operational procedure, diagnostic protocol, or technical deliverable verifying mastery of "${title}".`
   };
@@ -1076,27 +1025,27 @@ window.openNotesModal = function() {
     const readingGuide = generateMilestoneSpecificReadingGuide(m.title, m.desc, goal);
 
     milestoneDetailsHTML += `
-      <div class="p-4 rounded-2xl theme-card-inner space-y-3 border border-white/10">
+      <div class="p-3 sm:p-4 rounded-2xl theme-card-inner space-y-2.5 sm:space-y-3 border border-white/10">
         <div class="flex items-center justify-between">
-          <span class="font-bold theme-text-title flex items-center gap-2 text-xs">
-            <span class="w-5 h-5 rounded-full bg-purple-500/20 dynamic-accent-text flex items-center justify-center font-bold text-[10px]">${idx + 1}</span>
-            <span>${escapeHtml(m.title)}</span>
+          <span class="font-bold theme-text-title flex items-center gap-2 text-xs truncate">
+            <span class="w-5 h-5 rounded-full bg-purple-500/20 dynamic-accent-text flex items-center justify-center font-bold text-[10px] shrink-0">${idx + 1}</span>
+            <span class="truncate">${escapeHtml(m.title)}</span>
           </span>
-          <span class="font-mono text-[10px] text-amber-400 font-bold">${m.hours} Study Target</span>
+          <span class="font-mono text-[10px] text-amber-400 font-bold shrink-0">${m.hours} Target</span>
         </div>
         
         <p class="theme-text-sub text-[11px] leading-relaxed">
           ${escapeHtml(m.desc || 'Comprehensive core competence required for career benchmarks.')}
         </p>
 
-        <div class="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-2 text-[11px]">
+        <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-2 text-[11px]">
           <div class="font-bold dynamic-accent-text flex items-center gap-1.5">
-            <span>📚 Core Concepts & Readings to Master for "${escapeHtml(m.title)}":</span>
+            <span>📚 Core Concepts to Master for "${escapeHtml(m.title)}":</span>
           </div>
           <div class="space-y-1.5 text-slate-300">
             <div><strong class="text-white">🔬 Theoretical Mechanics:</strong> <span class="theme-text-sub">${readingGuide.theory}</span></div>
-            <div><strong class="text-white">🏥 Clinical / Industry Case Study:</strong> <span class="theme-text-sub">${readingGuide.caseStudy}</span></div>
-            <div><strong class="text-white">🎯 Practical Hands-on Deliverable:</strong> <span class="theme-text-sub">${readingGuide.deliverable}</span></div>
+            <div><strong class="text-white">🏥 Case Protocol:</strong> <span class="theme-text-sub">${readingGuide.caseStudy}</span></div>
+            <div><strong class="text-white">🎯 Practical Deliverable:</strong> <span class="theme-text-sub">${readingGuide.deliverable}</span></div>
           </div>
         </div>
       </div>
@@ -1104,10 +1053,10 @@ window.openNotesModal = function() {
   });
 
   container.innerHTML = `
-    <div class="p-4 rounded-2xl bg-gradient-to-r from-purple-900/30 via-indigo-900/20 to-transparent border border-purple-500/30 space-y-1.5">
+    <div class="p-3 sm:p-4 rounded-2xl bg-gradient-to-r from-purple-900/30 via-indigo-900/20 to-transparent border border-purple-500/30 space-y-1">
       <div class="flex items-center justify-between">
         <span class="text-[10px] font-mono font-extrabold uppercase tracking-wider dynamic-accent-text">Syllabus Deep-Dive Specification</span>
-        <span class="px-2.5 py-0.5 rounded-full bg-purple-500/20 dynamic-accent-text text-[10px] font-bold">Phase ${activePhaseIdx + 1}</span>
+        <span class="px-2 py-0.5 rounded-full bg-purple-500/20 dynamic-accent-text text-[10px] font-bold">Phase ${activePhaseIdx + 1}</span>
       </div>
       <h4 class="text-sm font-bold theme-text-title">${escapeHtml(phaseTitle)}</h4>
       <p class="theme-text-sub text-[11px] leading-relaxed">
@@ -1123,7 +1072,7 @@ window.openNotesModal = function() {
   openModal('modal-notes');
 };
 
-// GAP ANALYZER MODAL
+// ACTIVE BACKLOGS MANAGER MODAL (Formerly Gap Analyzer)
 window.openGapModal = function() {
   const s = window.currentStudent;
   const container = document.getElementById('gap-analysis-container');
@@ -1146,23 +1095,23 @@ window.openGapModal = function() {
   if (gapMilestones.length === 0) {
     gapListHTML = `
       <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-center text-xs font-semibold">
-        🎉 Zero Curriculum Gaps Remaining! You have verified 100% of your targeted syllabus competencies.
+        🎉 All Backlogs Resolved! You have verified 100% of your targeted syllabus competencies.
       </div>
     `;
   } else {
     gapMilestones.forEach((gm, idx) => {
       gapListHTML += `
-        <div class="p-3.5 rounded-2xl theme-card-inner border border-rose-500/20 flex items-center justify-between gap-3 text-xs">
-          <div class="space-y-1">
-            <div class="flex items-center gap-2">
-              <span class="w-5 h-5 rounded-full bg-rose-500/20 text-rose-400 font-bold flex items-center justify-center text-[10px]">${idx + 1}</span>
-              <span class="font-bold theme-text-title">${escapeHtml(gm.title)}</span>
-              <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-white/5 theme-text-sub">${escapeHtml(gm.phaseTitle)}</span>
+        <div class="p-3 sm:p-3.5 rounded-2xl theme-card-inner border border-rose-500/20 flex items-center justify-between gap-2.5 text-xs">
+          <div class="space-y-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="w-5 h-5 rounded-full bg-rose-500/20 text-rose-400 font-bold flex items-center justify-center text-[10px] shrink-0">${idx + 1}</span>
+              <span class="font-bold theme-text-title truncate">${escapeHtml(gm.title)}</span>
+              <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white/5 theme-text-sub shrink-0">${escapeHtml(gm.phaseTitle)}</span>
             </div>
-            <p class="theme-text-sub text-[11px] pl-7">${escapeHtml(gm.desc)}</p>
+            <p class="theme-text-sub text-[11px] pl-7 line-clamp-2">${escapeHtml(gm.desc)}</p>
           </div>
-          <button type="button" onclick="bridgeGap('${gm.id}')" class="shrink-0 px-3 py-1.5 rounded-xl btn-brand text-[10px] font-bold shadow cursor-pointer">
-            Bridge Gap ✓
+          <button type="button" onclick="bridgeGap('${gm.id}')" class="shrink-0 px-2.5 sm:px-3 py-1.5 rounded-xl btn-brand text-[10px] font-bold shadow cursor-pointer">
+            Resolve ✓
           </button>
         </div>
       `;
@@ -1170,43 +1119,31 @@ window.openGapModal = function() {
   }
 
   container.innerHTML = `
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-      <div class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300">
-        <div class="text-[10px] font-mono uppercase font-bold text-rose-400">Target Deficit Ratio</div>
-        <div class="text-2xl font-black font-mono mt-1">${deficitsPercentage}% Untested</div>
-        <div class="text-[10px] theme-text-sub mt-0.5">${gapMilestones.length} syllabus competencies remaining</div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 text-xs">
+      <div class="p-3.5 sm:p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300">
+        <div class="text-[10px] font-mono uppercase font-bold text-rose-400">Backlog Ratio</div>
+        <div class="text-xl sm:text-2xl font-black font-mono mt-1">${deficitsPercentage}% Pending</div>
+        <div class="text-[10px] theme-text-sub mt-0.5">${gapMilestones.length} syllabus topics remaining</div>
       </div>
-      <div class="p-4 rounded-2xl theme-card-inner border border-white/10 sm:col-span-2 space-y-1">
-        <div class="text-[10px] font-mono uppercase font-bold dynamic-accent-text">Candidate Baseline vs Hiring Clearance</div>
-        <div class="text-xs font-semibold theme-text-title">From: "${escapeHtml(background)}" → Target: "${escapeHtml(goal)}"</div>
+      <div class="p-3.5 sm:p-4 rounded-2xl theme-card-inner border border-white/10 sm:col-span-2 space-y-1">
+        <div class="text-[10px] font-mono uppercase font-bold dynamic-accent-text">Candidate Baseline vs Benchmark Clearance</div>
+        <div class="text-xs font-semibold theme-text-title truncate">From: "${escapeHtml(background)}" → Target: "${escapeHtml(goal)}"</div>
         <p class="text-[11px] theme-text-sub leading-relaxed">
-          The analyzer isolates clinical, technical, and operational vulnerabilities that must be verified before career benchmark clearance.
+          Resolve pending backlogs by completing milestone drills or clicking "Resolve ✓".
         </p>
       </div>
     </div>
 
-    <div class="space-y-2.5 pt-2">
+    <div class="space-y-2 pt-1">
       <div class="flex items-center justify-between text-xs font-bold theme-text-title">
         <span class="flex items-center gap-1.5 text-rose-400">
-          <span>⚠️</span> <span>High-Priority Concept Gaps to Bridge:</span>
+          <span>⚠️</span> <span>Pending Milestone Backlogs:</span>
         </span>
-        <span class="text-[10px] font-mono theme-text-sub">Click "Bridge Gap" to verify completion</span>
+        <span class="text-[10px] font-mono theme-text-sub">Click "Resolve ✓" to clear</span>
       </div>
       <div class="space-y-2">
         ${gapListHTML}
       </div>
-    </div>
-
-    <div class="p-4 rounded-2xl theme-card-inner border border-purple-500/30 flex items-center justify-between gap-3 text-xs">
-      <div>
-        <div class="font-bold theme-text-title flex items-center gap-1.5">
-          <span>🤖</span> <span>Need an accelerated revision plan for these deficits?</span>
-        </div>
-        <p class="text-[11px] theme-text-sub mt-0.5">Your AI Tutor can generate immediate practice questions or concept summaries for your top deficit.</p>
-      </div>
-      <button type="button" onclick="closeModal('modal-gaps'); toggleTutorChat();" class="px-4 py-2 rounded-xl btn-brand font-bold text-xs shrink-0 cursor-pointer">
-        Consult AI Tutor →
-      </button>
     </div>
   `;
 
@@ -1218,12 +1155,13 @@ window.bridgeGap = function(milestoneId) {
   setTimeout(openGapModal, 100);
 };
 
-// ENDLESS RIDDLES STUDIO
+// ENDLESS RIDDLES STUDIO (Option Randomization across A, B, and C)
 window.startEndlessRiddleSession = function() {
   riddleSession = {
     currentIdx: Math.floor(Math.random() * endlessRiddlesBank.length),
     score: 0,
-    answered: false
+    answered: false,
+    activeRiddle: null
   };
   document.getElementById('riddle-score').textContent = '0';
   openModal('modal-puzzle');
@@ -1232,11 +1170,20 @@ window.startEndlessRiddleSession = function() {
 
 function renderCurrentRiddle() {
   riddleSession.answered = false;
-  const riddle = endlessRiddlesBank[riddleSession.currentIdx % endlessRiddlesBank.length];
+  const rawRiddle = endlessRiddlesBank[riddleSession.currentIdx % endlessRiddlesBank.length];
+
+  // Randomize the riddle options so the answer is NOT always A or B
+  const { shuffledOptions, newCorrectIdx } = shuffleOptionsAndFixAnswer(rawRiddle.options, rawRiddle.correct);
+
+  riddleSession.activeRiddle = {
+    ...rawRiddle,
+    options: shuffledOptions,
+    correct: newCorrectIdx
+  };
 
   document.getElementById('riddle-number-label').textContent = `Riddle #${(riddleSession.currentIdx % endlessRiddlesBank.length) + 1}`;
-  document.getElementById('riddle-category-tag').textContent = riddle.category || "Brain Teaser";
-  document.getElementById('riddle-question-text').textContent = riddle.q;
+  document.getElementById('riddle-category-tag').textContent = rawRiddle.category || "Brain Teaser";
+  document.getElementById('riddle-question-text').textContent = rawRiddle.q;
 
   const fb = document.getElementById('riddle-feedback');
   const nxt = document.getElementById('btn-next-riddle');
@@ -1247,12 +1194,12 @@ function renderCurrentRiddle() {
   if (!container) return;
   container.innerHTML = '';
 
-  riddle.options.forEach((opt, idx) => {
+  riddleSession.activeRiddle.options.forEach((opt, idx) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = "riddle-opt-btn w-full p-3.5 rounded-xl theme-card-inner text-left hover:border-purple-500/50 transition cursor-pointer flex items-center gap-2.5 font-medium";
-    btn.innerHTML = `<span class="w-5 h-5 rounded-full bg-white/10 dynamic-accent-text flex items-center justify-center font-bold text-[10px] shrink-0">${String.fromCharCode(65 + idx)}</span> <span>${escapeHtml(opt)}</span>`;
-    btn.onclick = () => handleRiddleChoice(idx, riddle);
+    btn.className = "riddle-opt-btn w-full p-3 rounded-xl theme-card-inner text-left hover:border-purple-500/50 transition cursor-pointer flex items-center gap-2.5 font-medium text-xs";
+    btn.innerHTML = `<span class="w-5 h-5 rounded-full bg-white/10 dynamic-accent-text flex items-center justify-center font-bold text-[10px] shrink-0">${String.fromCharCode(65 + idx)}</span> <span class="truncate">${escapeHtml(opt)}</span>`;
+    btn.onclick = () => handleRiddleChoice(idx, riddleSession.activeRiddle);
     container.appendChild(btn);
   });
 }
@@ -1269,9 +1216,9 @@ function handleRiddleChoice(chosenIdx, riddle) {
   allBtns.forEach((b, idx) => {
     b.disabled = true;
     if (idx === riddle.correct) {
-      b.className = "riddle-opt-btn w-full p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-500/15 text-emerald-300 font-bold text-xs flex items-center gap-2.5";
+      b.className = "riddle-opt-btn w-full p-3 rounded-xl border-2 border-emerald-500 bg-emerald-500/15 text-emerald-300 font-bold text-xs flex items-center gap-2.5";
     } else if (idx === chosenIdx && !isCorrect) {
-      b.className = "riddle-opt-btn w-full p-3.5 rounded-xl border-2 border-rose-500 bg-rose-500/15 text-rose-300 font-bold text-xs flex items-center gap-2.5";
+      b.className = "riddle-opt-btn w-full p-3 rounded-xl border-2 border-rose-500 bg-rose-500/15 text-rose-300 font-bold text-xs flex items-center gap-2.5";
     } else {
       b.classList.add('opacity-40');
     }
@@ -1282,7 +1229,7 @@ function handleRiddleChoice(chosenIdx, riddle) {
     if (isCorrect) {
       riddleSession.score += 10;
       document.getElementById('riddle-score').textContent = riddleSession.score;
-      fb.className = "p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-medium";
+      fb.className = "p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-medium";
       fb.innerHTML = `<strong>✓ Spot On!</strong> ${escapeHtml(riddle.explanation)}`;
 
       if (window.currentStudent) {
@@ -1290,7 +1237,7 @@ function handleRiddleChoice(chosenIdx, riddle) {
         updateDashboardUI();
       }
     } else {
-      fb.className = "p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-medium";
+      fb.className = "p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-medium";
       fb.innerHTML = `<strong>✕ Not quite!</strong> ${escapeHtml(riddle.explanation)}`;
     }
   }
@@ -1303,8 +1250,11 @@ window.nextRiddle = function() {
   renderCurrentRiddle();
 };
 
-// GOAL-SPECIFIC ENDLESS AI MCQ STUDIO
-window.startEndlessMCQSession = function() {
+// ==========================================================
+// GOAL-SPECIFIC ENDLESS AI MCQ STUDIO (With Shuffled Options)
+// ==========================================
+window.startEndlessMCQSession = function(mode = 'general') {
+  currentMCQMode = mode;
   mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [], activeQuestion: null };
   const corr = document.getElementById('mcq-correct-counter');
   const wrng = document.getElementById('mcq-wrong-counter');
@@ -1314,8 +1264,17 @@ window.startEndlessMCQSession = function() {
   const goal = window.currentStudent?.career_goal || 'Specialist';
   if (corr) corr.textContent = '0';
   if (wrng) wrng.textContent = '0';
-  if (bdg) bdg.textContent = goal;
-  if (sub) sub.textContent = `Continuous AI question generator tailored exclusively to ${goal}`;
+  
+  if (mode === 'daily') {
+    if (bdg) bdg.textContent = "Daily Drill";
+    if (sub) sub.textContent = `Daily focus questions for ${goal}`;
+  } else if (mode === 'weekly') {
+    if (bdg) bdg.textContent = "Weekly Sprint";
+    if (sub) sub.textContent = `Comprehensive phase evaluation for ${goal}`;
+  } else {
+    if (bdg) bdg.textContent = goal;
+    if (sub) sub.textContent = `Continuous AI questions tailored to ${goal}`;
+  }
 
   openModal('modal-mcq');
   generateNextMCQ();
@@ -1352,30 +1311,37 @@ window.generateNextMCQ = async function() {
       body: JSON.stringify({
         careerGoal: goal,
         currentTopic: currentTopic,
-        completedCount: mcqSession.total
+        completedCount: mcqSession.total,
+        mode: currentMCQMode
       })
     });
 
     const aiMCQ = await res.json();
     if (aiMCQ.error || !aiMCQ.options) throw new Error(aiMCQ.error || 'Malformed question');
 
-    mcqSession.activeQuestion = aiMCQ;
-    renderMCQQuestion(aiMCQ);
+    // RANDOMIZE OPTIONS & CORRECT INDEX SO ANSWER IS NOT ALWAYS OPTION A
+    const { shuffledOptions, newCorrectIdx } = shuffleOptionsAndFixAnswer(aiMCQ.options, aiMCQ.correct !== undefined ? aiMCQ.correct : 0);
+
+    mcqSession.activeQuestion = {
+      ...aiMCQ,
+      options: shuffledOptions,
+      correct: newCorrectIdx
+    };
+
+    renderMCQQuestion(mcqSession.activeQuestion);
   } catch (err) {
     console.warn("AI MCQ synthesis fallback engaged:", err.message);
-    const fallbackQuestion = {
-      q: `For a specialist in ${goal}, which core principle is critical when executing ${currentTopic}?`,
-      topic: currentTopic,
-      options: [
-        `Systematically identify underlying dependencies, reduce variance, and document edge cases.`,
-        `Bypass baseline testing protocols to deploy directly to end users.`,
-        `Rely exclusively on subjective intuition rather than verified performance telemetry.`
-      ],
-      correct: 0,
-      explanation: `Disciplined execution in ${goal} requires verifying constraints, measuring baseline performance, and documenting edge scenarios.`
+    const fallbackQuestion = generateOfflineGoalMCQ(goal, currentTopic, mcqSession.total);
+    
+    const { shuffledOptions, newCorrectIdx } = shuffleOptionsAndFixAnswer(fallbackQuestion.options, fallbackQuestion.correct);
+    
+    mcqSession.activeQuestion = {
+      ...fallbackQuestion,
+      options: shuffledOptions,
+      correct: newCorrectIdx
     };
-    mcqSession.activeQuestion = fallbackQuestion;
-    renderMCQQuestion(fallbackQuestion);
+    
+    renderMCQQuestion(mcqSession.activeQuestion);
   }
 };
 
@@ -1392,11 +1358,66 @@ function renderMCQQuestion(qObj) {
   (qObj.options || []).forEach((opt, idx) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = "mcq-choice-btn w-full text-left p-3.5 rounded-xl theme-card-inner text-xs theme-text-title font-medium transition flex items-start gap-2.5 cursor-pointer";
-    btn.innerHTML = `<span class="font-mono dynamic-accent-text font-bold">${String.fromCharCode(65 + idx)}.</span> <span>${escapeHtml(opt)}</span>`;
+    btn.className = "mcq-choice-btn w-full text-left p-3 rounded-xl theme-card-inner text-xs theme-text-title font-medium transition flex items-start gap-2.5 cursor-pointer";
+    btn.innerHTML = `<span class="font-mono dynamic-accent-text font-bold">${String.fromCharCode(65 + idx)}.</span> <span class="break-words">${escapeHtml(opt)}</span>`;
     btn.onclick = () => handleMCQChoice(idx, qObj);
     container.appendChild(btn);
   });
+}
+
+function generateOfflineGoalMCQ(goal, topic, count) {
+  const g = (goal || '').toLowerCase();
+  
+  if (g.includes('cardio') || g.includes('medic') || g.includes('doctor')) {
+    const bank = [
+      {
+        q: "Which ion channel conductance phase of the cardiac myocyte action potential is responsible for the rapid, transient Phase 1 repolarization?",
+        topic: "Cardiac Electrophysiology",
+        options: [
+          "Inactivation of fast inward Na+ channels with transient outward K+ (I_to) activation.",
+          "Opening of L-type Ca2+ slow inward channels.",
+          "Delayed rectifier K+ (I_Kr) repolarizing outflow."
+        ],
+        correct: 0,
+        explanation: "Phase 1 repolarization is driven by the rapid inactivation of Phase 0 fast Na+ channels combined with the activation of transient outward K+ currents (I_to)."
+      },
+      {
+        q: "In Wiggers pressure-volume loops, acute aortic valve regurgitation causes which primary hemodynamic variation?",
+        topic: "Hemodynamics & Valvular Mechanics",
+        options: [
+          "Widened pulse pressure with steep diastolic runoff into the left ventricle, eliminating true isovolumetric relaxation.",
+          "Isolated elevation of peak systolic aortic pressure without changes in end-diastolic volume.",
+          "Premature closure of the tricuspid valve during early isovolumetric contraction."
+        ],
+        correct: 0,
+        explanation: "Aortic regurgitation leaks blood retrograde from the aorta into the left ventricle during diastole, widening pulse pressure and preventing a true isovolumetric relaxation phase."
+      },
+      {
+        q: "In 12-Lead ECG interpretation, persistent ST-segment elevation in leads V1-V4 indicates infarction of which anatomical territory?",
+        topic: "Clinical ECG Interpretation",
+        options: [
+          "Anteroseptal myocardial infarction (Left Anterior Descending Artery).",
+          "Inferior wall myocardial infarction (Right Coronary Artery).",
+          "Posterior wall infarction (Left Circumflex Artery)."
+        ],
+        correct: 0,
+        explanation: "Leads V1-V4 look directly at the anterior and septal walls of the left ventricle, perfused by the Left Anterior Descending (LAD) coronary artery."
+      }
+    ];
+    return bank[count % bank.length];
+  }
+
+  return {
+    q: `For a specialist in ${goal}, which core principle is critical when executing ${topic}?`,
+    topic: topic,
+    options: [
+      `Systematically identify underlying dependencies, reduce variance, and document edge cases.`,
+      `Bypass baseline testing protocols to deploy directly to production.`,
+      `Rely exclusively on subjective intuition rather than verified performance telemetry.`
+    ],
+    correct: 0,
+    explanation: `Disciplined execution in ${goal} requires verifying constraints, measuring baseline performance, and documenting edge scenarios.`
+  };
 }
 
 function handleMCQChoice(selectedIdx, qObj) {
@@ -1411,9 +1432,9 @@ function handleMCQChoice(selectedIdx, qObj) {
   allBtns.forEach((btn, idx) => {
     btn.disabled = true;
     if (idx === qObj.correct) {
-      btn.className = "mcq-choice-btn w-full text-left p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex items-start gap-2.5 shadow-lg shadow-emerald-500/10";
+      btn.className = "mcq-choice-btn w-full text-left p-3 rounded-xl border-2 border-emerald-500 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex items-start gap-2.5 shadow-lg shadow-emerald-500/10";
     } else if (idx === selectedIdx && !isCorrect) {
-      btn.className = "mcq-choice-btn w-full text-left p-3.5 rounded-xl border-2 border-rose-500 bg-rose-500/15 text-rose-700 dark:text-rose-300 font-bold text-xs flex items-start gap-2.5 shadow-lg shadow-rose-500/10";
+      btn.className = "mcq-choice-btn w-full text-left p-3 rounded-xl border-2 border-rose-500 bg-rose-500/15 text-rose-700 dark:text-rose-300 font-bold text-xs flex items-start gap-2.5 shadow-lg shadow-rose-500/10";
     } else {
       btn.classList.add('opacity-40');
     }
@@ -1424,7 +1445,7 @@ function handleMCQChoice(selectedIdx, qObj) {
     if (isCorrect) {
       mcqSession.correct++;
       document.getElementById('mcq-correct-counter').textContent = mcqSession.correct;
-      fb.className = "p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-medium";
+      fb.className = "p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-medium";
       fb.innerHTML = `<strong>✓ Correct!</strong> ${escapeHtml(qObj.explanation)}`;
       
       if (window.currentStudent) {
@@ -1434,7 +1455,7 @@ function handleMCQChoice(selectedIdx, qObj) {
     } else {
       mcqSession.wrong++;
       document.getElementById('mcq-wrong-counter').textContent = mcqSession.wrong;
-      fb.className = "p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs font-medium";
+      fb.className = "p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs font-medium";
       fb.innerHTML = `<strong>✕ Incorrect.</strong> You picked ${String.fromCharCode(65 + selectedIdx)}.<br><br><strong>Key Concept:</strong> ${escapeHtml(qObj.explanation)}`;
       mcqSession.incorrectReview.push({
         question: qObj.q,
@@ -1472,48 +1493,6 @@ window.finishMCQSession = function() {
     });
   }
   openModal('modal-scorecard');
-};
-
-// GITHUB TELEMETRY
-window.fetchGitHubRepos = async function() {
-  const u = (document.getElementById('in-github-scan').value || window.currentStudent?.github || '').trim();
-  const c = document.getElementById('github-repos-container');
-  if (!u) {
-    c.innerHTML = '<div class="p-3 text-rose-400">Please enter a GitHub username to scan.</div>';
-    return;
-  }
-
-  c.innerHTML = '<div class="p-3 theme-text-sub">Querying GitHub API...</div>';
-  try {
-    const res = await fetch(`https://api.github.com/users/${u}/repos?sort=updated&per_page=6`);
-    const data = await res.json();
-
-    if (!Array.isArray(data)) {
-      c.innerHTML = `<div class="p-3 text-rose-500">User @${u} not found or rate limited.</div>`;
-      return;
-    }
-
-    c.innerHTML = data.map(r => `
-      <a href="${r.html_url}" target="_blank" rel="noopener noreferrer" class="p-3 rounded-xl theme-card-inner hover:border-purple-400 transition flex justify-between items-center text-xs group block">
-        <div class="flex items-center gap-2">
-          <span class="text-base group-hover:scale-110 transition">📦</span>
-          <div>
-            <div class="font-bold theme-text-title group-hover:text-purple-500 transition flex items-center gap-1.5">
-              <span>${r.name}</span>
-              <svg class="w-3 h-3 theme-text-sub" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            </div>
-            <div class="text-[10px] theme-text-sub truncate max-w-[280px]">${r.description || 'Public academic repository.'}</div>
-          </div>
-        </div>
-        <div class="flex items-center gap-2 shrink-0">
-          <span class="dynamic-accent-text font-mono text-[10px] font-bold">${r.language || 'Code'}</span>
-          <span class="text-[10px] text-amber-500">★ ${r.stargazers_count}</span>
-        </div>
-      </a>
-    `).join('');
-  } catch(e) {
-    c.innerHTML = '<div class="text-rose-500 p-3">Error connecting to GitHub API.</div>';
-  }
 };
 
 function initPointerGlow() {
