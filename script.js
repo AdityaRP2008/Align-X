@@ -1,6 +1,6 @@
 /**
  * Align-X Academic Engine
- * Dynamic Career Readiness & Velocity Sprint Pace + Goal-Specific Endless AI MCQs
+ * Live Gemini Chatbot + Context-Aware Topic Notes + Endless Brain Riddles + Gap Analyzer
  */
 
 const SUPABASE_URL = "https://eydgvjsgkqjyqjkkedi.supabase.co";
@@ -20,7 +20,7 @@ let activePhaseIdx = 0;
 window.currentStudent = null;
 window.pendingRegistrationEmail = "";
 
-// Dynamic Fallback Curriculum
+// Dynamic fallback curriculum generator based on goal and knowledge
 function generateFallbackCurriculum(goal, knowledge) {
   const g = (goal || 'Cardiologist').toLowerCase();
   
@@ -93,6 +93,118 @@ function generateFallbackCurriculum(goal, knowledge) {
 let mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [], activeQuestion: null };
 
 // ==========================================
+// ENDLESS GENERIC LOGIC RIDDLES BANK & STATE
+// ==========================================
+const endlessRiddlesBank = [
+  {
+    q: "A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much does the ball cost?",
+    category: "Mathematical Logic",
+    options: ["$0.10", "$0.05", "$0.01"],
+    correct: 1,
+    explanation: "If the ball costs $0.05, the bat costs $1.05 ($1.00 more), giving a total of $1.10."
+  },
+  {
+    q: "You are running in a marathon and you overtake the person in second place. What position are you in now?",
+    category: "Lateral Thinking",
+    options: ["First place", "Second place", "Third place"],
+    correct: 1,
+    explanation: "You took the spot of the person who was second, so you are now in second place."
+  },
+  {
+    q: "I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?",
+    category: "Classic Enigma",
+    options: ["An Echo", "A Shadow", "A Cloud"],
+    correct: 0,
+    explanation: "An echo reflects sound (speaks and hears without organs) and travels on sound waves through air."
+  },
+  {
+    q: "If five machines take 5 minutes to make 5 widgets, how long would it take 100 machines to make 100 widgets?",
+    category: "Operational Rate",
+    options: ["100 minutes", "5 minutes", "1 minute"],
+    correct: 1,
+    explanation: "Each individual machine takes 5 minutes to create 1 widget. Running 100 machines concurrently takes 5 minutes to make 100 widgets."
+  },
+  {
+    q: "The person who makes it has no need of it; the person who buys it has no use for it. The person who uses it can neither see nor feel it. What is it?",
+    category: "Abstract Deduction",
+    options: ["A Coffin", "A Poison", "A Secret"],
+    correct: 0,
+    explanation: "A coffin is built to sell, bought for another, and used after death."
+  },
+  {
+    q: "You have a 3-liter jug and a 5-liter jug with an unlimited water supply. How do you measure exactly 4 liters?",
+    category: "Quorum Problem",
+    options: [
+      "Fill 5L, pour into 3L (leaving 2L in 5L). Empty 3L, pour the 2L into 3L. Fill 5L and top off the 3L (which needs 1L), leaving 4L in the 5L jug.",
+      "Fill the 3L jug twice and pour directly into the 5L jug.",
+      "Fill the 5L jug halfway by eyesight estimation."
+    ],
+    correct: 0,
+    explanation: "Standard conservation of volume: 5L - 3L = 2L. Transfer 2L into 3L. Refill 5L, pour 1L to fill 3L jug, leaving precisely 4L."
+  },
+  {
+    q: "What can travel around the entire world while staying in a single corner?",
+    category: "Wordplay Logic",
+    options: ["A Postcard Stamp", "An Airplane Pilot", "The Equator"],
+    correct: 0,
+    explanation: "A postage stamp stays in the corner of an envelope as it travels across continents."
+  },
+  {
+    q: "A doctor gives you three pills and tells you to take one every half hour. How long will the pills last?",
+    category: "Temporal Sequence",
+    options: ["60 minutes", "90 minutes", "30 minutes"],
+    correct: 0,
+    explanation: "You take Pill 1 at minute 0, Pill 2 at minute 30, and Pill 3 at minute 60 (total time = 60 minutes)."
+  }
+];
+
+let riddleSession = {
+  currentIdx: 0,
+  score: 0,
+  answered: false
+};
+
+// ==========================================
+// COURSE MODIFICATION & PRE-POPULATION FIX
+// ==========================================
+window.openProfileModifier = function() {
+  const s = window.currentStudent;
+
+  // Pre-fill inputs with the user's ACTUAL saved data so nothing disappears
+  if (s) {
+    document.getElementById('prof-name-input').value = s.name || '';
+    document.getElementById('prof-level-input').value = s.academic_level || '';
+    document.getElementById('prof-goal-input').value = s.career_goal || '';
+    document.getElementById('prof-know-input').value = s.current_knowledge || '';
+    document.getElementById('prof-tenure-input').value = s.tenure || '';
+    document.getElementById('prof-github-input').value = s.github || '';
+  }
+
+  // Set step heading and back button text to return to dashboard
+  document.getElementById('profiler-step-heading').textContent = "Update Career Target & Knowledge";
+  document.getElementById('profiler-back-label').textContent = "Back to Dashboard";
+
+  // Display Profiler view
+  document.getElementById('auth-view').style.display = 'flex';
+  document.getElementById('app-view').style.display = 'none';
+  showAuthStep('profiler');
+};
+
+window.handleProfilerBackButton = function() {
+  // If the user already has a student session, return to dashboard instead of signing out
+  if (window.currentStudent && window.currentStudent.career_goal) {
+    document.getElementById('auth-view').style.display = 'none';
+    document.getElementById('app-view').style.display = 'flex';
+    document.getElementById('btn-floating-center').style.display = 'flex';
+    document.getElementById('btn-floating-tutor').style.display = 'flex';
+    updateDashboardUI();
+  } else {
+    // If not logged in, go back to register tab
+    showAuthStep('register');
+  }
+};
+
+// ==========================================
 // AUTH & PROFILER CONTROLLERS
 // ==========================================
 window.submitSignIn = async function() {
@@ -155,7 +267,7 @@ window.submitProfilerForm = async function() {
   }
 
   const nameVal = document.getElementById('prof-name-input')?.value.trim() || 'Scholar';
-  const emailVal = window.pendingRegistrationEmail || (nameVal.toLowerCase().replace(/\s+/g, '') + "@alignx.edu");
+  const emailVal = window.pendingRegistrationEmail || (window.currentStudent?.email) || (nameVal.toLowerCase().replace(/\s+/g, '') + "@alignx.edu");
   const levelVal = document.getElementById('prof-level-input')?.value.trim() || 'Undergraduate';
   const goalVal = document.getElementById('prof-goal-input')?.value.trim() || 'Cardiologist';
   const knowVal = document.getElementById('prof-know-input')?.value.trim() || 'Basics';
@@ -205,7 +317,6 @@ window.submitProfilerForm = async function() {
       normalizedPhases = fallback.phases;
     }
 
-    // STRICT METRICS: Unstarted course starts strictly at 0% Readiness and 0% Pace
     window.currentStudent = {
       email: payload.email,
       name: payload.name,
@@ -334,7 +445,6 @@ window.addEventListener('DOMContentLoaded', () => {
       const parsed = JSON.parse(savedSession);
       if (parsed && parsed.phases && parsed.phases.length > 0) {
         window.currentStudent = parsed;
-        // Recalculate metrics on load to eliminate stale hardcoded baselines
         recalculateMetrics();
         enterDashboard();
       } else {
@@ -367,6 +477,7 @@ function showAuthGateway() {
   if (appView) appView.style.display = 'none';
   if (cBtn) cBtn.style.display = 'none';
   if (tBtn) tBtn.style.display = 'none';
+  document.getElementById('profiler-back-label').textContent = "Back";
   showAuthStep('signin');
 }
 
@@ -383,7 +494,7 @@ function enterDashboard() {
   updateDashboardUI();
 }
 
-// DYNAMIC METRICS RECALCULATION (Eliminates artificial 25% floor & static 85% pace)
+// METRICS RECALCULATION
 function recalculateMetrics() {
   if (!window.currentStudent) return;
   let total = 0, completed = 0;
@@ -400,11 +511,8 @@ function recalculateMetrics() {
 
   window.currentStudent.curriculum_mastery = mastery;
   window.currentStudent.concept_deficits = Math.max(0, 100 - mastery);
-  
-  // Strict Career Readiness: 0% when unstarted, scaling precisely with verified completion & performance
   window.currentStudent.readiness = Math.round(completionRatio * 100);
 
-  // Dynamic Sprint Pace: Velocity scales based on milestones completed and active momentum
   const quizFactor = Math.min(25, (mcqSession.correct || 0) * 5);
   if (completed === 0) {
     window.currentStudent.target_pace = quizFactor > 0 ? quizFactor : 0;
@@ -447,19 +555,15 @@ function updateDashboardUI() {
   if (initEl) initEl.textContent = initials;
   if (lvlBadge) lvlBadge.textContent = `L${s.level || 1}`;
 
-  // Dial 1: Curriculum Mastery
   document.getElementById('meter-current-val').innerHTML = `${s.curriculum_mastery}% <span class="text-xs font-normal theme-text-sub">/100%</span>`;
   document.getElementById('meter-current-sub').textContent = `${completedMilestones} of ${totalMilestones} verified`;
 
-  // Dial 2: Concept Deficits
   document.getElementById('meter-gap-val').innerHTML = `${s.concept_deficits}% <span class="text-xs font-normal theme-text-sub">untested</span>`;
   document.getElementById('meter-gap-sub').textContent = `${totalMilestones - completedMilestones} syllabus topics left`;
 
-  // Dial 3: Career Readiness (Strict 0% when unstarted)
   document.getElementById('meter-readiness-val').innerHTML = `${s.readiness}% <span class="text-xs font-normal theme-text-sub">score</span>`;
   document.getElementById('meter-readiness-sub').textContent = s.readiness === 0 ? 'Course unstarted' : 'Verified clearance';
 
-  // Dial 4: Dynamic Study Sprint Pace
   document.getElementById('meter-time-val').innerHTML = `${s.target_pace}% <span class="text-xs font-normal theme-text-sub">pace</span>`;
   document.getElementById('meter-time-sub').textContent = s.target_pace === 0 ? 'Sprint unstarted' : 'Active velocity';
 
@@ -515,7 +619,7 @@ function renderStudyPlanModules() {
     container.innerHTML = `
       <div class="p-6 text-center theme-card-inner rounded-2xl space-y-2">
         <p class="theme-text-sub">No milestones mapped yet.</p>
-        <button onclick="showAuthStep('profiler'); document.getElementById('auth-view').style.display='flex'; document.getElementById('app-view').style.display='none';" class="btn-brand px-4 py-1.5 rounded-xl text-xs cursor-pointer">✨ Configure Milestones</button>
+        <button onclick="openProfileModifier()" class="btn-brand px-4 py-1.5 rounded-xl text-xs cursor-pointer">✨ Configure Milestones</button>
       </div>
     `;
     return;
@@ -586,7 +690,7 @@ function renderRoadmapModal() {
   });
 }
 
-// MILESTONE TOGGLE (Dynamically recalculates XP, Mastery, Deficits, Readiness, and Pace)
+// MILESTONE TOGGLE
 async function toggleMilestoneState(mId) {
   (window.currentStudent.phases || []).forEach(phase => {
     (phase.milestones || []).forEach(m => {
@@ -691,9 +795,7 @@ function renderRadar() {
   ctx.fill();
 }
 
-// ==========================================
-// DYNAMIC AI TUTOR (WITH FULL GEMINI REPLIES)
-// ==========================================
+// AI TUTOR HANDLER
 window.handleTutorSend = async function(e) {
   if (e && e.preventDefault) e.preventDefault();
   const inEl = document.getElementById('tutor-input');
@@ -761,9 +863,7 @@ window.handleTutorSend = async function(e) {
   box.scrollTop = box.scrollHeight;
 };
 
-// ==========================================================
-// DYNAMIC TOPIC-TAILORED "WHAT TO READ & MASTER" NOTES
-// ==========================================================
+// NOTES GENERATOR
 function generateMilestoneSpecificReadingGuide(title, desc, goal) {
   const t = (title || '').toLowerCase();
   
@@ -873,9 +973,7 @@ window.openNotesModal = function() {
   openModal('modal-notes');
 };
 
-// ==========================================================
-// CAREER GAP & DEFICITS ANALYZER MODAL
-// ==========================================================
+// GAP ANALYZER MODAL
 window.openGapModal = function() {
   const s = window.currentStudent;
   const container = document.getElementById('gap-analysis-container');
@@ -971,8 +1069,95 @@ window.bridgeGap = function(milestoneId) {
 };
 
 // ==========================================================
-// GOAL-SPECIFIC ENDLESS AI MCQ STUDIO
+// ENDLESS GENERIC MIND RIDDLE STUDIO CONTROLLER
+// ==========================================
+window.startEndlessRiddleSession = function() {
+  riddleSession = {
+    currentIdx: Math.floor(Math.random() * endlessRiddlesBank.length),
+    score: 0,
+    answered: false
+  };
+  document.getElementById('riddle-score').textContent = '0';
+  openModal('modal-puzzle');
+  renderCurrentRiddle();
+};
+
+function renderCurrentRiddle() {
+  riddleSession.answered = false;
+  const riddle = endlessRiddlesBank[riddleSession.currentIdx % endlessRiddlesBank.length];
+
+  document.getElementById('riddle-number-label').textContent = `Riddle #${(riddleSession.currentIdx % endlessRiddlesBank.length) + 1}`;
+  document.getElementById('riddle-category-tag').textContent = riddle.category || "Brain Teaser";
+  document.getElementById('riddle-question-text').textContent = riddle.q;
+
+  const fb = document.getElementById('riddle-feedback');
+  const nxt = document.getElementById('btn-next-riddle');
+  if (fb) fb.style.display = 'none';
+  if (nxt) nxt.style.display = 'none';
+
+  const container = document.getElementById('riddle-options-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  riddle.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = "riddle-opt-btn w-full p-3.5 rounded-xl theme-card-inner text-left hover:border-purple-500/50 transition cursor-pointer flex items-center gap-2.5 font-medium";
+    btn.innerHTML = `<span class="w-5 h-5 rounded-full bg-white/10 dynamic-accent-text flex items-center justify-center font-bold text-[10px] shrink-0">${String.fromCharCode(65 + idx)}</span> <span>${escapeHtml(opt)}</span>`;
+    btn.onclick = () => handleRiddleChoice(idx, riddle);
+    container.appendChild(btn);
+  });
+}
+
+function handleRiddleChoice(chosenIdx, riddle) {
+  if (riddleSession.answered) return;
+  riddleSession.answered = true;
+
+  const isCorrect = (chosenIdx === riddle.correct);
+  const fb = document.getElementById('riddle-feedback');
+  const nxt = document.getElementById('btn-next-riddle');
+  const allBtns = document.querySelectorAll('.riddle-opt-btn');
+
+  allBtns.forEach((b, idx) => {
+    b.disabled = true;
+    if (idx === riddle.correct) {
+      b.className = "riddle-opt-btn w-full p-3.5 rounded-xl border-2 border-emerald-500 bg-emerald-500/15 text-emerald-300 font-bold text-xs flex items-center gap-2.5";
+    } else if (idx === chosenIdx && !isCorrect) {
+      b.className = "riddle-opt-btn w-full p-3.5 rounded-xl border-2 border-rose-500 bg-rose-500/15 text-rose-300 font-bold text-xs flex items-center gap-2.5";
+    } else {
+      b.classList.add('opacity-40');
+    }
+  });
+
+  if (fb) {
+    fb.style.display = 'block';
+    if (isCorrect) {
+      riddleSession.score += 10;
+      document.getElementById('riddle-score').textContent = riddleSession.score;
+      fb.className = "p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-medium";
+      fb.innerHTML = `<strong>✓ Spot On!</strong> ${escapeHtml(riddle.explanation)}`;
+
+      if (window.currentStudent) {
+        window.currentStudent.xp = (window.currentStudent.xp || 0) + 25;
+        updateDashboardUI();
+      }
+    } else {
+      fb.className = "p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-medium";
+      fb.innerHTML = `<strong>✕ Not quite!</strong> ${escapeHtml(riddle.explanation)}`;
+    }
+  }
+
+  if (nxt) nxt.style.display = 'inline-block';
+}
+
+window.nextRiddle = function() {
+  riddleSession.currentIdx++;
+  renderCurrentRiddle();
+};
+
 // ==========================================================
+// GOAL-SPECIFIC ENDLESS AI MCQ STUDIO
+// ==========================================
 window.startEndlessMCQSession = function() {
   mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [], activeQuestion: null };
   const corr = document.getElementById('mcq-correct-counter');
@@ -1007,7 +1192,6 @@ window.generateNextMCQ = async function() {
 
   const goal = window.currentStudent?.career_goal || 'Cardiologist';
   
-  // Pick active topic from student's curriculum
   let currentTopic = goal;
   const phases = window.currentStudent?.phases || [];
   if (phases[activePhaseIdx]?.milestones?.length > 0) {
@@ -1101,9 +1285,8 @@ function generateOfflineGoalMCQ(goal, topic, count) {
     return bank[count % bank.length];
   }
 
-  // General Goal Fallback
   return {
-    q: `For a professional in ${goal}, which core principle is critical when executing ${topic}?`,
+    q: `For a specialist in ${goal}, which core principle is critical when mastering ${topic}?`,
     topic: topic,
     options: [
       `Systematically identify underlying dependencies, reduce variance, and document edge cases.`,
@@ -1143,7 +1326,6 @@ function handleMCQChoice(selectedIdx, qObj) {
       fb.className = "p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-medium";
       fb.innerHTML = `<strong>✓ Correct!</strong> ${escapeHtml(qObj.explanation)}`;
       
-      // Bonus XP for correct domain challenge
       if (window.currentStudent) {
         window.currentStudent.xp = (window.currentStudent.xp || 0) + 50;
         updateDashboardUI();
