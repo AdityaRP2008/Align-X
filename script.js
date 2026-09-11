@@ -1,6 +1,6 @@
 /**
  * Align-X Academic Engine
- * Live Gemini Chatbot + Context-Aware Topic Notes + Career Gap Deficits Analyzer
+ * Dynamic Career Readiness & Velocity Sprint Pace + Goal-Specific Endless AI MCQs
  */
 
 const SUPABASE_URL = "https://eydgvjsgkqjyqjkkedi.supabase.co";
@@ -20,7 +20,7 @@ let activePhaseIdx = 0;
 window.currentStudent = null;
 window.pendingRegistrationEmail = "";
 
-// Dynamic fallback curriculum generator based on goal and knowledge
+// Dynamic Fallback Curriculum
 function generateFallbackCurriculum(goal, knowledge) {
   const g = (goal || 'Cardiologist').toLowerCase();
   
@@ -35,9 +35,9 @@ function generateFallbackCurriculum(goal, knowledge) {
         {
           phaseTitle: "Phase 1: Cardiovascular Anatomy & Cellular Physiology",
           milestones: [
-            { id: "med-1", title: "Cardiac Electrophysiology & Action Potentials", hours: "14 hrs", desc: "Action potential phases 0-4, ion channel conductances, and resting membrane gradients.", completed: false, xp: 140 },
-            { id: "med-2", title: "12-Lead ECG Interpretation & Arrhythmia Mapping", hours: "18 hrs", desc: "Systematic vector analysis, bundle branch blocks, and ischemia vectors.", completed: false, xp: 180 },
-            { id: "med-3", title: "Hemodynamics, Pressure-Volume Loops & Murmurs", hours: "16 hrs", desc: "Wiggers diagram mastery, preload/afterload curve shifts, and auscultatory timing.", completed: false, xp: 160 }
+            { id: "med-1", title: "Cardiac Action Potentials & Ion Channels", hours: "14 hrs", desc: "Action potential phases 0-4, ion channel conductances, and resting membrane gradients.", completed: false, xp: 140 },
+            { id: "med-2", title: "Mastering 12-Lead ECG Interpretation", hours: "18 hrs", desc: "Systematic vector analysis, bundle branch blocks, and ischemia vectors.", completed: false, xp: 180 },
+            { id: "med-3", title: "Hemodynamic Principles and Pressure-Volume Loops", hours: "16 hrs", desc: "Wiggers diagram mastery, preload/afterload curve shifts, and auscultatory timing.", completed: false, xp: 160 }
           ]
         },
         {
@@ -59,11 +59,10 @@ function generateFallbackCurriculum(goal, knowledge) {
     };
   }
 
-  // General Fallback
   return {
     radar: {
       categories: ["Theoretical Foundations", "Applied Core", "System Integration", "Tooling & Protocols", "Safety / Validation", "Case Decision Systems"],
-      candidate: [30, 20, 15, 25, 10, 15],
+      candidate: [20, 15, 10, 15, 10, 10],
       benchmark: [90, 85, 85, 80, 80, 75]
     },
     phases: [
@@ -91,74 +90,11 @@ function generateFallbackCurriculum(goal, knowledge) {
   };
 }
 
-// Continuous MCQ Bank
-const endlessMCQBank = [
-  {
-    q: "In 12-Lead ECG interpretation, persistent ST-segment elevation in leads V1-V4 indicates infarction of which anatomical territory?",
-    topic: "Cardiology",
-    options: [
-      "Anteroseptal myocardial infarction (Left Anterior Descending Artery).",
-      "Inferior wall myocardial infarction (Right Coronary Artery).",
-      "Lateral myocardial infarction (Left Circumflex Artery)."
-    ],
-    correct: 0,
-    explanation: "Leads V1-V4 look directly at the anterior and septal walls of the left ventricle, which are perfused by the LAD artery."
-  },
-  {
-    q: "Why do relational database engines (PostgreSQL, InnoDB) prefer B+ Trees over standard Red-Black Binary Trees for disk index storage?",
-    topic: "Database Internals",
-    options: [
-      "Red-Black trees require non-volatile encryption keys on physical sectors.",
-      "High fanout matches physical disk page block sizes, drastically reducing random I/O seeks.",
-      "Binary trees cannot store variable-width VARCHAR columns."
-    ],
-    correct: 1,
-    explanation: "Disks read and write in block pages (4KB-8KB). Because B+ Trees have huge fanouts, tree depth stays at 3-4 levels, requiring only 3-4 disk block seeks."
-  }
-];
-
-let mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [] };
+let mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [], activeQuestion: null };
 
 // ==========================================
 // AUTH & PROFILER CONTROLLERS
 // ==========================================
-window.showAuthStep = function(step) {
-  const fIn = document.getElementById('form-signin');
-  const fReg = document.getElementById('form-register');
-  const fProf = document.getElementById('form-profiler-integrated');
-  const bIn = document.getElementById('tab-btn-signin');
-  const bReg = document.getElementById('tab-btn-register');
-  const tabBar = document.getElementById('auth-tab-bar');
-
-  if (fIn) fIn.style.display = 'none';
-  if (fReg) fReg.style.display = 'none';
-  if (fProf) fProf.style.display = 'none';
-  if (tabBar) tabBar.style.display = 'grid';
-
-  if (step === 'signin') {
-    if (fIn) fIn.style.display = 'block';
-    if (bIn) bIn.className = 'py-2.5 rounded-xl transition btn-brand shadow-sm cursor-pointer';
-    if (bReg) bReg.className = 'py-2.5 rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer';
-  } else if (step === 'register') {
-    if (fReg) fReg.style.display = 'block';
-    if (bReg) bReg.className = 'py-2.5 rounded-xl transition btn-brand shadow-sm cursor-pointer';
-    if (bIn) bIn.className = 'py-2.5 rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer';
-  } else if (step === 'profiler') {
-    if (fProf) fProf.style.display = 'block';
-    if (tabBar) tabBar.style.display = 'none';
-  }
-};
-
-window.goToProfilerStep = function() {
-  const regEmail = document.getElementById('reg-email');
-  if (regEmail && !regEmail.value.trim()) {
-    regEmail.focus();
-    return;
-  }
-  window.pendingRegistrationEmail = regEmail ? regEmail.value.trim() : '';
-  showAuthStep('profiler');
-};
-
 window.submitSignIn = async function() {
   const emailInput = document.getElementById('signin-email');
   const email = emailInput ? emailInput.value.trim() : "";
@@ -269,6 +205,7 @@ window.submitProfilerForm = async function() {
       normalizedPhases = fallback.phases;
     }
 
+    // STRICT METRICS: Unstarted course starts strictly at 0% Readiness and 0% Pace
     window.currentStudent = {
       email: payload.email,
       name: payload.name,
@@ -277,10 +214,10 @@ window.submitProfilerForm = async function() {
       current_knowledge: payload.currentKnowledge,
       tenure: payload.tenure,
       github: payload.github,
-      readiness: Number(aiData.readiness) || 25,
-      curriculum_mastery: Number(aiData.curriculumMastery) || 0,
-      concept_deficits: Number(aiData.conceptDeficits) || 100,
-      target_pace: Number(aiData.targetPace) || 75,
+      readiness: 0,
+      curriculum_mastery: 0,
+      concept_deficits: 100,
+      target_pace: 0,
       radar: aiData.radar || fallback.radar,
       phases: normalizedPhases,
       xp: 0,
@@ -305,10 +242,10 @@ window.submitProfilerForm = async function() {
       current_knowledge: payload.currentKnowledge,
       tenure: payload.tenure,
       github: payload.github,
-      readiness: 25,
+      readiness: 0,
       curriculum_mastery: 0,
       concept_deficits: 100,
-      target_pace: 75,
+      target_pace: 0,
       radar: fallback.radar,
       phases: fallback.phases,
       xp: 0,
@@ -397,6 +334,8 @@ window.addEventListener('DOMContentLoaded', () => {
       const parsed = JSON.parse(savedSession);
       if (parsed && parsed.phases && parsed.phases.length > 0) {
         window.currentStudent = parsed;
+        // Recalculate metrics on load to eliminate stale hardcoded baselines
+        recalculateMetrics();
         enterDashboard();
       } else {
         showAuthGateway();
@@ -444,10 +383,49 @@ function enterDashboard() {
   updateDashboardUI();
 }
 
+// DYNAMIC METRICS RECALCULATION (Eliminates artificial 25% floor & static 85% pace)
+function recalculateMetrics() {
+  if (!window.currentStudent) return;
+  let total = 0, completed = 0;
+
+  (window.currentStudent.phases || []).forEach(phase => {
+    (phase.milestones || []).forEach(m => {
+      total++;
+      if (m.completed) completed++;
+    });
+  });
+
+  const completionRatio = total > 0 ? (completed / total) : 0;
+  const mastery = Math.round(completionRatio * 100);
+
+  window.currentStudent.curriculum_mastery = mastery;
+  window.currentStudent.concept_deficits = Math.max(0, 100 - mastery);
+  
+  // Strict Career Readiness: 0% when unstarted, scaling precisely with verified completion & performance
+  window.currentStudent.readiness = Math.round(completionRatio * 100);
+
+  // Dynamic Sprint Pace: Velocity scales based on milestones completed and active momentum
+  const quizFactor = Math.min(25, (mcqSession.correct || 0) * 5);
+  if (completed === 0) {
+    window.currentStudent.target_pace = quizFactor > 0 ? quizFactor : 0;
+  } else {
+    window.currentStudent.target_pace = Math.min(100, Math.round(20 + (completionRatio * 70) + quizFactor));
+  }
+}
+
 // DASHBOARD UI UPDATES
 function updateDashboardUI() {
   if (!window.currentStudent) return;
+  recalculateMetrics();
   const s = window.currentStudent;
+
+  let totalMilestones = 0, completedMilestones = 0;
+  (s.phases || []).forEach(phase => {
+    (phase.milestones || []).forEach(m => {
+      totalMilestones++;
+      if (m.completed) completedMilestones++;
+    });
+  });
 
   const roleEl = document.getElementById('nav-current-role');
   const ghEl = document.getElementById('nav-github-label');
@@ -456,12 +434,12 @@ function updateDashboardUI() {
   const termEl = document.getElementById('nav-academic-term');
   const goalEl = document.getElementById('drawer-user-goal');
 
-  if (roleEl) roleEl.textContent = s.career_goal || 'Cardiologist';
+  if (roleEl) roleEl.textContent = s.career_goal || 'Goal Unset';
   if (ghEl) ghEl.textContent = s.github ? `@${s.github}` : '@student';
   if (uNameEl) uNameEl.textContent = s.name || 'Student Scholar';
   if (dNameEl) dNameEl.textContent = s.name || 'Student Scholar';
   if (termEl) termEl.textContent = s.academic_level || 'Education Profile';
-  if (goalEl) goalEl.textContent = s.career_goal || 'Cardiologist';
+  if (goalEl) goalEl.textContent = s.career_goal || 'Target Goal';
 
   const initials = (s.name || 'ST').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   const initEl = document.getElementById('nav-avatar-initials');
@@ -469,20 +447,31 @@ function updateDashboardUI() {
   if (initEl) initEl.textContent = initials;
   if (lvlBadge) lvlBadge.textContent = `L${s.level || 1}`;
 
+  // Dial 1: Curriculum Mastery
   document.getElementById('meter-current-val').innerHTML = `${s.curriculum_mastery}% <span class="text-xs font-normal theme-text-sub">/100%</span>`;
+  document.getElementById('meter-current-sub').textContent = `${completedMilestones} of ${totalMilestones} verified`;
+
+  // Dial 2: Concept Deficits
   document.getElementById('meter-gap-val').innerHTML = `${s.concept_deficits}% <span class="text-xs font-normal theme-text-sub">untested</span>`;
+  document.getElementById('meter-gap-sub').textContent = `${totalMilestones - completedMilestones} syllabus topics left`;
+
+  // Dial 3: Career Readiness (Strict 0% when unstarted)
   document.getElementById('meter-readiness-val').innerHTML = `${s.readiness}% <span class="text-xs font-normal theme-text-sub">score</span>`;
-  document.getElementById('meter-time-val').innerHTML = `${s.target_pace || 75}% <span class="text-xs font-normal theme-text-sub">pace</span>`;
+  document.getElementById('meter-readiness-sub').textContent = s.readiness === 0 ? 'Course unstarted' : 'Verified clearance';
+
+  // Dial 4: Dynamic Study Sprint Pace
+  document.getElementById('meter-time-val').innerHTML = `${s.target_pace}% <span class="text-xs font-normal theme-text-sub">pace</span>`;
+  document.getElementById('meter-time-sub').textContent = s.target_pace === 0 ? 'Sprint unstarted' : 'Active velocity';
 
   document.getElementById('label-ring-1').textContent = `${s.curriculum_mastery}%`;
   document.getElementById('label-ring-2').textContent = `${s.concept_deficits}%`;
   document.getElementById('label-ring-3').textContent = `${s.readiness}%`;
-  document.getElementById('label-ring-4').textContent = `${s.target_pace || 75}%`;
+  document.getElementById('label-ring-4').textContent = `${s.target_pace}%`;
 
   updateRadialMeter('dial-ring-1', s.curriculum_mastery);
   updateRadialMeter('dial-ring-2', s.concept_deficits);
   updateRadialMeter('dial-ring-3', s.readiness);
-  updateRadialMeter('dial-ring-4', s.target_pace || 75);
+  updateRadialMeter('dial-ring-4', s.target_pace);
 
   const lvlTitle = document.getElementById('xp-level-title');
   const xpLabel = document.getElementById('xp-progress-label');
@@ -597,35 +586,20 @@ function renderRoadmapModal() {
   });
 }
 
-// PROGRESS & XP RECOMPUTATION
+// MILESTONE TOGGLE (Dynamically recalculates XP, Mastery, Deficits, Readiness, and Pace)
 async function toggleMilestoneState(mId) {
-  let total = 0, completed = 0;
-
-  window.currentStudent.phases.forEach(phase => {
+  (window.currentStudent.phases || []).forEach(phase => {
     (phase.milestones || []).forEach(m => {
-      total++;
       if (m.id === mId) {
         m.completed = !m.completed;
         const delta = m.xp || 100;
         window.currentStudent.xp = m.completed ? (window.currentStudent.xp || 0) + delta : Math.max(0, (window.currentStudent.xp || 0) - delta);
       }
-      if (m.completed) completed++;
     });
   });
 
-  const ratio = completed / (total || 1);
-  const mastery = Math.round(ratio * 100);
-  window.currentStudent.curriculum_mastery = mastery;
-  window.currentStudent.concept_deficits = Math.max(0, 100 - mastery);
-  window.currentStudent.readiness = Math.min(100, Math.round(25 + ratio * 75));
   window.currentStudent.level = Math.floor((window.currentStudent.xp || 0) / 1000) + 1;
-
-  if (window.currentStudent.radar && window.currentStudent.radar.candidate) {
-    window.currentStudent.radar.candidate = window.currentStudent.radar.candidate.map((val, idx) => {
-      const target = window.currentStudent.radar.benchmark ? window.currentStudent.radar.benchmark[idx] : 85;
-      return Math.min(target, Math.round(30 + ratio * 60));
-    });
-  }
+  recalculateMetrics();
 
   localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
 
@@ -801,7 +775,7 @@ function generateMilestoneSpecificReadingGuide(title, desc, goal) {
     };
   }
   
-  if (t.includes('pharmacology') || t.includes('drug')) {
+  if (t.includes('pharmacology') || t.includes('drug') || t.includes('dose')) {
     return {
       theory: "Receptor pharmacodynamics (Beta-1/Beta-2 adrenergic antagonism, Renin-Angiotensin-Aldosterone cascade inhibition, and Vaughan Williams Class I-IV antiarrhythmic mechanisms).",
       caseStudy: "Titrating Quadruple Therapy (ARNI, SGLT2i, Beta-Blocker, MRA) in decompensated heart failure with preserved renal function and hypotension considerations.",
@@ -809,7 +783,7 @@ function generateMilestoneSpecificReadingGuide(title, desc, goal) {
     };
   }
 
-  if (t.includes('coronary') || t.includes('artery') || t.includes('infarct') || t.includes('stemi')) {
+  if (t.includes('coronary') || t.includes('artery') || t.includes('stemi') || t.includes('infarct')) {
     return {
       theory: "Atherosclerotic plaque rupture cascade, platelet aggregation pathways (GPIIb/IIIa), subendocardial ischemia versus transmural necrosis pathology.",
       caseStudy: "Managing acute ST-elevation myocardial infarction with cardiogenic shock, door-to-balloon time benchmarks (<90 min), and dual antiplatelet loading protocols.",
@@ -817,35 +791,18 @@ function generateMilestoneSpecificReadingGuide(title, desc, goal) {
     };
   }
 
-  if (t.includes('electrophysiology') || t.includes('ecg') || t.includes('arrhythmia')) {
+  if (t.includes('electrophysiology') || t.includes('ecg') || t.includes('action potential') || t.includes('arrhythmia')) {
     return {
-      theory: "Cellular ionic flux (Na+ influx, K+ efflux, slow Ca2+ channels), Einthoven's triangle, hexaxial reference system, and re-entrant circuit pathophysiology.",
-      caseStudy: "Mapping and differentiating wide-complex tachycardias: Ventricular Tachycardia (VT) vs Supraventricular Tachycardia with aberrancy using Brugada criteria.",
-      deliverable: "Emergency antiarrhythmic cardioversion guide and 12-lead vector localization cheat-sheet."
+      theory: "Cellular ionic flux (Na+ fast channels in Phase 0, transient outward K+ in Phase 1, L-type Ca2+ plateau in Phase 2, rapid delayed rectifier K+ in Phase 3, Na+/K+ ATPase in Phase 4).",
+      caseStudy: "12-Lead ECG localization: differentiating anterior LAD occlusions (V1-V4) from RCA inferior infarcts (II, III, aVF) and identifying reciprocal ST-depression.",
+      deliverable: "Systematic 7-step vector analysis checklist for bundle branch blocks, QT prolongation risk scoring, and emergency cardioversion indications."
     };
   }
 
-  if (t.includes('cash burn') || t.includes('financial') || t.includes('runway')) {
-    return {
-      theory: "Gross Burn vs Net Burn formulas ($$\\text{Runway (Months)} = \\frac{\\text{Cash Reserves}}{\\text{Monthly Net Burn}}$$), zero-cash date trajectory modeling, and variable cost elasticity.",
-      caseStudy: "Surviving a funding freeze by slashing non-payroll OPEX by 40% to extend runway from 5 months to 18 months while maintaining product velocity.",
-      deliverable: "12-month rolling cash flow forecasting spreadsheet with scenario sensitivities for delayed revenues."
-    };
-  }
-
-  if (t.includes('tree') || t.includes('database') || t.includes('index')) {
-    return {
-      theory: "B+ Tree block page alignment, branch fanout factor ($$B = \\frac{\\text{Page Size}}{\\text{Key + Pointer Size}}$$), write amplification, and WAL (Write-Ahead Logging) protocols.",
-      caseStudy: "Eliminating table-scan disk I/O bottlenecks in a 50M-row transaction ledger by replacing binary composite indexes with covering B+ tree leaf indexes.",
-      deliverable: "PostgreSQL EXPLAIN ANALYZE index profiling audit script and schema optimization document."
-    };
-  }
-
-  // Smart Context-Aware Fallback for any domain
   return {
-    theory: `Detailed breakdown of underlying principles, authoritative standards, and structural equations for "${title}".`,
-    caseStudy: `Real-world breakdown of how leading practitioners in ${goal} execute "${title}" to minimize error and increase operational throughput.`,
-    deliverable: `Production-ready deliverable or technical documentation demonstrating mastery of "${title}".`
+    theory: `Authoritative clinical/technical foundations, mathematical formulas, and structural rules for "${title}".`,
+    caseStudy: `Real-world clinical or production protocol analyzing how specialists in ${goal} execute "${title}" under acute conditions.`,
+    deliverable: `Standardized operational procedure, diagnostic protocol, or technical deliverable verifying mastery of "${title}".`
   };
 }
 
@@ -863,8 +820,8 @@ window.openNotesModal = function() {
   if (!container) return;
 
   const milestones = currentPhase?.milestones || [];
-  
   let milestoneDetailsHTML = '';
+
   milestones.forEach((m, idx) => {
     const readingGuide = generateMilestoneSpecificReadingGuide(m.title, m.desc, goal);
 
@@ -882,7 +839,6 @@ window.openNotesModal = function() {
           ${escapeHtml(m.desc || 'Comprehensive core competence required for career benchmarks.')}
         </p>
 
-        <!-- Topic-Specific Tailored Study Guide -->
         <div class="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-2 text-[11px]">
           <div class="font-bold dynamic-accent-text flex items-center gap-1.5">
             <span>📚 Core Concepts & Readings to Master for "${escapeHtml(m.title)}":</span>
@@ -926,10 +882,9 @@ window.openGapModal = function() {
   if (!container || !s) return;
 
   const goal = s.career_goal || 'Selected Target Goal';
-  const background = s.current_knowledge || 'Undergraduate Background';
-  const deficitsPercentage = s.concept_deficits || 80;
+  const background = s.current_knowledge || 'Educational Baseline';
+  const deficitsPercentage = s.concept_deficits !== undefined ? s.concept_deficits : 100;
 
-  // Gather incomplete milestones representing the curriculum gap
   const gapMilestones = [];
   (s.phases || []).forEach((p, pIdx) => {
     (p.milestones || []).forEach(m => {
@@ -947,7 +902,7 @@ window.openGapModal = function() {
       </div>
     `;
   } else {
-    gapMilestones.slice(0, 6).forEach((gm, idx) => {
+    gapMilestones.forEach((gm, idx) => {
       gapListHTML += `
         <div class="p-3.5 rounded-2xl theme-card-inner border border-rose-500/20 flex items-center justify-between gap-3 text-xs">
           <div class="space-y-1">
@@ -967,7 +922,6 @@ window.openGapModal = function() {
   }
 
   container.innerHTML = `
-    <!-- Top Deficit Overview -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
       <div class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300">
         <div class="text-[10px] font-mono uppercase font-bold text-rose-400">Target Deficit Ratio</div>
@@ -975,19 +929,18 @@ window.openGapModal = function() {
         <div class="text-[10px] theme-text-sub mt-0.5">${gapMilestones.length} syllabus competencies remaining</div>
       </div>
       <div class="p-4 rounded-2xl theme-card-inner border border-white/10 sm:col-span-2 space-y-1">
-        <div class="text-[10px] font-mono uppercase font-bold dynamic-accent-text">Candidate Background vs Industry Benchmark</div>
+        <div class="text-[10px] font-mono uppercase font-bold dynamic-accent-text">Candidate Baseline vs Hiring Clearance</div>
         <div class="text-xs font-semibold theme-text-title">From: "${escapeHtml(background)}" → Target: "${escapeHtml(goal)}"</div>
         <p class="text-[11px] theme-text-sub leading-relaxed">
-          The analyzer highlights core clinical/technical deficits that hiring managers or boards inspect before clearance.
+          The analyzer isolates clinical, technical, and operational vulnerabilities that must be verified before career benchmark clearance.
         </p>
       </div>
     </div>
 
-    <!-- Priority Action Items to Bridge the Gap -->
     <div class="space-y-2.5 pt-2">
       <div class="flex items-center justify-between text-xs font-bold theme-text-title">
         <span class="flex items-center gap-1.5 text-rose-400">
-          <span>⚠️</span> <span>High-Priority Concept Gaps to Cover:</span>
+          <span>⚠️</span> <span>High-Priority Concept Gaps to Bridge:</span>
         </span>
         <span class="text-[10px] font-mono theme-text-sub">Click "Bridge Gap" to verify completion</span>
       </div>
@@ -996,7 +949,6 @@ window.openGapModal = function() {
       </div>
     </div>
 
-    <!-- AI Tutor Direct Assistance -->
     <div class="p-4 rounded-2xl theme-card-inner border border-purple-500/30 flex items-center justify-between gap-3 text-xs">
       <div>
         <div class="font-bold theme-text-title flex items-center gap-1.5">
@@ -1018,85 +970,150 @@ window.bridgeGap = function(milestoneId) {
   setTimeout(openGapModal, 100);
 };
 
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-// THEME SWITCHER
-window.setAccentTheme = function(themeName) {
-  document.documentElement.setAttribute('data-theme', themeName);
-  localStorage.setItem('alignx_accent', themeName);
-
-  const themeLabels = {
-    purple: "Cyber Purple",
-    emerald: "Emerald Matrix",
-    amber: "Solar Amber",
-    cyan: "Ocean Cyan",
-    white: "Pure White",
-    light: "Light Theme"
-  };
-
-  const themeColors = {
-    purple: "#C084FC",
-    emerald: "#34D399",
-    amber: "#FBBF24",
-    cyan: "#38BDF8",
-    white: "#FFFFFF",
-    light: "#7C3AED"
-  };
-
-  const lbl = document.getElementById('active-theme-label');
-  const dot = document.getElementById('active-theme-dot');
-  if (lbl) lbl.textContent = themeLabels[themeName] || "Cyber Purple";
-  if (dot) dot.style.backgroundColor = themeColors[themeName] || "#C084FC";
-
-  renderStudyPlanModules();
-  renderRadar();
-};
-
-// MCQ STUDIO
+// ==========================================================
+// GOAL-SPECIFIC ENDLESS AI MCQ STUDIO
+// ==========================================================
 window.startEndlessMCQSession = function() {
-  mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [] };
+  mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [], activeQuestion: null };
   const corr = document.getElementById('mcq-correct-counter');
   const wrng = document.getElementById('mcq-wrong-counter');
   const bdg = document.getElementById('mcq-badge-track');
+  const sub = document.getElementById('mcq-subtext');
+
+  const goal = window.currentStudent?.career_goal || 'Specialist';
   if (corr) corr.textContent = '0';
   if (wrng) wrng.textContent = '0';
-  if (bdg) bdg.textContent = window.currentStudent?.career_goal || 'Cardiologist';
+  if (bdg) bdg.textContent = goal;
+  if (sub) sub.textContent = `Continuous AI question generator tailored exclusively to ${goal}`;
+
   openModal('modal-mcq');
   generateNextMCQ();
 };
 
-window.generateNextMCQ = function() {
+window.generateNextMCQ = async function() {
   mcqSession.answeredCurrent = false;
   const nxt = document.getElementById('btn-next-mcq');
   const fb = document.getElementById('mcq-instant-feedback');
+  const qNum = document.getElementById('mcq-question-number');
+  const qTopic = document.getElementById('mcq-topic-tag');
+  const qText = document.getElementById('mcq-question-text');
+  const container = document.getElementById('mcq-choices-container');
+
   if (nxt) nxt.style.display = 'none';
   if (fb) fb.style.display = 'none';
+  if (qNum) qNum.textContent = `Challenge #${mcqSession.total + 1}`;
+  if (qText) qText.textContent = "Synthesizing challenge from Gemini for your target career...";
+  if (container) container.innerHTML = '<div class="p-6 text-center theme-text-sub italic"><span class="w-2 h-2 rounded-full bg-purple-400 animate-ping inline-block mr-2"></span>Generating domain question...</div>';
 
-  const qObj = endlessMCQBank[mcqSession.total % endlessMCQBank.length];
-  document.getElementById('mcq-question-number').textContent = `Challenge #${mcqSession.total + 1}`;
-  document.getElementById('mcq-topic-tag').textContent = qObj.topic;
-  document.getElementById('mcq-question-text').textContent = qObj.q;
+  const goal = window.currentStudent?.career_goal || 'Cardiologist';
+  
+  // Pick active topic from student's curriculum
+  let currentTopic = goal;
+  const phases = window.currentStudent?.phases || [];
+  if (phases[activePhaseIdx]?.milestones?.length > 0) {
+    const mIdx = mcqSession.total % phases[activePhaseIdx].milestones.length;
+    currentTopic = phases[activePhaseIdx].milestones[mIdx].title;
+  }
 
+  try {
+    const res = await fetch('/api/mcq', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        careerGoal: goal,
+        currentTopic: currentTopic,
+        completedCount: mcqSession.total
+      })
+    });
+
+    const aiMCQ = await res.json();
+    if (aiMCQ.error || !aiMCQ.options) throw new Error(aiMCQ.error || 'Malformed question');
+
+    mcqSession.activeQuestion = aiMCQ;
+    renderMCQQuestion(aiMCQ);
+  } catch (err) {
+    console.warn("AI MCQ synthesis fallback engaged:", err.message);
+    const fallbackQuestion = generateOfflineGoalMCQ(goal, currentTopic, mcqSession.total);
+    mcqSession.activeQuestion = fallbackQuestion;
+    renderMCQQuestion(fallbackQuestion);
+  }
+};
+
+function renderMCQQuestion(qObj) {
+  const qTopic = document.getElementById('mcq-topic-tag');
+  const qText = document.getElementById('mcq-question-text');
   const container = document.getElementById('mcq-choices-container');
+
+  if (qTopic) qTopic.textContent = qObj.topic || window.currentStudent?.career_goal || "Core Concept";
+  if (qText) qText.textContent = qObj.q;
+  if (!container) return;
   container.innerHTML = '';
 
-  qObj.options.forEach((opt, idx) => {
+  (qObj.options || []).forEach((opt, idx) => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = "mcq-choice-btn w-full text-left p-3.5 rounded-xl theme-card-inner text-xs theme-text-title font-medium transition flex items-start gap-2.5 cursor-pointer";
-    btn.innerHTML = `<span class="font-mono dynamic-accent-text font-bold">${String.fromCharCode(65 + idx)}.</span> <span>${opt}</span>`;
+    btn.innerHTML = `<span class="font-mono dynamic-accent-text font-bold">${String.fromCharCode(65 + idx)}.</span> <span>${escapeHtml(opt)}</span>`;
     btn.onclick = () => handleMCQChoice(idx, qObj);
     container.appendChild(btn);
   });
-};
+}
+
+function generateOfflineGoalMCQ(goal, topic, count) {
+  const g = (goal || '').toLowerCase();
+  
+  if (g.includes('cardio') || g.includes('medic') || g.includes('doctor')) {
+    const bank = [
+      {
+        q: "Which ion channel conductance phase of the cardiac myocyte action potential is responsible for the rapid, transient Phase 1 repolarization?",
+        topic: "Cardiac Electrophysiology",
+        options: [
+          "Inactivation of fast inward Na+ channels with transient outward K+ (I_to) activation.",
+          "Opening of L-type Ca2+ slow inward channels.",
+          "Delayed rectifier K+ (I_Kr) repolarizing outflow."
+        ],
+        correct: 0,
+        explanation: "Phase 1 repolarization is driven by the rapid inactivation of Phase 0 fast Na+ channels combined with the activation of transient outward K+ currents (I_to)."
+      },
+      {
+        q: "In Wiggers pressure-volume loops, acute aortic valve regurgitation causes which primary hemodynamic variation?",
+        topic: "Hemodynamics & Valvular Mechanics",
+        options: [
+          "Widened pulse pressure with steep diastolic runoff into the left ventricle, eliminating true isovolumetric relaxation.",
+          "Isolated elevation of peak systolic aortic pressure without changes in end-diastolic volume.",
+          "Premature closure of the tricuspid valve during early isovolumetric contraction."
+        ],
+        correct: 0,
+        explanation: "Aortic regurgitation leaks blood retrograde from the aorta into the left ventricle during diastole, widening pulse pressure and preventing a true isovolumetric relaxation phase."
+      },
+      {
+        q: "In 12-Lead ECG interpretation, persistent ST-segment elevation in leads V1-V4 indicates infarction of which anatomical territory?",
+        topic: "Clinical ECG Interpretation",
+        options: [
+          "Anteroseptal myocardial infarction (Left Anterior Descending Artery).",
+          "Inferior wall myocardial infarction (Right Coronary Artery).",
+          "Posterior wall infarction (Left Circumflex Artery)."
+        ],
+        correct: 0,
+        explanation: "Leads V1-V4 look directly at the anterior and septal walls of the left ventricle, perfused by the Left Anterior Descending (LAD) coronary artery."
+      }
+    ];
+    return bank[count % bank.length];
+  }
+
+  // General Goal Fallback
+  return {
+    q: `For a professional in ${goal}, which core principle is critical when executing ${topic}?`,
+    topic: topic,
+    options: [
+      `Systematically identify underlying dependencies, reduce variance, and document edge cases.`,
+      `Bypass baseline testing protocols to deploy directly to end users.`,
+      `Rely exclusively on subjective intuition rather than verified performance telemetry.`
+    ],
+    correct: 0,
+    explanation: `Disciplined execution in ${goal} requires verifying constraints, measuring baseline performance, and documenting edge scenarios.`
+  };
+}
 
 function handleMCQChoice(selectedIdx, qObj) {
   if (mcqSession.answeredCurrent) return;
@@ -1124,12 +1141,18 @@ function handleMCQChoice(selectedIdx, qObj) {
       mcqSession.correct++;
       document.getElementById('mcq-correct-counter').textContent = mcqSession.correct;
       fb.className = "p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-medium";
-      fb.innerHTML = `<strong>✓ Correct!</strong> ${qObj.explanation}`;
+      fb.innerHTML = `<strong>✓ Correct!</strong> ${escapeHtml(qObj.explanation)}`;
+      
+      // Bonus XP for correct domain challenge
+      if (window.currentStudent) {
+        window.currentStudent.xp = (window.currentStudent.xp || 0) + 50;
+        updateDashboardUI();
+      }
     } else {
       mcqSession.wrong++;
       document.getElementById('mcq-wrong-counter').textContent = mcqSession.wrong;
       fb.className = "p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs font-medium";
-      fb.innerHTML = `<strong>✕ Incorrect.</strong> You picked ${String.fromCharCode(65 + selectedIdx)}.<br><br><strong>Key Concept:</strong> ${qObj.explanation}`;
+      fb.innerHTML = `<strong>✕ Incorrect.</strong> You picked ${String.fromCharCode(65 + selectedIdx)}.<br><br><strong>Key Concept:</strong> ${escapeHtml(qObj.explanation)}`;
       mcqSession.incorrectReview.push({
         question: qObj.q,
         userAnswer: qObj.options[selectedIdx],
@@ -1157,10 +1180,10 @@ window.finishMCQSession = function() {
     mcqSession.incorrectReview.forEach(item => {
       list.innerHTML += `
         <div class="p-3.5 rounded-xl theme-card-inner space-y-1.5 text-xs">
-          <div class="font-bold theme-text-title">${item.question}</div>
-          <div class="text-rose-500 font-medium">✕ Your Choice: ${item.userAnswer}</div>
-          <div class="text-emerald-500 font-medium">✓ Correct Concept: ${item.correctAnswer}</div>
-          <div class="theme-text-sub text-[11px] pt-1 leading-relaxed">${item.explanation}</div>
+          <div class="font-bold theme-text-title">${escapeHtml(item.question)}</div>
+          <div class="text-rose-500 font-medium">✕ Your Choice: ${escapeHtml(item.userAnswer)}</div>
+          <div class="text-emerald-500 font-medium">✓ Correct Concept: ${escapeHtml(item.correctAnswer)}</div>
+          <div class="theme-text-sub text-[11px] pt-1 leading-relaxed">${escapeHtml(item.explanation)}</div>
         </div>
       `;
     });
@@ -1170,9 +1193,12 @@ window.finishMCQSession = function() {
 
 // GITHUB TELEMETRY
 window.fetchGitHubRepos = async function() {
-  const u = (document.getElementById('in-github-scan').value || window.currentStudent?.github || 'adityarp2008').trim();
+  const u = (document.getElementById('in-github-scan').value || window.currentStudent?.github || '').trim();
   const c = document.getElementById('github-repos-container');
-  if (!u) return;
+  if (!u) {
+    c.innerHTML = '<div class="p-3 text-rose-400">Please enter a GitHub username to scan.</div>';
+    return;
+  }
 
   c.innerHTML = '<div class="p-3 theme-text-sub">Querying GitHub API...</div>';
   try {
@@ -1232,3 +1258,45 @@ function initPointerGlow() {
     ctx.fillRect(0,0,w,h);
   });
 }
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// THEME SWITCHER
+window.setAccentTheme = function(themeName) {
+  document.documentElement.setAttribute('data-theme', themeName);
+  localStorage.setItem('alignx_accent', themeName);
+
+  const themeLabels = {
+    purple: "Cyber Purple",
+    emerald: "Emerald Matrix",
+    amber: "Solar Amber",
+    cyan: "Ocean Cyan",
+    white: "Pure White",
+    light: "Light Theme"
+  };
+
+  const themeColors = {
+    purple: "#C084FC",
+    emerald: "#34D399",
+    amber: "#FBBF24",
+    cyan: "#38BDF8",
+    white: "#FFFFFF",
+    light: "#7C3AED"
+  };
+
+  const lbl = document.getElementById('active-theme-label');
+  const dot = document.getElementById('active-theme-dot');
+  if (lbl) lbl.textContent = themeLabels[themeName] || "Cyber Purple";
+  if (dot) dot.style.backgroundColor = themeColors[themeName] || "#C084FC";
+
+  renderStudyPlanModules();
+  renderRadar();
+};
