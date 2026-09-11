@@ -3,23 +3,11 @@
  * Guaranteed Global Handler Binding + Gemini Synthesis + Supabase Persistence
  */
 
-const SUPABASE_URL = "https://eydgvjsgkqjyqjkkedi.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5ZGd2anNna3FqeXFqa2tlZGkiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc1NzQ4OTc1MCwiZXhwIjoyMDczMDY1NzUwfQ.f11c7dG38yT7CwhL6f6f9lKkEee9r8r_placeholder";
-
-let supabaseClient = null;
-if (window.supabase && typeof window.supabase.createClient === 'function') {
-  try {
-    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  } catch (e) {
-    console.warn("Supabase running local mode.");
-  }
-}
-
 let activePhaseIdx = 0;
 window.currentStudent = null;
 window.pendingRegistrationEmail = "";
 
-// Helper to generate a complete tailored curriculum based on goal and knowledge
+// Dynamic fallback curriculum generator based on goal and knowledge
 function generateFallbackCurriculum(goal, knowledge) {
   const g = (goal || 'AI Engineer').toLowerCase();
   
@@ -58,7 +46,6 @@ function generateFallbackCurriculum(goal, knowledge) {
     };
   }
 
-  // General Software / Full-Stack
   return {
     radar: {
       categories: ["Frontend", "Backend APIs", "System Design", "Databases", "DevOps", "Testing"],
@@ -181,20 +168,23 @@ window.submitSignIn = async function() {
     btn.textContent = "Checking Profile...";
   }
 
-  // 1. Check Supabase
-  if (supabaseClient) {
-    try {
-      const { data, error } = await supabaseClient.from('students').select('*').eq('email', email).single();
-      if (data && !error && data.career_goal && data.phases && data.phases.length > 0) {
-        window.currentStudent = data;
-        localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
-        if (btn) { btn.disabled = false; btn.textContent = "Sign In →"; }
-        enterDashboard();
-        return;
-      }
-    } catch (err) {
-      console.warn("Supabase lookup offline:", err.message);
+  // 1. Query Supabase via server route
+  try {
+    const res = await fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'get', email: email })
+    });
+    const result = await res.json();
+    if (result && result.student && result.student.phases && result.student.phases.length > 0) {
+      window.currentStudent = result.student;
+      localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
+      if (btn) { btn.disabled = false; btn.textContent = "Sign In →"; }
+      enterDashboard();
+      return;
     }
+  } catch (err) {
+    console.warn("Server auth lookup error:", err.message);
   }
 
   // 2. Check localStorage
@@ -258,7 +248,7 @@ window.submitProfilerForm = async function() {
 
     if (aiData.error) throw new Error(aiData.error);
 
-    // Normalize phases to ensure milestones are always properly populated
+    // Normalize phases to ensure milestones are always structured properly
     let normalizedPhases = [];
     if (Array.isArray(aiData.phases) && aiData.phases.length > 0) {
       normalizedPhases = aiData.phases.map((p, pIdx) => {
@@ -298,11 +288,12 @@ window.submitProfilerForm = async function() {
       level: 1
     };
 
-    if (supabaseClient) {
-      try {
-        await supabaseClient.from('students').upsert(window.currentStudent, { onConflict: 'email' });
-      } catch (err) {}
-    }
+    // Save to Supabase via server route
+    fetch('/api/auth', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'save', studentData: window.currentStudent })
+    }).catch(e => console.warn('Background Supabase save:', e));
 
     localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
     enterDashboard();
@@ -336,7 +327,7 @@ window.submitProfilerForm = async function() {
   }
 };
 
-// MODAL CONTROLLERS (Uses display to prevent any invisible overlay click blocking)
+// MODAL CONTROLLERS (Uses display: flex/none to guarantee no invisible overlay click blocking)
 window.openModal = function(id) {
   const el = document.getElementById(id);
   if (el) {
@@ -639,11 +630,12 @@ async function toggleMilestoneState(mId) {
   }
 
   localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
-  if (supabaseClient && window.currentStudent.email) {
-    try {
-      await supabaseClient.from('students').upsert(window.currentStudent, { onConflict: 'email' });
-    } catch (e) {}
-  }
+
+  fetch('/api/auth', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'save', studentData: window.currentStudent })
+  }).catch(e => console.warn('Milestone save error:', e));
 
   updateDashboardUI();
 }
@@ -727,7 +719,7 @@ function renderRadar() {
   ctx.fill();
 }
 
-// AI TUTOR HANDLER
+// AI TUTOR HANDLER (CALLS /api/chat)
 window.handleTutorSend = async function(e) {
   if (e && e.preventDefault) e.preventDefault();
   const inEl = document.getElementById('tutor-input');
@@ -940,8 +932,7 @@ window.fetchGitHubRepos = async function() {
 };
 
 window.openNotesModal = function() {
-  const titleEl = document.getElementById('notes-modal-title');
-  if (titleEl) titleEl.textContent = `${window.currentStudent?.career_goal || 'AI Engineer'} - Architecture Blueprint`;
+  document.getElementById('notes-modal-title').textContent = `${window.currentStudent?.career_goal || 'AI Engineer'} - Architecture Blueprint`;
   const container = document.getElementById('notes-container');
   if (container) {
     container.innerHTML = `
