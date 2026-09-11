@@ -1,6 +1,6 @@
 /**
  * Align-X Academic Engine
- * Live Gemini Chatbot + Detailed Phase-Based Reading Notes + Dynamic Telemetry
+ * Live Gemini Chatbot + Context-Aware Topic Notes + Career Gap Deficits Analyzer
  */
 
 const SUPABASE_URL = "https://eydgvjsgkqjyqjkkedi.supabase.co";
@@ -22,105 +22,69 @@ window.pendingRegistrationEmail = "";
 
 // Dynamic fallback curriculum generator based on goal and knowledge
 function generateFallbackCurriculum(goal, knowledge) {
-  const g = (goal || 'AI Engineer').toLowerCase();
+  const g = (goal || 'Cardiologist').toLowerCase();
   
-  if (g.includes('entrepreneur') || g.includes('business') || g.includes('startup') || g.includes('founder')) {
+  if (g.includes('cardio') || g.includes('medic') || g.includes('doctor') || g.includes('surgeon')) {
     return {
       radar: {
-        categories: ["Market Validation", "Financial Modeling", "Product / MVP", "Customer Discovery", "Unit Economics", "Growth & Sales"],
-        candidate: [30, 25, 20, 35, 15, 20],
-        benchmark: [90, 85, 85, 90, 80, 85]
+        categories: ["Cardiovascular Anatomy", "Diagnostic Imaging", "Hemodynamics", "Pharmacology", "Interventional Procedures", "Emergency Protocols"],
+        candidate: [25, 20, 15, 30, 10, 20],
+        benchmark: [95, 90, 90, 85, 80, 90]
       },
       phases: [
         {
-          phaseTitle: "Phase 1: Problem Identification & Niche Selection",
+          phaseTitle: "Phase 1: Cardiovascular Anatomy & Cellular Physiology",
           milestones: [
-            { id: "ent-1", title: "Problem Identification & Niche Selection", hours: "10 hrs", desc: "Identify high-margin market gaps and customer pain points.", completed: false, xp: 120 },
-            { id: "ent-2", title: "Lean Customer Discovery & Surveys", hours: "12 hrs", desc: "Conduct primary market research and interview 20+ prospective customers.", completed: false, xp: 160 },
-            { id: "ent-3", title: "Minimum Viable Product (MVP) Blueprint", hours: "14 hrs", desc: "Design a low-cost, high-value MVP scope to test product-market fit.", completed: false, xp: 180 }
+            { id: "med-1", title: "Cardiac Electrophysiology & Action Potentials", hours: "14 hrs", desc: "Action potential phases 0-4, ion channel conductances, and resting membrane gradients.", completed: false, xp: 140 },
+            { id: "med-2", title: "12-Lead ECG Interpretation & Arrhythmia Mapping", hours: "18 hrs", desc: "Systematic vector analysis, bundle branch blocks, and ischemia vectors.", completed: false, xp: 180 },
+            { id: "med-3", title: "Hemodynamics, Pressure-Volume Loops & Murmurs", hours: "16 hrs", desc: "Wiggers diagram mastery, preload/afterload curve shifts, and auscultatory timing.", completed: false, xp: 160 }
           ]
         },
         {
-          phaseTitle: "Phase 2: Financial Modeling & Unit Economics",
+          phaseTitle: "Phase 2: Diagnostic Imaging & Cardiovascular Pharmacology",
           milestones: [
-            { id: "ent-4", title: "Cash Burn & Runway Analysis", hours: "10 hrs", desc: "Model Gross Burn, Net Burn, and 18-month survival runway.", completed: false, xp: 200 },
-            { id: "ent-5", title: "CAC to LTV Ratio Calculation", hours: "8 hrs", desc: "Ensure customer acquisition cost is at least 3x recovered over lifetime.", completed: false, xp: 220 },
-            { id: "ent-6", title: "Pricing Model & Margin Architecture", hours: "10 hrs", desc: "Validate recurring subscription vs transaction fee economics.", completed: false, xp: 240 }
+            { id: "med-4", title: "Echocardiography Fundamentals & Doppler Ultrasound", hours: "20 hrs", desc: "Identify valvular stenosis, regurgitation, and wall motion abnormalities via 2D and Doppler echo views.", completed: false, xp: 200 },
+            { id: "med-5", title: "Cardiovascular Pharmacology & Drug Mechanisms", hours: "18 hrs", desc: "Prescribe and manage dosages for beta-blockers, ACE inhibitors, antiarrhythmics, and inotropic agents.", completed: false, xp: 220 },
+            { id: "med-6", title: "Coronary Artery Disease & Acute Coronary Syndromes", hours: "16 hrs", desc: "Differentiate STEMI from NSTEMI protocols, triage acute chest pain, and map out emergency interventions.", completed: false, xp: 240 }
           ]
         },
         {
-          phaseTitle: "Phase 3: Go-To-Market & Capital Scaling",
+          phaseTitle: "Phase 3: Invasive Cardiology & Clinical Decision Systems",
           milestones: [
-            { id: "ent-7", title: "Outbound Sales Funnel & Lead Gen", hours: "16 hrs", desc: "Build automated cold email, LinkedIn, and conversion funnels.", completed: false, xp: 280 },
-            { id: "ent-8", title: "Pitch Deck & Seed Capital Readiness", hours: "14 hrs", desc: "10-slide investor narrative covering TAM, traction, and financial pro-forma.", completed: false, xp: 300 }
+            { id: "med-7", title: "Cardiac Catheterization & Angiography Protocols", hours: "22 hrs", desc: "Fluoroscopic coronary anatomy, fractional flow reserve (FFR), and stent deployment parameters.", completed: false, xp: 300 },
+            { id: "med-8", title: "Heart Failure Management & Mechanical Support", hours: "20 hrs", desc: "HFrEF vs HFpEF guidelines, left ventricular assist devices (LVAD), and transplant indications.", completed: false, xp: 320 }
           ]
         }
       ]
     };
   }
 
-  if (g.includes('ai') || g.includes('machine learning') || g.includes('data')) {
-    return {
-      radar: {
-        categories: ["Python", "Algorithms", "Machine Learning", "Deep Learning", "Math/Stats", "Data Pipelines"],
-        candidate: [30, 20, 15, 10, 25, 15],
-        benchmark: [90, 85, 85, 80, 80, 75]
-      },
-      phases: [
-        {
-          phaseTitle: "Phase 1: Python Fundamentals & Data Primitives",
-          milestones: [
-            { id: "ai-1", title: "Master Python OOP & Generator Pipelines", hours: "8 hrs", desc: "Object models, iterators, and vector primitives.", completed: false, xp: 120 },
-            { id: "ai-2", title: "Applied Linear Algebra & Probability", hours: "10 hrs", desc: "Matrix operations, dot products, and Bayes theorem.", completed: false, xp: 150 },
-            { id: "ai-3", title: "NumPy & Pandas Data Manipulation", hours: "6 hrs", desc: "DataFrames, vectorization, and dataset cleansing.", completed: false, xp: 100 }
-          ]
-        },
-        {
-          phaseTitle: "Phase 2: Core Machine Learning & Statistical Models",
-          milestones: [
-            { id: "ai-4", title: "Scikit-Learn Regression & Classification", hours: "12 hrs", desc: "Train-test splits, cross-validation, and metrics.", completed: false, xp: 200 },
-            { id: "ai-5", title: "Feature Engineering & Data Preprocessing", hours: "10 hrs", desc: "One-hot encoding, imputation, and scaling pipelines.", completed: false, xp: 220 },
-            { id: "ai-6", title: "Gradient Descent & Loss Functions", hours: "8 hrs", desc: "Deriving cost functions and learning rate decay.", completed: false, xp: 180 }
-          ]
-        },
-        {
-          phaseTitle: "Phase 3: Deep Learning & Production Deployment",
-          milestones: [
-            { id: "ai-7", title: "PyTorch Neural Networks & Backprop", hours: "16 hrs", desc: "Autograd, tensor computation, and training loops.", completed: false, xp: 280 },
-            { id: "ai-8", title: "Deploy Inference API with FastAPI & Docker", hours: "14 hrs", desc: "Containerize model endpoint for low-latency serving.", completed: false, xp: 300 }
-          ]
-        }
-      ]
-    };
-  }
-
+  // General Fallback
   return {
     radar: {
-      categories: ["Frontend", "Backend APIs", "System Design", "Databases", "DevOps", "Testing"],
-      candidate: [35, 25, 15, 30, 10, 20],
-      benchmark: [90, 85, 80, 85, 75, 75]
+      categories: ["Theoretical Foundations", "Applied Core", "System Integration", "Tooling & Protocols", "Safety / Validation", "Case Decision Systems"],
+      candidate: [30, 20, 15, 25, 10, 15],
+      benchmark: [90, 85, 85, 80, 80, 75]
     },
     phases: [
       {
-        phaseTitle: "Phase 1: Foundational Systems & Architecture",
+        phaseTitle: "Phase 1: Core Fundamentals & Prerequisite Competency",
         milestones: [
-          { id: "fs-1", title: "Implement B+ Tree Indexing in PostgreSQL", hours: "6 hrs", desc: "Reduce random disk block reads.", completed: false, xp: 120 },
-          { id: "fs-2", title: "Configure High-Performance Nginx Reverse Proxy", hours: "4 hrs", desc: "Isolate application runtime and caching.", completed: false, xp: 90 },
-          { id: "fs-3", title: "RESTful API Design & Structured JSON Validation", hours: "6 hrs", desc: "HTTP error conventions and data serialization.", completed: false, xp: 110 }
+          { id: "gen-1", title: "Master Theoretical Principles & Terminology", hours: "10 hrs", desc: "Understand foundational taxonomies, formulas, and operational rules.", completed: false, xp: 120 },
+          { id: "gen-2", title: "Applied Practical Drills & Diagnostic Baseline", hours: "12 hrs", desc: "Execute baseline exercises to detect gaps against target benchmarks.", completed: false, xp: 150 }
         ]
       },
       {
-        phaseTitle: "Phase 2: Concurrency & Distributed Storage",
+        phaseTitle: "Phase 2: Intermediate Implementation & Systems",
         milestones: [
-          { id: "fs-4", title: "Deploy Redis Atomic Lua Rate Limiter", hours: "8 hrs", desc: "Eliminate multi-instance race conditions.", completed: false, xp: 200 },
-          { id: "fs-5", title: "Design Multi-Region Event Pub/Sub with Kafka", hours: "10 hrs", desc: "Event ordering across distributed brokers.", completed: false, xp: 250 }
+          { id: "gen-3", title: "Core Architecture & Methodological Execution", hours: "16 hrs", desc: "Build comprehensive end-to-end projects demonstrating domain mastery.", completed: false, xp: 220 },
+          { id: "gen-4", title: "Testing, Stress Scenarios & Edge Cases", hours: "14 hrs", desc: "Evaluate failure states and optimize performance under adverse criteria.", completed: false, xp: 240 }
         ]
       },
       {
-        phaseTitle: "Phase 3: Production Hardening & Cloud Native",
+        phaseTitle: "Phase 3: Production Mastery & Capstone Benchmark",
         milestones: [
-          { id: "fs-6", title: "Multi-Stage Docker Compose Containerization", hours: "6 hrs", desc: "Secure multi-container production environments.", completed: false, xp: 150 },
-          { id: "fs-7", title: "Automate CI/CD & Integration Testing (k6)", hours: "8 hrs", desc: "Load test concurrent scenarios in GitHub Actions.", completed: false, xp: 180 }
+          { id: "gen-5", title: "Industry-Standard Production Deliverable", hours: "20 hrs", desc: "Deploy final peer-reviewed deliverable ready for hiring evaluation.", completed: false, xp: 300 }
         ]
       }
     ]
@@ -130,15 +94,15 @@ function generateFallbackCurriculum(goal, knowledge) {
 // Continuous MCQ Bank
 const endlessMCQBank = [
   {
-    q: "In financial modeling for startups, what does 'Net Cash Burn' measure?",
-    topic: "Venture Finance",
+    q: "In 12-Lead ECG interpretation, persistent ST-segment elevation in leads V1-V4 indicates infarction of which anatomical territory?",
+    topic: "Cardiology",
     options: [
-      "Total operating costs minus total gross revenue in a given monthly window.",
-      "The legal salary drawn by equity partners before depreciation.",
-      "The total amount of venture debt available in credit lines."
+      "Anteroseptal myocardial infarction (Left Anterior Descending Artery).",
+      "Inferior wall myocardial infarction (Right Coronary Artery).",
+      "Lateral myocardial infarction (Left Circumflex Artery)."
     ],
     correct: 0,
-    explanation: "Net Cash Burn = Total Cash Outflows (Salaries, Servers, Rent) - Cash Inflows (Revenues). It dictates how many months of runway the startup has before bank balance hits zero."
+    explanation: "Leads V1-V4 look directly at the anterior and septal walls of the left ventricle, which are perfused by the LAD artery."
   },
   {
     q: "Why do relational database engines (PostgreSQL, InnoDB) prefer B+ Trees over standard Red-Black Binary Trees for disk index storage?",
@@ -150,17 +114,6 @@ const endlessMCQBank = [
     ],
     correct: 1,
     explanation: "Disks read and write in block pages (4KB-8KB). Because B+ Trees have huge fanouts, tree depth stays at 3-4 levels, requiring only 3-4 disk block seeks."
-  },
-  {
-    q: "When implementing an atomic rate limiter across multiple auto-scaled instances, which architecture guarantees zero race conditions?",
-    topic: "Distributed Systems",
-    options: [
-      "Using Redis running an atomic Lua script (Token Bucket algorithm).",
-      "Storing requests in a local in-memory Map.",
-      "Executing a SQL query: SELECT COUNT(*) WHERE created_at > NOW() - INTERVAL '1 minute'."
-    ],
-    correct: 0,
-    explanation: "Redis executes Lua scripts atomically in a single event loop iteration without distributed lock contention across multiple pods."
   }
 ];
 
@@ -249,7 +202,6 @@ window.submitSignIn = async function() {
     } catch (err) {}
   }
 
-  // 3. New user or incomplete profile -> show profiler
   if (btn) {
     btn.disabled = false;
     btn.textContent = "Sign In →";
@@ -269,7 +221,7 @@ window.submitProfilerForm = async function() {
   const nameVal = document.getElementById('prof-name-input')?.value.trim() || 'Scholar';
   const emailVal = window.pendingRegistrationEmail || (nameVal.toLowerCase().replace(/\s+/g, '') + "@alignx.edu");
   const levelVal = document.getElementById('prof-level-input')?.value.trim() || 'Undergraduate';
-  const goalVal = document.getElementById('prof-goal-input')?.value.trim() || 'AI Engineer';
+  const goalVal = document.getElementById('prof-goal-input')?.value.trim() || 'Cardiologist';
   const knowVal = document.getElementById('prof-know-input')?.value.trim() || 'Basics';
   const tenureVal = document.getElementById('prof-tenure-input')?.value.trim() || '12 Months';
   const ghVal = document.getElementById('prof-github-input')?.value.trim() || '';
@@ -304,8 +256,8 @@ window.submitProfilerForm = async function() {
         const milestones = Array.isArray(rawList) ? rawList.map((m, mIdx) => ({
           id: m.id || `m-${pIdx}-${mIdx}`,
           title: m.title || m.name || `Milestone ${mIdx + 1}`,
-          desc: m.desc || m.description || `${m.hours || '8 hrs'} structured practice`,
-          hours: m.hours || '8 hrs',
+          desc: m.desc || m.description || `${m.hours || '10 hrs'} structured practice`,
+          hours: m.hours || '10 hrs',
           completed: Boolean(m.completed),
           xp: Number(m.xp) || 120
         })) : [];
@@ -504,12 +456,12 @@ function updateDashboardUI() {
   const termEl = document.getElementById('nav-academic-term');
   const goalEl = document.getElementById('drawer-user-goal');
 
-  if (roleEl) roleEl.textContent = s.career_goal || 'Goal Unset';
+  if (roleEl) roleEl.textContent = s.career_goal || 'Cardiologist';
   if (ghEl) ghEl.textContent = s.github ? `@${s.github}` : '@student';
   if (uNameEl) uNameEl.textContent = s.name || 'Student Scholar';
   if (dNameEl) dNameEl.textContent = s.name || 'Student Scholar';
   if (termEl) termEl.textContent = s.academic_level || 'Education Profile';
-  if (goalEl) goalEl.textContent = s.career_goal || 'Target Goal';
+  if (goalEl) goalEl.textContent = s.career_goal || 'Cardiologist';
 
   const initials = (s.name || 'ST').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   const initEl = document.getElementById('nav-avatar-initials');
@@ -775,7 +727,6 @@ window.handleTutorSend = async function(e) {
   const msg = inEl ? inEl.value.trim() : '';
   if (!msg) return;
 
-  // Add User Message Bubble
   box.innerHTML += `
     <div class="flex justify-end">
       <div class="p-3 rounded-2xl bg-purple-600/30 text-purple-200 border border-purple-500/30 max-w-[85%] text-left font-medium leading-relaxed">
@@ -785,7 +736,6 @@ window.handleTutorSend = async function(e) {
   `;
   inEl.value = '';
 
-  // Add Typing Indicator
   const typingId = 'typing-' + Date.now();
   box.innerHTML += `
     <div id="${typingId}" class="flex justify-start">
@@ -837,9 +787,68 @@ window.handleTutorSend = async function(e) {
   box.scrollTop = box.scrollHeight;
 };
 
-// ==========================================
-// DETAILED "WHAT TO READ & MASTER" NOTES MODAL
-// ==========================================
+// ==========================================================
+// DYNAMIC TOPIC-TAILORED "WHAT TO READ & MASTER" NOTES
+// ==========================================================
+function generateMilestoneSpecificReadingGuide(title, desc, goal) {
+  const t = (title || '').toLowerCase();
+  
+  if (t.includes('echocardiography') || t.includes('ultrasound') || t.includes('imaging')) {
+    return {
+      theory: "Physical acoustic impedance differences, Doppler shift equation ($$f_d = \\frac{2 f_0 v \\cos\\theta}{c}$$), Nyquist limits, and wall motion score indexing (WMSI).",
+      caseStudy: "Diagnosing severe aortic stenosis vs regurgitation in bicuspid aortic valves using transesophageal echocardiography (TEE) peak jet velocity and mean pressure gradients.",
+      deliverable: "Standardized 5-view transthoracic echo protocol mapping with left ventricular ejection fraction (LVEF) calculations via Simpson's biplane method."
+    };
+  }
+  
+  if (t.includes('pharmacology') || t.includes('drug')) {
+    return {
+      theory: "Receptor pharmacodynamics (Beta-1/Beta-2 adrenergic antagonism, Renin-Angiotensin-Aldosterone cascade inhibition, and Vaughan Williams Class I-IV antiarrhythmic mechanisms).",
+      caseStudy: "Titrating Quadruple Therapy (ARNI, SGLT2i, Beta-Blocker, MRA) in decompensated heart failure with preserved renal function and hypotension considerations.",
+      deliverable: "Emergency dosing reference card for intravenous vasodilators, inotropes (Dobutamine, Milrinone), and antiarrhythmics (Amiodarone)."
+    };
+  }
+
+  if (t.includes('coronary') || t.includes('artery') || t.includes('infarct') || t.includes('stemi')) {
+    return {
+      theory: "Atherosclerotic plaque rupture cascade, platelet aggregation pathways (GPIIb/IIIa), subendocardial ischemia versus transmural necrosis pathology.",
+      caseStudy: "Managing acute ST-elevation myocardial infarction with cardiogenic shock, door-to-balloon time benchmarks (<90 min), and dual antiplatelet loading protocols.",
+      deliverable: "High-risk acute chest pain triage pathway decision tree with troponin kinetics and Killip classification grading."
+    };
+  }
+
+  if (t.includes('electrophysiology') || t.includes('ecg') || t.includes('arrhythmia')) {
+    return {
+      theory: "Cellular ionic flux (Na+ influx, K+ efflux, slow Ca2+ channels), Einthoven's triangle, hexaxial reference system, and re-entrant circuit pathophysiology.",
+      caseStudy: "Mapping and differentiating wide-complex tachycardias: Ventricular Tachycardia (VT) vs Supraventricular Tachycardia with aberrancy using Brugada criteria.",
+      deliverable: "Emergency antiarrhythmic cardioversion guide and 12-lead vector localization cheat-sheet."
+    };
+  }
+
+  if (t.includes('cash burn') || t.includes('financial') || t.includes('runway')) {
+    return {
+      theory: "Gross Burn vs Net Burn formulas ($$\\text{Runway (Months)} = \\frac{\\text{Cash Reserves}}{\\text{Monthly Net Burn}}$$), zero-cash date trajectory modeling, and variable cost elasticity.",
+      caseStudy: "Surviving a funding freeze by slashing non-payroll OPEX by 40% to extend runway from 5 months to 18 months while maintaining product velocity.",
+      deliverable: "12-month rolling cash flow forecasting spreadsheet with scenario sensitivities for delayed revenues."
+    };
+  }
+
+  if (t.includes('tree') || t.includes('database') || t.includes('index')) {
+    return {
+      theory: "B+ Tree block page alignment, branch fanout factor ($$B = \\frac{\\text{Page Size}}{\\text{Key + Pointer Size}}$$), write amplification, and WAL (Write-Ahead Logging) protocols.",
+      caseStudy: "Eliminating table-scan disk I/O bottlenecks in a 50M-row transaction ledger by replacing binary composite indexes with covering B+ tree leaf indexes.",
+      deliverable: "PostgreSQL EXPLAIN ANALYZE index profiling audit script and schema optimization document."
+    };
+  }
+
+  // Smart Context-Aware Fallback for any domain
+  return {
+    theory: `Detailed breakdown of underlying principles, authoritative standards, and structural equations for "${title}".`,
+    caseStudy: `Real-world breakdown of how leading practitioners in ${goal} execute "${title}" to minimize error and increase operational throughput.`,
+    deliverable: `Production-ready deliverable or technical documentation demonstrating mastery of "${title}".`
+  };
+}
+
 window.openNotesModal = function() {
   const currentPhase = (window.currentStudent?.phases || [])[activePhaseIdx] || (window.currentStudent?.phases || [])[0];
   const phaseTitle = currentPhase?.phaseTitle || `Phase ${activePhaseIdx + 1}`;
@@ -847,7 +856,7 @@ window.openNotesModal = function() {
   
   const titleEl = document.getElementById('notes-modal-title');
   if (titleEl) {
-    titleEl.textContent = `${phaseTitle} • What to Read & Master`;
+    titleEl.textContent = `${phaseTitle} • Tailored Study Specifications`;
   }
   
   const container = document.getElementById('notes-container');
@@ -857,8 +866,10 @@ window.openNotesModal = function() {
   
   let milestoneDetailsHTML = '';
   milestones.forEach((m, idx) => {
+    const readingGuide = generateMilestoneSpecificReadingGuide(m.title, m.desc, goal);
+
     milestoneDetailsHTML += `
-      <div class="p-4 rounded-2xl theme-card-inner space-y-2.5 border border-white/10">
+      <div class="p-4 rounded-2xl theme-card-inner space-y-3 border border-white/10">
         <div class="flex items-center justify-between">
           <span class="font-bold theme-text-title flex items-center gap-2 text-xs">
             <span class="w-5 h-5 rounded-full bg-purple-500/20 dynamic-accent-text flex items-center justify-center font-bold text-[10px]">${idx + 1}</span>
@@ -871,15 +882,16 @@ window.openNotesModal = function() {
           ${escapeHtml(m.desc || 'Comprehensive core competence required for career benchmarks.')}
         </p>
 
-        <div class="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1.5 text-[11px]">
-          <div class="font-semibold dynamic-accent-text flex items-center gap-1.5">
-            <span>📚 Core Reading & Concepts to Master:</span>
+        <!-- Topic-Specific Tailored Study Guide -->
+        <div class="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 space-y-2 text-[11px]">
+          <div class="font-bold dynamic-accent-text flex items-center gap-1.5">
+            <span>📚 Core Concepts & Readings to Master for "${escapeHtml(m.title)}":</span>
           </div>
-          <ul class="list-disc list-inside space-y-1 theme-text-sub">
-            <li><strong>Theoretical Foundations:</strong> Master the underlying mechanics, formulas, and definitions.</li>
-            <li><strong>Industry Case Studies:</strong> Analyze how real-world teams implement this to mitigate risk or increase velocity.</li>
-            <li><strong>Hands-on Deliverable:</strong> Write a concise specification document, executable script, or prototype validating this topic.</li>
-          </ul>
+          <div class="space-y-1.5 text-slate-300">
+            <div><strong class="text-white">🔬 Theoretical Mechanics:</strong> <span class="theme-text-sub">${readingGuide.theory}</span></div>
+            <div><strong class="text-white">🏥 Clinical / Industry Case Study:</strong> <span class="theme-text-sub">${readingGuide.caseStudy}</span></div>
+            <div><strong class="text-white">🎯 Practical Hands-on Deliverable:</strong> <span class="theme-text-sub">${readingGuide.deliverable}</span></div>
+          </div>
         </div>
       </div>
     `;
@@ -893,26 +905,117 @@ window.openNotesModal = function() {
       </div>
       <h4 class="text-sm font-bold theme-text-title">${escapeHtml(phaseTitle)}</h4>
       <p class="theme-text-sub text-[11px] leading-relaxed">
-        Curriculum reading blueprint configured for <strong>${escapeHtml(goal)}</strong> candidates with background in <em>"${escapeHtml(window.currentStudent?.current_knowledge || 'Undergraduate')}"</em>.
+        Personalized curriculum reading guide configured specifically for <strong>${escapeHtml(goal)}</strong>.
       </p>
     </div>
 
     <div class="space-y-3 pt-1">
       ${milestoneDetailsHTML || '<p class="theme-text-sub">No milestones mapped in this phase.</p>'}
     </div>
-
-    <div class="p-3.5 rounded-2xl theme-card-inner border border-white/10 space-y-2 text-xs">
-      <div class="font-bold theme-text-title flex items-center gap-2">
-        <span>🔍</span>
-        <span>Recommended Learning Path:</span>
-      </div>
-      <p class="theme-text-sub text-[11px] leading-relaxed">
-        Focus your time on building tangible outputs for each milestone above. You can ask your <strong>AI Tutor</strong> (in the bottom right) anytime for explanations, code reviews, or business breakdowns of any concept in this phase.
-      </p>
-    </div>
   `;
 
   openModal('modal-notes');
+};
+
+// ==========================================================
+// CAREER GAP & DEFICITS ANALYZER MODAL
+// ==========================================================
+window.openGapModal = function() {
+  const s = window.currentStudent;
+  const container = document.getElementById('gap-analysis-container');
+  if (!container || !s) return;
+
+  const goal = s.career_goal || 'Selected Target Goal';
+  const background = s.current_knowledge || 'Undergraduate Background';
+  const deficitsPercentage = s.concept_deficits || 80;
+
+  // Gather incomplete milestones representing the curriculum gap
+  const gapMilestones = [];
+  (s.phases || []).forEach((p, pIdx) => {
+    (p.milestones || []).forEach(m => {
+      if (!m.completed) {
+        gapMilestones.push({ ...m, phaseTitle: p.phaseTitle || `Phase ${pIdx + 1}` });
+      }
+    });
+  });
+
+  let gapListHTML = '';
+  if (gapMilestones.length === 0) {
+    gapListHTML = `
+      <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-center text-xs font-semibold">
+        🎉 Zero Curriculum Gaps Remaining! You have verified 100% of your targeted syllabus competencies.
+      </div>
+    `;
+  } else {
+    gapMilestones.slice(0, 6).forEach((gm, idx) => {
+      gapListHTML += `
+        <div class="p-3.5 rounded-2xl theme-card-inner border border-rose-500/20 flex items-center justify-between gap-3 text-xs">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full bg-rose-500/20 text-rose-400 font-bold flex items-center justify-center text-[10px]">${idx + 1}</span>
+              <span class="font-bold theme-text-title">${escapeHtml(gm.title)}</span>
+              <span class="text-[9px] font-mono px-2 py-0.5 rounded bg-white/5 theme-text-sub">${escapeHtml(gm.phaseTitle)}</span>
+            </div>
+            <p class="theme-text-sub text-[11px] pl-7">${escapeHtml(gm.desc)}</p>
+          </div>
+          <button type="button" onclick="bridgeGap('${gm.id}')" class="shrink-0 px-3 py-1.5 rounded-xl btn-brand text-[10px] font-bold shadow cursor-pointer">
+            Bridge Gap ✓
+          </button>
+        </div>
+      `;
+    });
+  }
+
+  container.innerHTML = `
+    <!-- Top Deficit Overview -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+      <div class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300">
+        <div class="text-[10px] font-mono uppercase font-bold text-rose-400">Target Deficit Ratio</div>
+        <div class="text-2xl font-black font-mono mt-1">${deficitsPercentage}% Untested</div>
+        <div class="text-[10px] theme-text-sub mt-0.5">${gapMilestones.length} syllabus competencies remaining</div>
+      </div>
+      <div class="p-4 rounded-2xl theme-card-inner border border-white/10 sm:col-span-2 space-y-1">
+        <div class="text-[10px] font-mono uppercase font-bold dynamic-accent-text">Candidate Background vs Industry Benchmark</div>
+        <div class="text-xs font-semibold theme-text-title">From: "${escapeHtml(background)}" → Target: "${escapeHtml(goal)}"</div>
+        <p class="text-[11px] theme-text-sub leading-relaxed">
+          The analyzer highlights core clinical/technical deficits that hiring managers or boards inspect before clearance.
+        </p>
+      </div>
+    </div>
+
+    <!-- Priority Action Items to Bridge the Gap -->
+    <div class="space-y-2.5 pt-2">
+      <div class="flex items-center justify-between text-xs font-bold theme-text-title">
+        <span class="flex items-center gap-1.5 text-rose-400">
+          <span>⚠️</span> <span>High-Priority Concept Gaps to Cover:</span>
+        </span>
+        <span class="text-[10px] font-mono theme-text-sub">Click "Bridge Gap" to verify completion</span>
+      </div>
+      <div class="space-y-2">
+        ${gapListHTML}
+      </div>
+    </div>
+
+    <!-- AI Tutor Direct Assistance -->
+    <div class="p-4 rounded-2xl theme-card-inner border border-purple-500/30 flex items-center justify-between gap-3 text-xs">
+      <div>
+        <div class="font-bold theme-text-title flex items-center gap-1.5">
+          <span>🤖</span> <span>Need an accelerated revision plan for these deficits?</span>
+        </div>
+        <p class="text-[11px] theme-text-sub mt-0.5">Your AI Tutor can generate immediate practice questions or concept summaries for your top deficit.</p>
+      </div>
+      <button type="button" onclick="closeModal('modal-gaps'); toggleTutorChat();" class="px-4 py-2 rounded-xl btn-brand font-bold text-xs shrink-0 cursor-pointer">
+        Consult AI Tutor →
+      </button>
+    </div>
+  `;
+
+  openModal('modal-gaps');
+};
+
+window.bridgeGap = function(milestoneId) {
+  toggleMilestoneState(milestoneId);
+  setTimeout(openGapModal, 100);
 };
 
 function escapeHtml(str) {
@@ -965,7 +1068,7 @@ window.startEndlessMCQSession = function() {
   const bdg = document.getElementById('mcq-badge-track');
   if (corr) corr.textContent = '0';
   if (wrng) wrng.textContent = '0';
-  if (bdg) bdg.textContent = window.currentStudent?.career_goal || 'Specialist Track';
+  if (bdg) bdg.textContent = window.currentStudent?.career_goal || 'Cardiologist';
   openModal('modal-mcq');
   generateNextMCQ();
 };
@@ -1067,12 +1170,9 @@ window.finishMCQSession = function() {
 
 // GITHUB TELEMETRY
 window.fetchGitHubRepos = async function() {
-  const u = (document.getElementById('in-github-scan').value || window.currentStudent?.github || '').trim();
+  const u = (document.getElementById('in-github-scan').value || window.currentStudent?.github || 'adityarp2008').trim();
   const c = document.getElementById('github-repos-container');
-  if (!u) {
-    c.innerHTML = '<div class="p-3 text-rose-400">Please enter a GitHub username to scan.</div>';
-    return;
-  }
+  if (!u) return;
 
   c.innerHTML = '<div class="p-3 theme-text-sub">Querying GitHub API...</div>';
   try {
