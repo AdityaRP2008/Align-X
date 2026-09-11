@@ -209,6 +209,7 @@
       </div>
 
       <div class="flex items-center gap-1.5 sm:gap-3">
+        <!-- THEME MENU -->
         <div class="relative" id="dropdown-theme-wrapper">
           <button type="button" onclick="toggleMenu('menu-themes', event)" class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-white/10 text-xs font-medium theme-card-inner transition cursor-pointer">
             <span class="w-2.5 h-2.5 rounded-full" id="active-theme-dot" style="background-color: var(--accent-main);"></span>
@@ -243,6 +244,12 @@
             </button>
           </div>
         </div>
+
+        <!-- RESTORED GITHUB BUTTON -->
+        <button type="button" onclick="openModal('modal-github')" class="flex px-2.5 sm:px-3 py-1.5 rounded-xl border border-white/10 text-[11px] sm:text-xs font-mono items-center gap-1.5 sm:gap-2 theme-card-inner transition cursor-pointer hover:border-emerald-500/40" title="Inspect Public GitHub Repos">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="nav-github-label" class="truncate max-w-[85px] sm:max-w-[120px]">@student</span>
+        </button>
 
         <button type="button" onclick="handleLogout()" class="px-2.5 sm:px-3 py-1.5 rounded-xl border border-rose-500/30 text-rose-400 hover:bg-rose-500/10 text-[11px] sm:text-xs font-bold transition cursor-pointer">
           Logout
@@ -280,7 +287,7 @@
       </button>
     </section>
 
-    <!-- 4 Telemetry Dials: Now with ACTIVE BACKLOGS in place of Concept Deficit -->
+    <!-- 4 Telemetry Dials: Backlogs initialized to 0% Pending -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 relative z-10">
       <div class="study-card p-4 sm:p-5 rounded-2xl flex items-center justify-between">
         <div>
@@ -294,19 +301,19 @@
         </div>
       </div>
 
-      <!-- ACTIVE BACKLOGS DIAL -->
+      <!-- ACTIVE BACKLOGS: Zeroed Out on Unstarted Baseline -->
       <div onclick="openGapModal()" class="study-card p-4 sm:p-5 rounded-2xl flex items-center justify-between cursor-pointer hover:border-red-500/50 transition">
         <div>
           <div class="text-[10px] font-mono text-rose-400 font-bold mb-0.5 sm:mb-1 flex items-center gap-1.5">
             <span>ACTIVE BACKLOGS</span>
             <span class="underline text-[9px] font-normal text-rose-300">Resolve →</span>
           </div>
-          <div class="text-2xl sm:text-3xl font-extrabold font-mono text-rose-500" id="meter-gap-val">100% <span class="text-xs font-normal theme-text-sub">pending</span></div>
-          <div class="text-[10px] sm:text-[11px] theme-text-sub mt-0.5 sm:mt-1" id="meter-gap-sub">All backlogs pending</div>
+          <div class="text-2xl sm:text-3xl font-extrabold font-mono text-rose-400" id="meter-gap-val">0% <span class="text-xs font-normal theme-text-sub">pending</span></div>
+          <div class="text-[10px] sm:text-[11px] theme-text-sub mt-0.5 sm:mt-1" id="meter-gap-sub">Course unstarted</div>
         </div>
         <div class="relative w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center shrink-0">
-          <svg class="w-12 h-12 sm:w-14 sm:h-14 transform -rotate-90" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" stroke="var(--meter-bg-track)" stroke-width="5" fill="none"/><circle id="dial-ring-2" cx="32" cy="32" r="26" stroke="#F43F5E" stroke-width="5" fill="none" stroke-dasharray="163.36" stroke-dashoffset="0"/></svg>
-          <span class="absolute text-[9px] sm:text-[10px] font-mono font-bold text-rose-400" id="label-ring-2">100%</span>
+          <svg class="w-12 h-12 sm:w-14 sm:h-14 transform -rotate-90" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" stroke="var(--meter-bg-track)" stroke-width="5" fill="none"/><circle id="dial-ring-2" cx="32" cy="32" r="26" stroke="#F43F5E" stroke-width="5" fill="none" stroke-dasharray="163.36" stroke-dashoffset="163.36"/></svg>
+          <span class="absolute text-[9px] sm:text-[10px] font-mono font-bold text-rose-400" id="label-ring-2">0%</span>
         </div>
       </div>
 
@@ -441,7 +448,7 @@
     <span>Tutor</span>
   </button>
 
-  <!-- Navigation Drawer (With Daily/Weekly AI MCQ & Backlog Center) -->
+  <!-- Navigation Drawer (With Daily/Weekly AI MCQ & Backlog Center & GitHub Option) -->
   <aside id="nav-drawer" class="fixed inset-y-0 left-0 w-72 sm:w-80 max-w-[85vw] dropdown-menu-pane border-r backdrop-blur-2xl z-[120] transform -translate-x-full transition-transform duration-300 flex flex-col justify-between p-4 sm:p-6 shadow-2xl overflow-y-auto">
     <div class="space-y-4">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
@@ -457,7 +464,7 @@
         <button type="button" onclick="toggleNavSidebar()" class="theme-text-sub hover:text-white p-1 text-sm cursor-pointer">✕</button>
       </div>
 
-      <!-- DAILY & WEEKLY AI CHALLENGE PANEL IN SIDEBAR -->
+      <!-- DAILY & WEEKLY AI CHALLENGE PANEL -->
       <div class="p-3 rounded-2xl bg-gradient-to-br from-purple-500/15 to-indigo-500/10 border border-purple-500/30 space-y-2">
         <div class="flex items-center justify-between">
           <span class="text-[10px] font-mono uppercase font-bold dynamic-accent-text flex items-center gap-1.5">
@@ -480,35 +487,41 @@
       </div>
 
       <nav class="space-y-1.5 text-xs font-semibold">
-        <button type="button" onclick="addNewProfileTrack(); toggleNavSidebar();" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-purple-500/20 border border-purple-500/40 dynamic-accent-text transition cursor-pointer font-bold">
+        <button type="button" onclick="addNewProfileTrack(); toggleNavSidebar();" class="w-full flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-purple-500/20 border border-purple-500/40 dynamic-accent-text transition cursor-pointer font-bold">
           <span class="flex items-center gap-2"><span>➕</span> <span>Add New Career Profile</span></span>
           <span class="text-[9px] font-mono uppercase bg-purple-500/30 px-1.5 py-0.5 rounded">New</span>
         </button>
 
-        <button type="button" onclick="openProfileModifier(); toggleNavSidebar();" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/30 dynamic-accent-text transition cursor-pointer">
+        <button type="button" onclick="openProfileModifier(); toggleNavSidebar();" class="w-full flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 dynamic-accent-text transition cursor-pointer">
           <span class="flex items-center gap-2"><span>✨</span> <span>Update Current Profile</span></span>
           <span class="text-[9px] font-mono dynamic-accent-text font-bold">Edit</span>
         </button>
 
-        <button type="button" onclick="openRoadmapModal(); toggleNavSidebar();" class="w-full flex items-center justify-between p-2.5 rounded-xl theme-card-inner dynamic-accent-text transition cursor-pointer">
+        <button type="button" onclick="openRoadmapModal(); toggleNavSidebar();" class="w-full flex items-center justify-between p-2.5 sm:p-3 rounded-xl theme-card-inner dynamic-accent-text transition cursor-pointer">
           <span class="flex items-center gap-2"><span>📚</span> <span>Career Roadmap</span></span>
           <span class="text-[9px] font-mono dynamic-accent-text font-bold">Phased</span>
         </button>
 
         <!-- ACTIVE BACKLOGS ITEM IN SIDEBAR -->
-        <button type="button" onclick="openGapModal(); toggleNavSidebar();" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 hover:bg-rose-500/20 transition cursor-pointer">
-          <span class="flex items-center gap-2"><span>⚠️</span> <span>Active Backlogs & Deficits</span></span>
-          <span class="text-[9px] font-mono text-rose-400 font-bold" id="sidebar-backlog-badge">Pending</span>
+        <button type="button" onclick="openGapModal(); toggleNavSidebar();" class="w-full flex items-center justify-between p-2.5 sm:p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 hover:bg-rose-500/20 transition cursor-pointer">
+          <span class="flex items-center gap-2"><span>⚠️</span> <span>Active Backlogs</span></span>
+          <span class="text-[9px] font-mono text-rose-400 font-bold" id="sidebar-backlog-badge">0 Pending</span>
         </button>
 
-        <button type="button" onclick="openModal('modal-capabilities'); toggleNavSidebar();" class="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-white/5 theme-text-title transition cursor-pointer">
+        <button type="button" onclick="openModal('modal-capabilities'); toggleNavSidebar();" class="w-full flex items-center justify-between p-2.5 sm:p-3 rounded-xl hover:bg-white/5 theme-text-title transition cursor-pointer">
           <span class="flex items-center gap-2"><span>🎯</span> <span>Capabilities Matrix</span></span>
           <span class="text-[9px] font-mono dynamic-accent-text font-bold">Radar</span>
         </button>
 
-        <button type="button" onclick="startEndlessRiddleSession(); toggleNavSidebar();" class="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-white/5 theme-text-title transition cursor-pointer">
+        <button type="button" onclick="startEndlessRiddleSession(); toggleNavSidebar();" class="w-full flex items-center justify-between p-2.5 sm:p-3 rounded-xl hover:bg-white/5 theme-text-title transition cursor-pointer">
           <span class="flex items-center gap-2"><span>🧩</span> <span>Mind Riddles</span></span>
           <span class="text-[9px] font-mono dynamic-accent-text font-bold">Logic</span>
+        </button>
+
+        <!-- RESTORED GITHUB IN SIDEBAR -->
+        <button type="button" onclick="openModal('modal-github'); toggleNavSidebar();" class="w-full flex items-center justify-between p-2.5 sm:p-3 rounded-xl hover:bg-white/5 theme-text-title transition cursor-pointer">
+          <span class="flex items-center gap-2"><span>🐙</span> <span>GitHub Telemetry Scanner</span></span>
+          <span class="text-[9px] font-mono text-emerald-400 font-bold">Inspect</span>
         </button>
       </nav>
     </div>
@@ -523,7 +536,7 @@
   <!-- MODALS                                                   -->
   <!-- ======================================================== -->
 
-  <!-- ACTIVE BACKLOGS MODAL (Formerly Gap Analyzer) -->
+  <!-- ACTIVE BACKLOGS MODAL -->
   <div id="modal-gaps" style="display: none;" class="fixed inset-0 z-[150] bg-black/80 backdrop-blur-md items-center justify-center p-2 sm:p-4">
     <div class="study-card rounded-2xl sm:rounded-3xl max-w-3xl w-full p-4 sm:p-8 space-y-4 sm:space-y-5 shadow-2xl max-h-[92vh] flex flex-col">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
@@ -658,6 +671,24 @@
     </div>
   </div>
 
+  <!-- GITHUB REPOSITORIES TELEMETRY MODAL -->
+  <div id="modal-github" style="display: none;" class="fixed inset-0 z-[150] bg-black/80 backdrop-blur-md items-center justify-center p-2 sm:p-4">
+    <div class="study-card rounded-2xl sm:rounded-3xl max-w-lg w-full p-4 sm:p-6 space-y-3 sm:space-y-4 shadow-2xl max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-2 border-b border-white/10">
+        <div class="flex items-center gap-2">
+          <span class="text-base sm:text-lg">🐙</span>
+          <h3 class="text-xs sm:text-sm font-bold theme-text-title">GitHub Repository Telemetry</h3>
+        </div>
+        <button type="button" onclick="closeModal('modal-github')" class="theme-text-sub hover:text-white cursor-pointer p-1">✕</button>
+      </div>
+      <div class="flex gap-2">
+        <input type="text" id="in-github-scan" placeholder="GitHub username" value="" class="flex-1 theme-card-inner rounded-xl px-3 py-2 text-xs theme-text-title font-mono focus:outline-none">
+        <button type="button" onclick="fetchGitHubRepos()" class="btn-brand px-3.5 py-2 rounded-xl text-xs font-bold cursor-pointer">Scan</button>
+      </div>
+      <div id="github-repos-container" class="max-h-60 overflow-y-auto space-y-2 text-xs pr-1"></div>
+    </div>
+  </div>
+
   <div id="modal-notes" style="display: none;" class="fixed inset-0 z-[150] bg-black/80 backdrop-blur-md items-center justify-center p-2 sm:p-4">
     <div class="study-card rounded-2xl sm:rounded-3xl max-w-2xl w-full p-4 sm:p-6 space-y-3 sm:space-y-4 shadow-2xl max-h-[92vh] flex flex-col">
       <div class="flex items-center justify-between pb-2 border-b border-white/10">
@@ -734,7 +765,7 @@
       } else if (step === 'register') {
         if (fReg) fReg.style.display = 'block';
         if (bReg) bReg.className = 'py-2 sm:py-2.5 rounded-lg sm:rounded-xl transition btn-brand shadow-sm cursor-pointer';
-        if (bIn) bIn.className = 'py-2.5 rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer';
+        if (bIn) bIn.className = 'py-2 sm:py-2.5 rounded-lg sm:rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer';
       } else if (step === 'profiler') {
         if (fProf) fProf.style.display = 'block';
         if (tabBar) tabBar.style.display = 'none';
