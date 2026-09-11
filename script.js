@@ -6,19 +6,91 @@
 const SUPABASE_URL = "https://eydgvjsgkqjyqjkkedi.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5ZGd2anNna3FqeXFqa2tlZGkiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc1NzQ4OTc1MCwiZXhwIjoyMDczMDY1NzUwfQ.f11c7dG38yT7CwhL6f6f9lKkEee9r8r_placeholder";
 
-let supabase = null;
+let supabaseClient = null;
 if (window.supabase && typeof window.supabase.createClient === 'function') {
   try {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    window.supabase = supabase;
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   } catch (e) {
     console.warn("Supabase running local mode.");
   }
 }
 
 let activePhaseIdx = 0;
-if (!window.currentStudent) window.currentStudent = null;
-if (!window.pendingRegistrationEmail) window.pendingRegistrationEmail = "";
+window.currentStudent = null;
+window.pendingRegistrationEmail = "";
+
+// Helper to generate a complete tailored curriculum based on goal and knowledge
+function generateFallbackCurriculum(goal, knowledge) {
+  const g = (goal || 'AI Engineer').toLowerCase();
+  
+  if (g.includes('ai') || g.includes('machine learning') || g.includes('data')) {
+    return {
+      radar: {
+        categories: ["Python", "Algorithms", "Machine Learning", "Deep Learning", "Math/Stats", "Data Pipelines"],
+        candidate: [30, 20, 15, 10, 25, 15],
+        benchmark: [90, 85, 85, 80, 80, 75]
+      },
+      phases: [
+        {
+          phaseTitle: "Phase 1: Python Fundamentals & Data Primitives",
+          milestones: [
+            { id: "ai-1", title: "Master Python OOP & Generator Pipelines", hours: "8 hrs", desc: "Object models, iterators, and vector primitives.", completed: false, xp: 120 },
+            { id: "ai-2", title: "Applied Linear Algebra & Probability", hours: "10 hrs", desc: "Matrix operations, dot products, and Bayes theorem.", completed: false, xp: 150 },
+            { id: "ai-3", title: "NumPy & Pandas Data Manipulation", hours: "6 hrs", desc: "DataFrames, vectorization, and dataset cleansing.", completed: false, xp: 100 }
+          ]
+        },
+        {
+          phaseTitle: "Phase 2: Core Machine Learning & Statistical Models",
+          milestones: [
+            { id: "ai-4", title: "Scikit-Learn Regression & Classification", hours: "12 hrs", desc: "Train-test splits, cross-validation, and metrics.", completed: false, xp: 200 },
+            { id: "ai-5", title: "Feature Engineering & Data Preprocessing", hours: "10 hrs", desc: "One-hot encoding, imputation, and scaling pipelines.", completed: false, xp: 220 },
+            { id: "ai-6", title: "Gradient Descent & Loss Functions", hours: "8 hrs", desc: "Deriving cost functions and learning rate decay.", completed: false, xp: 180 }
+          ]
+        },
+        {
+          phaseTitle: "Phase 3: Deep Learning & Production Deployment",
+          milestones: [
+            { id: "ai-7", title: "PyTorch Neural Networks & Backprop", hours: "16 hrs", desc: "Autograd, tensor computation, and training loops.", completed: false, xp: 280 },
+            { id: "ai-8", title: "Deploy Inference API with FastAPI & Docker", hours: "14 hrs", desc: "Containerize model endpoint for low-latency serving.", completed: false, xp: 300 }
+          ]
+        }
+      ]
+    };
+  }
+
+  // General Software / Full-Stack
+  return {
+    radar: {
+      categories: ["Frontend", "Backend APIs", "System Design", "Databases", "DevOps", "Testing"],
+      candidate: [35, 25, 15, 30, 10, 20],
+      benchmark: [90, 85, 80, 85, 75, 75]
+    },
+    phases: [
+      {
+        phaseTitle: "Phase 1: Foundational Systems & Architecture",
+        milestones: [
+          { id: "fs-1", title: "Implement B+ Tree Indexing in PostgreSQL", hours: "6 hrs", desc: "Reduce random disk block reads.", completed: false, xp: 120 },
+          { id: "fs-2", title: "Configure High-Performance Nginx Reverse Proxy", hours: "4 hrs", desc: "Isolate application runtime and caching.", completed: false, xp: 90 },
+          { id: "fs-3", title: "RESTful API Design & Structured JSON Validation", hours: "6 hrs", desc: "HTTP error conventions and data serialization.", completed: false, xp: 110 }
+        ]
+      },
+      {
+        phaseTitle: "Phase 2: Concurrency & Distributed Storage",
+        milestones: [
+          { id: "fs-4", title: "Deploy Redis Atomic Lua Rate Limiter", hours: "8 hrs", desc: "Eliminate multi-instance race conditions.", completed: false, xp: 200 },
+          { id: "fs-5", title: "Design Multi-Region Event Pub/Sub with Kafka", hours: "10 hrs", desc: "Event ordering across distributed brokers.", completed: false, xp: 250 }
+        ]
+      },
+      {
+        phaseTitle: "Phase 3: Production Hardening & Cloud Native",
+        milestones: [
+          { id: "fs-6", title: "Multi-Stage Docker Compose Containerization", hours: "6 hrs", desc: "Secure multi-container production environments.", completed: false, xp: 150 },
+          { id: "fs-7", title: "Automate CI/CD & Integration Testing (k6)", hours: "8 hrs", desc: "Load test concurrent scenarios in GitHub Actions.", completed: false, xp: 180 }
+        ]
+      }
+    ]
+  };
+}
 
 // Continuous MCQ Bank
 const endlessMCQBank = [
@@ -60,8 +132,45 @@ const endlessMCQBank = [
 let mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [] };
 
 // ==========================================
-// CONTROLLER ACTIONS
+// AUTH & PROFILER CONTROLLERS
 // ==========================================
+window.showAuthStep = function(step) {
+  const fIn = document.getElementById('form-signin');
+  const fReg = document.getElementById('form-register');
+  const fProf = document.getElementById('form-profiler-integrated');
+  const bIn = document.getElementById('tab-btn-signin');
+  const bReg = document.getElementById('tab-btn-register');
+  const tabBar = document.getElementById('auth-tab-bar');
+
+  if (fIn) fIn.style.display = 'none';
+  if (fReg) fReg.style.display = 'none';
+  if (fProf) fProf.style.display = 'none';
+  if (tabBar) tabBar.style.display = 'grid';
+
+  if (step === 'signin') {
+    if (fIn) fIn.style.display = 'block';
+    if (bIn) bIn.className = 'py-2.5 rounded-xl transition btn-brand shadow-sm cursor-pointer';
+    if (bReg) bReg.className = 'py-2.5 rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer';
+  } else if (step === 'register') {
+    if (fReg) fReg.style.display = 'block';
+    if (bReg) bReg.className = 'py-2.5 rounded-xl transition btn-brand shadow-sm cursor-pointer';
+    if (bIn) bIn.className = 'py-2.5 rounded-xl transition theme-text-sub hover:opacity-100 cursor-pointer';
+  } else if (step === 'profiler') {
+    if (fProf) fProf.style.display = 'block';
+    if (tabBar) tabBar.style.display = 'none';
+  }
+};
+
+window.goToProfilerStep = function() {
+  const regEmail = document.getElementById('reg-email');
+  if (regEmail && !regEmail.value.trim()) {
+    regEmail.focus();
+    return;
+  }
+  window.pendingRegistrationEmail = regEmail ? regEmail.value.trim() : '';
+  showAuthStep('profiler');
+};
+
 window.submitSignIn = async function() {
   const emailInput = document.getElementById('signin-email');
   const email = emailInput ? emailInput.value.trim() : "aditya@joyuniversity.edu.in";
@@ -73,10 +182,10 @@ window.submitSignIn = async function() {
   }
 
   // 1. Check Supabase
-  if (supabase) {
+  if (supabaseClient) {
     try {
-      const { data, error } = await supabase.from('students').select('*').eq('email', email).single();
-      if (data && !error && data.career_goal) {
+      const { data, error } = await supabaseClient.from('students').select('*').eq('email', email).single();
+      if (data && !error && data.career_goal && data.phases && data.phases.length > 0) {
         window.currentStudent = data;
         localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
         if (btn) { btn.disabled = false; btn.textContent = "Sign In →"; }
@@ -84,7 +193,7 @@ window.submitSignIn = async function() {
         return;
       }
     } catch (err) {
-      console.warn("Supabase check offline:", err.message);
+      console.warn("Supabase lookup offline:", err.message);
     }
   }
 
@@ -93,7 +202,7 @@ window.submitSignIn = async function() {
   if (localData) {
     try {
       const parsed = JSON.parse(localData);
-      if (parsed.email && parsed.email.toLowerCase() === email.toLowerCase() && parsed.career_goal) {
+      if (parsed.email && parsed.email.toLowerCase() === email.toLowerCase() && parsed.career_goal && parsed.phases && parsed.phases.length > 0) {
         window.currentStudent = parsed;
         if (btn) { btn.disabled = false; btn.textContent = "Sign In →"; }
         enterDashboard();
@@ -102,13 +211,147 @@ window.submitSignIn = async function() {
     } catch (err) {}
   }
 
-  // 3. No existing profile? Transition straight to the profiler
+  // 3. New user or incomplete profile -> show profiler
   if (btn) {
     btn.disabled = false;
     btn.textContent = "Sign In →";
   }
   window.pendingRegistrationEmail = email;
-  if (typeof showAuthStep === 'function') showAuthStep('profiler');
+  showAuthStep('profiler');
+};
+
+// GEMINI PROFILER SYNTHESIS
+window.submitProfilerForm = async function() {
+  const btn = document.getElementById('btn-submit-ai-profiler');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<span class="animate-spin">↻</span> Gemini is architecting your roadmap...`;
+  }
+
+  const nameVal = document.getElementById('prof-name-input')?.value.trim() || 'Aditya Pandey';
+  const emailVal = window.pendingRegistrationEmail || (nameVal.toLowerCase().replace(/\s+/g, '') + "@alignx.edu");
+  const levelVal = document.getElementById('prof-level-input')?.value.trim() || '1st semester';
+  const goalVal = document.getElementById('prof-goal-input')?.value.trim() || 'AI Engineer';
+  const knowVal = document.getElementById('prof-know-input')?.value.trim() || 'basic html css and python';
+  const tenureVal = document.getElementById('prof-tenure-input')?.value || '12 Months Comprehensive';
+  const ghVal = document.getElementById('prof-github-input')?.value.trim() || 'adityarp2008';
+
+  const payload = {
+    email: emailVal,
+    name: nameVal,
+    academicLevel: levelVal,
+    careerGoal: goalVal,
+    currentKnowledge: knowVal,
+    tenure: tenureVal,
+    github: ghVal
+  };
+
+  const fallback = generateFallbackCurriculum(goalVal, knowVal);
+
+  try {
+    const res = await fetch('/api/roadmap', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const aiData = await res.json();
+
+    if (aiData.error) throw new Error(aiData.error);
+
+    // Normalize phases to ensure milestones are always properly populated
+    let normalizedPhases = [];
+    if (Array.isArray(aiData.phases) && aiData.phases.length > 0) {
+      normalizedPhases = aiData.phases.map((p, pIdx) => {
+        const title = p.phaseTitle || p.title || `Phase ${pIdx + 1}`;
+        const rawList = p.milestones || p.modules || p.steps || p.topics || [];
+        const milestones = Array.isArray(rawList) ? rawList.map((m, mIdx) => ({
+          id: m.id || `m-${pIdx}-${mIdx}`,
+          title: m.title || m.name || `Milestone ${mIdx + 1}`,
+          desc: m.desc || m.description || `${m.hours || '6 hrs'} structured practice`,
+          hours: m.hours || '6 hrs',
+          completed: Boolean(m.completed),
+          xp: Number(m.xp) || 100
+        })) : [];
+        return { phaseTitle: title, milestones };
+      });
+    }
+
+    if (normalizedPhases.length === 0 || !normalizedPhases[0].milestones || normalizedPhases[0].milestones.length === 0) {
+      normalizedPhases = fallback.phases;
+    }
+
+    window.currentStudent = {
+      email: payload.email,
+      name: payload.name,
+      academic_level: payload.academicLevel,
+      career_goal: payload.careerGoal,
+      current_knowledge: payload.currentKnowledge,
+      tenure: payload.tenure,
+      github: payload.github,
+      readiness: Number(aiData.readiness) || 25,
+      curriculum_mastery: Number(aiData.curriculumMastery) || 0,
+      concept_deficits: Number(aiData.conceptDeficits) || 100,
+      target_pace: Number(aiData.targetPace) || 75,
+      radar: aiData.radar || fallback.radar,
+      phases: normalizedPhases,
+      xp: 0,
+      level: 1
+    };
+
+    if (supabaseClient) {
+      try {
+        await supabaseClient.from('students').upsert(window.currentStudent, { onConflict: 'email' });
+      } catch (err) {}
+    }
+
+    localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
+    enterDashboard();
+  } catch (err) {
+    console.warn("Using smart fallback curriculum:", err.message);
+    window.currentStudent = {
+      email: payload.email,
+      name: payload.name,
+      academic_level: payload.academicLevel,
+      career_goal: payload.careerGoal,
+      current_knowledge: payload.currentKnowledge,
+      tenure: payload.tenure,
+      github: payload.github,
+      readiness: 25,
+      curriculum_mastery: 0,
+      concept_deficits: 100,
+      target_pace: 75,
+      radar: fallback.radar,
+      phases: fallback.phases,
+      xp: 0,
+      level: 1
+    };
+
+    localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
+    enterDashboard();
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<span>✨ Synthesize Custom Architecture via Gemini →</span>`;
+    }
+  }
+};
+
+// MODAL CONTROLLERS (Uses display to prevent any invisible overlay click blocking)
+window.openModal = function(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.style.display = 'flex';
+  }
+  if (id === 'modal-capabilities') {
+    setTimeout(renderRadar, 50);
+  }
+};
+
+window.closeModal = function(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.style.display = 'none';
+  }
 };
 
 window.openRoadmapModal = function() {
@@ -116,32 +359,33 @@ window.openRoadmapModal = function() {
   openModal('modal-roadmap');
 };
 
-window.openModal = function(id) {
-  const el = document.getElementById(id);
-  if (el) el.classList.remove('hidden');
-  if (id === 'modal-capabilities') setTimeout(renderRadar, 50);
-};
-
-window.closeModal = function(id) {
-  const el = document.getElementById(id);
-  if (el) el.classList.add('hidden');
-};
-
 window.toggleMenu = function(id, e) {
   if (e) e.stopPropagation();
-  document.getElementById(id)?.classList.toggle('hidden');
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.toggle('hidden');
+  }
 };
 
 window.closeMenu = function(id) {
-  document.getElementById(id)?.classList.add('hidden');
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.add('hidden');
+  }
 };
 
 window.toggleNavSidebar = function() {
-  document.getElementById('nav-drawer')?.classList.toggle('-translate-x-full');
+  const drawer = document.getElementById('nav-drawer');
+  if (drawer) {
+    drawer.classList.toggle('-translate-x-full');
+  }
 };
 
 window.toggleTutorChat = function() {
-  document.getElementById('drawer-ai-tutor')?.classList.toggle('translate-x-full');
+  const drawer = document.getElementById('drawer-ai-tutor');
+  if (drawer) {
+    drawer.classList.toggle('translate-x-full');
+  }
 };
 
 window.handleLogout = function() {
@@ -161,8 +405,13 @@ window.addEventListener('DOMContentLoaded', () => {
   const savedSession = localStorage.getItem('alignx_student_active');
   if (savedSession) {
     try {
-      window.currentStudent = JSON.parse(savedSession);
-      enterDashboard();
+      const parsed = JSON.parse(savedSession);
+      if (parsed && parsed.phases && parsed.phases.length > 0) {
+        window.currentStudent = parsed;
+        enterDashboard();
+      } else {
+        showAuthGateway();
+      }
     } catch (e) {
       showAuthGateway();
     }
@@ -188,9 +437,9 @@ function showAuthGateway() {
 
   if (authView) authView.style.display = 'flex';
   if (appView) appView.style.display = 'none';
-  if (cBtn) cBtn.classList.add('hidden');
-  if (tBtn) tBtn.classList.add('hidden');
-  if (typeof showAuthStep === 'function') showAuthStep('signin');
+  if (cBtn) cBtn.style.display = 'none';
+  if (tBtn) tBtn.style.display = 'none';
+  showAuthStep('signin');
 }
 
 function enterDashboard() {
@@ -201,8 +450,8 @@ function enterDashboard() {
 
   if (authView) authView.style.display = 'none';
   if (appView) appView.style.display = 'flex';
-  if (cBtn) cBtn.classList.remove('hidden');
-  if (tBtn) tBtn.classList.remove('hidden');
+  if (cBtn) cBtn.style.display = 'flex';
+  if (tBtn) tBtn.style.display = 'flex';
   updateDashboardUI();
 }
 
@@ -211,16 +460,25 @@ function updateDashboardUI() {
   if (!window.currentStudent) return;
   const s = window.currentStudent;
 
-  document.getElementById('nav-current-role').textContent = s.career_goal || 'AI Engineer';
-  document.getElementById('nav-github-label').textContent = s.github ? `@${s.github}` : '@student';
-  document.getElementById('nav-user-name').textContent = s.name || 'Aditya Pandey';
-  document.getElementById('drawer-user-name').textContent = s.name || 'Aditya Pandey';
-  document.getElementById('nav-academic-term').textContent = s.academic_level || 'Active Student';
-  document.getElementById('drawer-user-goal').textContent = s.career_goal || 'Target Goal';
+  const roleEl = document.getElementById('nav-current-role');
+  const ghEl = document.getElementById('nav-github-label');
+  const uNameEl = document.getElementById('nav-user-name');
+  const dNameEl = document.getElementById('drawer-user-name');
+  const termEl = document.getElementById('nav-academic-term');
+  const goalEl = document.getElementById('drawer-user-goal');
+
+  if (roleEl) roleEl.textContent = s.career_goal || 'AI Engineer';
+  if (ghEl) ghEl.textContent = s.github ? `@${s.github}` : '@student';
+  if (uNameEl) uNameEl.textContent = s.name || 'Aditya Pandey';
+  if (dNameEl) dNameEl.textContent = s.name || 'Aditya Pandey';
+  if (termEl) termEl.textContent = s.academic_level || 'Active Student';
+  if (goalEl) goalEl.textContent = s.career_goal || 'Target Goal';
 
   const initials = (s.name || 'AP').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-  document.getElementById('nav-avatar-initials').textContent = initials;
-  document.getElementById('nav-level-badge').textContent = `L${s.level || 1}`;
+  const initEl = document.getElementById('nav-avatar-initials');
+  const lvlBadge = document.getElementById('nav-level-badge');
+  if (initEl) initEl.textContent = initials;
+  if (lvlBadge) lvlBadge.textContent = `L${s.level || 1}`;
 
   document.getElementById('meter-current-val').innerHTML = `${s.curriculum_mastery}% <span class="text-xs font-normal theme-text-sub">/100%</span>`;
   document.getElementById('meter-gap-val').innerHTML = `${s.concept_deficits}% <span class="text-xs font-normal theme-text-sub">untested</span>`;
@@ -237,9 +495,12 @@ function updateDashboardUI() {
   updateRadialMeter('dial-ring-3', s.readiness);
   updateRadialMeter('dial-ring-4', s.target_pace || 75);
 
-  document.getElementById('xp-level-title').textContent = `⚡ Level ${s.level || 1}: Apprentice Architect`;
-  document.getElementById('xp-progress-label').textContent = `${s.xp || 0} / 1000 XP`;
-  document.getElementById('xp-progress-bar').style.width = `${Math.min(100, ((s.xp || 0) % 1000) / 10)}%`;
+  const lvlTitle = document.getElementById('xp-level-title');
+  const xpLabel = document.getElementById('xp-progress-label');
+  const xpBar = document.getElementById('xp-progress-bar');
+  if (lvlTitle) lvlTitle.textContent = `⚡ Level ${s.level || 1}: Apprentice Architect`;
+  if (xpLabel) xpLabel.textContent = `${s.xp || 0} / 1000 XP`;
+  if (xpBar) xpBar.style.width = `${Math.min(100, ((s.xp || 0) % 1000) / 10)}%`;
 
   renderStudyPlanModules();
   renderRoadmapModal();
@@ -258,7 +519,8 @@ function updateRadialMeter(circleId, percentage) {
 // STUDY PLAN MODULES
 window.changeStudyPlanPhase = function(phaseIdx) {
   activePhaseIdx = phaseIdx;
-  document.getElementById('active-week-label').textContent = `Phase ${phaseIdx + 1}`;
+  const lbl = document.getElementById('active-week-label');
+  if (lbl) lbl.textContent = `Phase ${phaseIdx + 1}`;
   closeMenu('menu-weeks');
   renderStudyPlanModules();
 };
@@ -272,7 +534,12 @@ function renderStudyPlanModules() {
   const currentPhase = phases[activePhaseIdx] || phases[0];
 
   if (!currentPhase || !currentPhase.milestones || currentPhase.milestones.length === 0) {
-    container.innerHTML = `<div class="p-4 text-center theme-text-sub">No milestones mapped yet.</div>`;
+    container.innerHTML = `
+      <div class="p-6 text-center theme-card-inner rounded-2xl space-y-2">
+        <p class="theme-text-sub">No milestones mapped yet.</p>
+        <button onclick="showAuthStep('profiler'); document.getElementById('auth-view').style.display='flex'; document.getElementById('app-view').style.display='none';" class="btn-brand px-4 py-1.5 rounded-xl text-xs cursor-pointer">✨ Configure Milestones</button>
+      </div>
+    `;
     return;
   }
 
@@ -305,7 +572,8 @@ function renderRoadmapModal() {
   if (!container || !window.currentStudent) return;
   container.innerHTML = '';
 
-  document.getElementById('roadmap-track-name').textContent = window.currentStudent.career_goal || 'Target Goal';
+  const trackEl = document.getElementById('roadmap-track-name');
+  if (trackEl) trackEl.textContent = window.currentStudent.career_goal || 'Target Goal';
   const phases = window.currentStudent.phases || [];
 
   phases.forEach((phase, pIdx) => {
@@ -313,7 +581,8 @@ function renderRoadmapModal() {
     box.className = "p-4 rounded-2xl theme-card-inner space-y-3";
     
     let html = '';
-    phase.milestones.forEach(m => {
+    const mList = phase.milestones || [];
+    mList.forEach(m => {
       html += `
         <div class="p-3 rounded-xl theme-card-inner flex items-center justify-between gap-3">
           <label class="flex items-center gap-3 cursor-pointer">
@@ -339,12 +608,12 @@ function renderRoadmapModal() {
   });
 }
 
-// PROGRESS CALCULATION
+// PROGRESS & XP RECOMPUTATION
 async function toggleMilestoneState(mId) {
   let total = 0, completed = 0;
 
   window.currentStudent.phases.forEach(phase => {
-    phase.milestones.forEach(m => {
+    (phase.milestones || []).forEach(m => {
       total++;
       if (m.id === mId) {
         m.completed = !m.completed;
@@ -370,9 +639,9 @@ async function toggleMilestoneState(mId) {
   }
 
   localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
-  if (supabase && window.currentStudent.email) {
+  if (supabaseClient && window.currentStudent.email) {
     try {
-      await supabase.from('students').upsert(window.currentStudent, { onConflict: 'email' });
+      await supabaseClient.from('students').upsert(window.currentStudent, { onConflict: 'email' });
     } catch (e) {}
   }
 
@@ -422,7 +691,7 @@ function renderRadar() {
     ctx.fillText(cats[i], cx + (radius + 26) * Math.cos(a), cy + (radius + 12) * Math.sin(a));
   }
 
-  // Industry Benchmark
+  // Benchmark
   ctx.beginPath();
   for (let i = 0; i < n; i++) {
     const a = (Math.PI * 2 / n) * i - Math.PI / 2;
@@ -437,7 +706,7 @@ function renderRadar() {
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // Candidate Polygon
+  // Candidate
   ctx.beginPath();
   for (let i = 0; i < n; i++) {
     const a = (Math.PI * 2 / n) * i - Math.PI / 2;
@@ -526,17 +795,22 @@ window.setAccentTheme = function(themeName) {
 // MCQ STUDIO
 window.startEndlessMCQSession = function() {
   mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [] };
-  document.getElementById('mcq-correct-counter').textContent = '0';
-  document.getElementById('mcq-wrong-counter').textContent = '0';
-  document.getElementById('mcq-badge-track').textContent = window.currentStudent?.career_goal || 'General Track';
+  const corr = document.getElementById('mcq-correct-counter');
+  const wrng = document.getElementById('mcq-wrong-counter');
+  const bdg = document.getElementById('mcq-badge-track');
+  if (corr) corr.textContent = '0';
+  if (wrng) wrng.textContent = '0';
+  if (bdg) bdg.textContent = window.currentStudent?.career_goal || 'AI Engineer';
   openModal('modal-mcq');
   generateNextMCQ();
 };
 
 window.generateNextMCQ = function() {
   mcqSession.answeredCurrent = false;
-  document.getElementById('btn-next-mcq').classList.add('hidden');
-  document.getElementById('mcq-instant-feedback').classList.add('hidden');
+  const nxt = document.getElementById('btn-next-mcq');
+  const fb = document.getElementById('mcq-instant-feedback');
+  if (nxt) nxt.style.display = 'none';
+  if (fb) fb.style.display = 'none';
 
   const qObj = endlessMCQBank[mcqSession.total % endlessMCQBank.length];
   document.getElementById('mcq-question-number').textContent = `Challenge #${mcqSession.total + 1}`;
@@ -576,27 +850,29 @@ function handleMCQChoice(selectedIdx, qObj) {
     }
   });
 
-  fb.classList.remove('hidden');
-
-  if (isCorrect) {
-    mcqSession.correct++;
-    document.getElementById('mcq-correct-counter').textContent = mcqSession.correct;
-    fb.className = "p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-medium";
-    fb.innerHTML = `<strong>✓ Correct!</strong> ${qObj.explanation}`;
-  } else {
-    mcqSession.wrong++;
-    document.getElementById('mcq-wrong-counter').textContent = mcqSession.wrong;
-    fb.className = "p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs font-medium";
-    fb.innerHTML = `<strong>✕ Incorrect.</strong> You picked ${String.fromCharCode(65 + selectedIdx)}.<br><br><strong>Key Concept:</strong> ${qObj.explanation}`;
-    mcqSession.incorrectReview.push({
-      question: qObj.q,
-      userAnswer: qObj.options[selectedIdx],
-      correctAnswer: qObj.options[qObj.correct],
-      explanation: qObj.explanation
-    });
+  if (fb) {
+    fb.style.display = 'block';
+    if (isCorrect) {
+      mcqSession.correct++;
+      document.getElementById('mcq-correct-counter').textContent = mcqSession.correct;
+      fb.className = "p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-medium";
+      fb.innerHTML = `<strong>✓ Correct!</strong> ${qObj.explanation}`;
+    } else {
+      mcqSession.wrong++;
+      document.getElementById('mcq-wrong-counter').textContent = mcqSession.wrong;
+      fb.className = "p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs font-medium";
+      fb.innerHTML = `<strong>✕ Incorrect.</strong> You picked ${String.fromCharCode(65 + selectedIdx)}.<br><br><strong>Key Concept:</strong> ${qObj.explanation}`;
+      mcqSession.incorrectReview.push({
+        question: qObj.q,
+        userAnswer: qObj.options[selectedIdx],
+        correctAnswer: qObj.options[qObj.correct],
+        explanation: qObj.explanation
+      });
+    }
   }
 
-  document.getElementById('btn-next-mcq').classList.remove('hidden');
+  const nxt = document.getElementById('btn-next-mcq');
+  if (nxt) nxt.style.display = 'inline-block';
 }
 
 window.finishMCQSession = function() {
@@ -664,17 +940,20 @@ window.fetchGitHubRepos = async function() {
 };
 
 window.openNotesModal = function() {
-  document.getElementById('notes-modal-title').textContent = `${window.currentStudent?.career_goal || 'Engineering'} - Architecture Blueprint`;
+  const titleEl = document.getElementById('notes-modal-title');
+  if (titleEl) titleEl.textContent = `${window.currentStudent?.career_goal || 'AI Engineer'} - Architecture Blueprint`;
   const container = document.getElementById('notes-container');
-  container.innerHTML = `
-    <div class="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-600 dark:text-blue-300 font-semibold mb-2">
-      🚀 Active Curricula Specs for ${window.currentStudent?.career_goal || 'Selected Track'}
-    </div>
-    <div class="p-3.5 rounded-xl theme-card-inner space-y-1">
-      <div class="font-bold theme-text-title">Current Domain Knowledge Profile</div>
-      <p class="theme-text-sub text-[11px] leading-relaxed">${window.currentStudent?.current_knowledge || 'Undergraduate student'}</p>
-    </div>
-  `;
+  if (container) {
+    container.innerHTML = `
+      <div class="p-3.5 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-600 dark:text-blue-300 font-semibold mb-2">
+        🚀 Active Curricula Specs for ${window.currentStudent?.career_goal || 'AI Engineer'}
+      </div>
+      <div class="p-3.5 rounded-xl theme-card-inner space-y-1">
+        <div class="font-bold theme-text-title">Current Knowledge Profile</div>
+        <p class="theme-text-sub text-[11px] leading-relaxed">${window.currentStudent?.current_knowledge || 'Basic HTML, CSS, and Python'}</p>
+      </div>
+    `;
+  }
   openModal('modal-notes');
 };
 
