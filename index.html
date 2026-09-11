@@ -21,7 +21,6 @@
   <!-- ======================================================== -->
   <main id="auth-view" class="relative z-40 w-full max-w-lg my-auto px-4 py-8 flex flex-col items-center">
     
-    <!-- Branding Header with Custom Logo -->
     <div class="text-center mb-6 space-y-2">
       <div class="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-fuchsia-500 items-center justify-center p-2.5 shadow-xl shadow-purple-500/25 border border-white/20">
         <svg class="w-full h-full text-white" viewBox="0 0 48 48" fill="none" stroke="currentColor">
@@ -76,8 +75,11 @@
       <!-- Step 3: Integrated Profiler Form -->
       <div id="form-profiler-integrated" style="display: none;" class="space-y-3.5 text-xs">
         <div class="border-b border-white/10 pb-2 flex items-center justify-between">
-          <span class="font-bold text-xs dynamic-accent-text">Step 2: Educational Background & Target</span>
-          <button type="button" onclick="showAuthStep('register')" class="text-[11px] theme-text-sub hover:underline cursor-pointer">← Back</button>
+          <span class="font-bold text-xs dynamic-accent-text" id="profiler-step-heading">Configure Career Target</span>
+          <!-- Dynamic Back Button that goes to Dashboard if logged in, or Register if not -->
+          <button type="button" onclick="handleProfilerBackButton()" class="text-[11px] theme-text-sub hover:underline cursor-pointer flex items-center gap-1">
+            <span>←</span> <span id="profiler-back-label">Back</span>
+          </button>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -117,9 +119,6 @@
         </button>
       </div>
 
-      <!-- Status Feedback -->
-      <div id="auth-status-msg" style="display: none;" class="p-3 rounded-xl text-center text-xs font-semibold"></div>
-
       <!-- Accent Theme Palette -->
       <div class="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] theme-text-sub">
         <span>Accent Theme:</span>
@@ -147,7 +146,6 @@
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
 
-        <!-- New Vector Icon Logo -->
         <div class="flex items-center gap-2.5">
           <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-fuchsia-500 flex items-center justify-center p-1.5 shadow-md shadow-purple-500/20 border border-white/20">
             <svg class="w-full h-full text-white" viewBox="0 0 48 48" fill="none" stroke="currentColor">
@@ -167,7 +165,7 @@
           </button>
           
           <div id="menu-tracks" class="hidden absolute left-0 top-full mt-2 w-64 rounded-xl dropdown-menu-pane p-1.5 text-xs space-y-1">
-            <button type="button" onclick="showAuthStep('profiler'); document.getElementById('auth-view').style.display='flex'; document.getElementById('app-view').style.display='none'; closeMenu('menu-tracks');" class="w-full text-left px-3 py-2 rounded-lg dropdown-item-btn font-semibold dynamic-accent-text">✨ Update Goal & Knowledge Profile</button>
+            <button type="button" onclick="openProfileModifier(); closeMenu('menu-tracks');" class="w-full text-left px-3 py-2 rounded-lg dropdown-item-btn font-semibold dynamic-accent-text">✨ Update Goal & Knowledge Profile</button>
             <button type="button" onclick="openRoadmapModal(); closeMenu('menu-tracks');" class="w-full text-left px-3 py-2 rounded-lg dropdown-item-btn">📚 View Phased Roadmap</button>
             <button type="button" onclick="openGapModal(); closeMenu('menu-tracks');" class="w-full text-left px-3 py-2 rounded-lg dropdown-item-btn font-semibold text-rose-400">⚠️ Analyze Career Gaps & Deficits</button>
           </div>
@@ -222,7 +220,7 @@
           Logout
         </button>
 
-        <div class="flex items-center gap-2.5 p-1 rounded-xl theme-card-inner border border-white/10 cursor-pointer" onclick="showAuthStep('profiler'); document.getElementById('auth-view').style.display='flex'; document.getElementById('app-view').style.display='none';">
+        <div class="flex items-center gap-2.5 p-1 rounded-xl theme-card-inner border border-white/10 cursor-pointer" onclick="openProfileModifier()">
           <div class="relative">
             <div class="w-7 h-7 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center font-bold text-xs dynamic-accent-text" id="nav-avatar-initials">ST</div>
             <span class="absolute -bottom-1 -right-1 px-1 py-0.2 bg-amber-500 text-black font-extrabold text-[7px] rounded-full" id="nav-level-badge">L1</span>
@@ -252,7 +250,7 @@
       <button type="button" onclick="cycleFunFact()" class="shrink-0 text-xs px-3 py-1.5 rounded-lg border border-white/10 theme-text-title font-mono hover:bg-white/5 transition cursor-pointer">↻ Next Fact</button>
     </section>
 
-    <!-- 4 Telemetry Dials: Dynamic Readiness & Dynamic Sprint Pace -->
+    <!-- 4 Telemetry Dials -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
       <div class="study-card p-5 rounded-2xl flex items-center justify-between">
         <div>
@@ -281,7 +279,6 @@
         </div>
       </div>
 
-      <!-- Career Readiness: Starts strictly at 0% when unstarted -->
       <div class="study-card p-5 rounded-2xl flex items-center justify-between">
         <div>
           <div class="text-[10px] font-mono theme-text-sub font-bold mb-1">CAREER READINESS</div>
@@ -294,7 +291,6 @@
         </div>
       </div>
 
-      <!-- Study Sprint Pace: Dynamic velocity score that adapts with user progress -->
       <div class="study-card p-5 rounded-2xl flex items-center justify-between">
         <div>
           <div class="text-[10px] font-mono theme-text-sub font-bold mb-1">STUDY SPRINT PACE</div>
@@ -355,7 +351,6 @@
               <span class="text-xs font-bold tracking-wide">Start Learning</span>
             </div>
 
-            <!-- Tailored Endless MCQ Studio Button -->
             <div onclick="startEndlessMCQSession()" class="action-card action-card-purple">
               <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -419,7 +414,7 @@
     <span>AI Tutor</span>
   </button>
 
-  <!-- Navigation Drawer -->
+  <!-- Navigation Drawer with Career Gap Deficits Item -->
   <aside id="nav-drawer" class="fixed inset-y-0 left-0 w-80 max-w-[85vw] dropdown-menu-pane border-r backdrop-blur-2xl z-[120] transform -translate-x-full transition-transform duration-300 flex flex-col justify-between p-6 shadow-2xl">
     <div class="space-y-6">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
@@ -428,7 +423,6 @@
             <svg class="w-full h-full text-white" viewBox="0 0 48 48" fill="none" stroke="currentColor">
               <path d="M12 12L36 36M36 12L12 36" stroke-width="5" stroke-linecap="round"/>
               <circle cx="24" cy="24" r="5" fill="currentColor"/>
-              <path d="M4 24H12M36 24H44M24 4V12M24 36V44" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 2"/>
             </svg>
           </div>
           <span class="font-extrabold text-sm theme-text-title">Align-X Menu</span>
@@ -437,7 +431,7 @@
       </div>
 
       <nav class="space-y-2 text-xs font-semibold">
-        <button type="button" onclick="showAuthStep('profiler'); document.getElementById('auth-view').style.display='flex'; document.getElementById('app-view').style.display='none'; toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 dynamic-accent-text transition cursor-pointer">
+        <button type="button" onclick="openProfileModifier(); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 dynamic-accent-text transition cursor-pointer">
           <span class="flex items-center gap-2.5"><span>✨</span> <span>Configure Goal & Background</span></span>
           <span class="text-[10px] font-mono dynamic-accent-text font-bold">Profiler</span>
         </button>
@@ -462,9 +456,10 @@
           <span class="text-[10px] font-mono text-emerald-500 font-bold">Continuous</span>
         </button>
 
-        <button type="button" onclick="openModal('modal-puzzle'); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white/5 theme-text-title transition cursor-pointer">
-          <span class="flex items-center gap-2.5"><span>🧩</span> <span>Mind Activation Riddle</span></span>
-          <span class="text-[10px] font-mono dynamic-accent-text font-bold">Puzzle</span>
+        <!-- Dynamic Endless Riddle Trigger -->
+        <button type="button" onclick="startEndlessRiddleSession(); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white/5 theme-text-title transition cursor-pointer">
+          <span class="flex items-center gap-2.5"><span>🧩</span> <span>Mind Activation Riddle Studio</span></span>
+          <span class="text-[10px] font-mono dynamic-accent-text font-bold">Endless</span>
         </button>
 
         <button type="button" onclick="openModal('modal-github'); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white/5 theme-text-title transition cursor-pointer">
@@ -514,7 +509,7 @@
     </div>
   </div>
 
-  <!-- Endless MCQ Studio Modal (Goal Specific) -->
+  <!-- Endless MCQ Studio Modal -->
   <div id="modal-mcq" style="display: none;" class="fixed inset-0 z-[150] bg-black/80 backdrop-blur-md items-center justify-center p-4">
     <div class="study-card rounded-3xl max-w-2xl w-full p-6 space-y-5 shadow-2xl relative">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
@@ -543,6 +538,44 @@
         <div class="pt-2 flex items-center justify-between">
           <button type="button" onclick="finishMCQSession()" class="px-3.5 py-1.5 rounded-xl border border-white/10 theme-text-sub hover:text-white text-xs font-semibold cursor-pointer">Finish & Review</button>
           <button type="button" id="btn-next-mcq" onclick="generateNextMCQ()" class="btn-brand px-5 py-2 rounded-xl text-xs font-bold cursor-pointer" style="display: none;">Next Challenge →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW: DYNAMIC ENDLESS RIDDLE STUDIO MODAL -->
+  <div id="modal-puzzle" style="display: none;" class="fixed inset-0 z-[150] bg-black/80 backdrop-blur-md items-center justify-center p-4">
+    <div class="study-card rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-base">🧩</span>
+            <h3 class="text-sm font-bold theme-text-title">Endless Logic & Mind Riddle Studio</h3>
+          </div>
+          <p class="text-xs theme-text-sub mt-0.5">Lateral thinking, probability, and classic brain teasers</p>
+        </div>
+        <div class="flex items-center gap-3 font-mono text-xs font-bold">
+          <div class="text-emerald-400">Score: <span id="riddle-score">0</span></div>
+          <button type="button" onclick="closeModal('modal-puzzle')" class="theme-text-sub hover:text-white ml-2 text-sm cursor-pointer">✕</button>
+        </div>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <div class="flex items-center justify-between font-mono theme-text-sub">
+          <span id="riddle-number-label">Riddle #1</span>
+          <span class="dynamic-accent-text font-bold" id="riddle-category-tag">Lateral Thinking</span>
+        </div>
+        <p class="text-sm font-semibold theme-text-title leading-relaxed" id="riddle-question-text">
+          Loading riddle...
+        </p>
+
+        <div id="riddle-options-container" class="space-y-2.5"></div>
+
+        <div id="riddle-feedback" style="display: none;" class="p-3.5 rounded-xl leading-relaxed font-medium"></div>
+
+        <div class="pt-2 flex items-center justify-between">
+          <button type="button" onclick="closeModal('modal-puzzle')" class="px-3.5 py-1.5 rounded-xl border border-white/10 theme-text-sub hover:text-white text-xs font-semibold cursor-pointer">Exit Riddle Studio</button>
+          <button type="button" id="btn-next-riddle" onclick="nextRiddle()" style="display: none;" class="btn-brand px-5 py-2 rounded-xl text-xs font-bold cursor-pointer">Next Riddle →</button>
         </div>
       </div>
     </div>
@@ -608,20 +641,6 @@
         <button type="button" onclick="closeModal('modal-notes')" class="theme-text-sub hover:text-white cursor-pointer">✕</button>
       </div>
       <div class="flex-1 overflow-y-auto space-y-3 text-xs" id="notes-container"></div>
-    </div>
-  </div>
-
-  <div id="modal-puzzle" style="display: none;" class="fixed inset-0 z-[150] bg-black/80 backdrop-blur-md items-center justify-center p-4">
-    <div class="study-card rounded-3xl max-w-xl w-full p-6 space-y-4 shadow-2xl">
-      <div class="flex items-center justify-between pb-3 border-b border-white/10">
-        <h3 class="text-sm font-bold theme-text-title">Engineering Logic Riddle</h3>
-        <button type="button" onclick="closeModal('modal-puzzle')" class="theme-text-sub hover:text-white cursor-pointer">✕</button>
-      </div>
-      <p class="text-xs theme-text-title">A network partition isolates Node C in a 3-node cluster. Under Strong Consistency (CP), what must Node C do?</p>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-        <button type="button" onclick="alert('Incorrect! Split-brain risk.')" class="p-3 rounded-xl theme-card-inner text-left hover:opacity-80 cursor-pointer">1. Accept write (200 OK)</button>
-        <button type="button" onclick="alert('Correct! Cannot form majority quorum.')" class="p-3 rounded-xl theme-card-inner text-left hover:opacity-80 cursor-pointer">2. Reject write (Error)</button>
-      </div>
     </div>
   </div>
 
