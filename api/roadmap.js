@@ -19,28 +19,38 @@ export default async function handler(req, res) {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
       model: "gemini-3.6-flash",
-      generationConfig: { responseMimeType: "application/json" }
+      generationConfig: {
+        responseMimeType: "application/json",
+        maxOutputTokens: 4096,
+        temperature: 0.2
+      }
     });
 
     const prompt = `You are the chief academic curriculum architect for Align-X Academy.
-Create an extensive, professional, comprehensive academic curriculum roadmap for a candidate transitioning from their background into their dream job.
+Create an in-depth, rigorous, comprehensive multi-phase curriculum roadmap for a candidate learning: "${careerGoal}".
 
-Student Telemetry:
+Student Profile:
 - Full Name: ${name}
 - Current Education / Degree: ${academicLevel || "Undergraduate"}
-- Target Goal / Dream Job: ${careerGoal}
-- Current Knowledge & Baseline: "${currentKnowledge}"
-- Target Timeline / Tenure: ${tenure || "12 Months"}
+- Target Dream Career: ${careerGoal}
+- Current Knowledge Baseline: "${currentKnowledge}"
+- Target Duration: ${tenure || "12 Months"}
 - GitHub: ${github || "None"}
 
-CRITICAL STRUCTURAL CONSTRAINTS:
-1. Generate between 4 to 6 sequential phases (e.g., Phase 1: Core Prerequisite Foundations, Phase 2: Intermediate Systems & Diagnostics, Phase 3: Applied Industry Workflows, Phase 4: Production Hardening, Phase 5: Capstone Certification / Benchmark).
-2. Each phase MUST contain between 4 to 6 detailed, practical, actionable milestones. NEVER return fewer than 4 milestones per phase.
-3. Every milestone must have an explicit realistic study duration (e.g., "12 hrs", "18 hrs", "24 hrs") and a concrete deliverable description.
-4. Select 6 domain categories for the skills radar specific to "${careerGoal}".
-5. Set curriculumMastery to 0, conceptDeficits to 100, and readiness to 0.
+MANDATORY STRUCTURAL RULES (STRICTLY ENFORCED):
+1. You MUST generate between 4 to 5 sequential phases.
+2. Every single phase MUST contain AT LEAST 5 TO 7 DISTINCT, IN-DEPTH MILESTONES / TOPICS. Never generate only 1, 2, or 3 milestones per phase.
+3. Every milestone must have:
+   - "id": unique string like "m1-1", "m1-2", etc.
+   - "title": Highly specific domain topic name (not generic).
+   - "hours": Realistic study target (e.g., "14 hrs", "20 hrs").
+   - "desc": Concrete description of theory, lab exercises, and specific clinical/technical deliverables.
+   - "completed": false
+   - "xp": Integer between 100 and 300.
+4. "radar": Provide 6 specific domain competency categories tailored directly to "${careerGoal}".
+5. Set "curriculumMastery" to 0, "conceptDeficits" to 100, and "readiness" to 0.
 
-Output strictly raw, valid JSON matching this schema:
+Output strictly valid JSON matching this schema:
 {
   "curriculumMastery": 0,
   "conceptDeficits": 100,
@@ -49,43 +59,18 @@ Output strictly raw, valid JSON matching this schema:
   "radar": {
     "categories": ["Domain 1", "Domain 2", "Domain 3", "Domain 4", "Domain 5", "Domain 6"],
     "candidate": [20, 15, 10, 15, 10, 15],
-    "benchmark": [90, 85, 85, 90, 80, 85]
+    "benchmark": [95, 90, 90, 85, 80, 90]
   },
   "phases": [
     {
-      "phaseTitle": "Phase 1: Foundational Prerequisites",
+      "phaseTitle": "Phase 1: Foundations & Core Theoretical Mechanisms",
       "milestones": [
-        { "id": "p1-1", "title": "Milestone 1 Title", "hours": "14 hrs", "desc": "Concrete description of theoretical and applied focus.", "completed": false, "xp": 120 },
-        { "id": "p1-2", "title": "Milestone 2 Title", "hours": "16 hrs", "desc": "Concrete description of practical drill and lab.", "completed": false, "xp: 140 },
-        { "id": "p1-3", "title": "Milestone 3 Title", "hours": "12 hrs", "desc": "Core methodology validation and diagnostics.", "completed": false, "xp": 120 },
-        { "id": "p1-4", "title": "Milestone 4 Title", "hours": "18 hrs", "desc": "Initial synthesis deliverable and review.", "completed": false, "xp": 150 }
-      ]
-    },
-    {
-      "phaseTitle": "Phase 2: Core Domain Practice",
-      "milestones": [
-        { "id": "p2-1", "title": "Milestone 1 Title", "hours": "16 hrs", "desc": "Applied intermediate frameworks.", "completed": false, "xp": 180 },
-        { "id": "p2-2", "title": "Milestone 2 Title", "hours": "20 hrs", "desc": "Systemic procedures and protocols.", "completed": false, "xp": 200 },
-        { "id": "p2-3", "title": "Milestone 3 Title", "hours": "18 hrs", "desc": "Failure analysis and stress mitigation.", "completed": false, "xp": 190 },
-        { "id": "p2-4", "title": "Milestone 4 Title", "hours": "22 hrs", "desc": "Integrated case review and portfolio item.", "completed": false, "xp": 220 }
-      ]
-    },
-    {
-      "phaseTitle": "Phase 3: Advanced Systems & Integration",
-      "milestones": [
-        { "id": "p3-1", "title": "Milestone 1 Title", "hours": "20 hrs", "desc": "Deep clinical/technical evaluation.", "completed": false, "xp": 240 },
-        { "id": "p3-2", "title": "Milestone 2 Title", "hours": "24 hrs", "desc": "Complex cross-domain workflows.", "completed": false, "xp": 260 },
-        { "id": "p3-3", "title": "Milestone 3 Title", "hours": "18 hrs", "desc": "Quality assurance and protocol audits.", "completed": false, "xp": 220 },
-        { "id": "p3-4", "title": "Milestone 4 Title", "hours": "22 hrs", "desc": "End-to-end integration project.", "completed": false, "xp": 250 }
-      ]
-    },
-    {
-      "phaseTitle": "Phase 4: Production & Benchmark Clearance",
-      "milestones": [
-        { "id": "p4-1", "title": "Milestone 1 Title", "hours": "24 hrs", "desc": "Simulated board/hiring assessment.", "completed": false, "xp": 280 },
-        { "id": "p4-2", "title": "Milestone 2 Title", "hours": "28 hrs", "desc": "Production-grade deliverable under time pressure.", "completed": false, "xp: 320 },
-        { "id": "p4-3", "title": "Milestone 3 Title", "hours": "20 hrs", "desc": "Comprehensive gap closure documentation.", "completed": false, "xp": 250 },
-        { "id": "p4-4", "title": "Milestone 4 Title", "hours": "30 hrs", "desc": "Capstone verification ready for hiring clearance.", "completed": false, "xp": 350 }
+        { "id": "m1-1", "title": "Topic 1", "hours": "14 hrs", "desc": "Detailed explanation and practical lab.", "completed": false, "xp": 120 },
+        { "id": "m1-2", "title": "Topic 2", "hours": "16 hrs", "desc": "Detailed explanation and practical lab.", "completed": false, "xp": 140 },
+        { "id": "m1-3", "title": "Topic 3", "hours": "12 hrs", "desc": "Detailed explanation and practical lab.", "completed": false, "xp": 120 },
+        { "id": "m1-4", "title": "Topic 4", "hours": "18 hrs", "desc": "Detailed explanation and practical lab.", "completed": false, "xp": 150 },
+        { "id": "m1-5", "title": "Topic 5", "hours": "15 hrs", "desc": "Detailed explanation and practical lab.", "completed": false, "xp": 130 },
+        { "id": "m1-6", "title": "Topic 6", "hours": "20 hrs", "desc": "Detailed explanation and practical lab.", "completed": false, "xp": 160 }
       ]
     }
   ]
@@ -96,7 +81,7 @@ Output strictly raw, valid JSON matching this schema:
     rawText = rawText.replace(/^```json\s*/i, "").replace(/```\s*$/i, "").trim();
     const generated = JSON.parse(rawText);
 
-    // Persist into Supabase
+    // Persist into Supabase server-side if configured
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_ANON_KEY;
     if (supabaseUrl && supabaseKey && email) {
