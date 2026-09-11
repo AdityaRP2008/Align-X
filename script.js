@@ -1,6 +1,6 @@
 /**
  * Align-X Academic Engine
- * Live Gemini Chatbot + Context-Aware Topic Notes + Endless Brain Riddles + Gap Analyzer
+ * Live Gemini AI Insights + Topic-Tailored Notes + Goal-Specific Endless AI MCQs + Endless Riddles
  */
 
 const SUPABASE_URL = "https://eydgvjsgkqjyqjkkedi.supabase.co";
@@ -92,9 +92,7 @@ function generateFallbackCurriculum(goal, knowledge) {
 
 let mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [], activeQuestion: null };
 
-// ==========================================
-// ENDLESS GENERIC LOGIC RIDDLES BANK & STATE
-// ==========================================
+// Endless Riddles Bank
 const endlessRiddlesBank = [
   {
     q: "A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much does the ball cost?",
@@ -164,13 +162,95 @@ let riddleSession = {
   answered: false
 };
 
+// ==========================================================
+// DYNAMIC AI FACT & INSIGHT CONTROLLER (GEMINI POWERED)
+// ==========================================================
+let isFactLoading = false;
+
+window.cycleFunFact = async function(manualClick = false) {
+  const factEl = document.getElementById('cs-fun-fact-text');
+  const roleTag = document.getElementById('cs-fact-role-tag');
+  const btn = document.getElementById('btn-next-fact');
+  if (!factEl || isFactLoading) return;
+
+  const s = window.currentStudent;
+  const goal = s?.career_goal || 'Specialist';
+  const knowledge = s?.current_knowledge || 'Undergraduate';
+
+  if (roleTag) {
+    roleTag.textContent = `• tailored for ${goal}`;
+  }
+
+  isFactLoading = true;
+  if (btn) btn.classList.add('opacity-50');
+
+  // Fade animation
+  factEl.style.opacity = '0.4';
+
+  try {
+    const res = await fetch('/api/fact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        careerGoal: goal,
+        currentKnowledge: knowledge,
+        academicLevel: s?.academic_level || 'Student'
+      })
+    });
+
+    const data = await res.json();
+    if (data.fact) {
+      factEl.textContent = data.fact;
+    } else {
+      throw new Error("Empty response");
+    }
+  } catch (err) {
+    // Intelligent fallback tailored to the goal
+    const fallbacks = getFallbackFacts(goal);
+    factEl.textContent = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+  } finally {
+    factEl.style.opacity = '1';
+    isFactLoading = false;
+    if (btn) btn.classList.remove('opacity-50');
+  }
+};
+
+function getFallbackFacts(goal) {
+  const g = (goal || '').toLowerCase();
+  if (g.includes('cardio') || g.includes('medic') || g.includes('doctor')) {
+    return [
+      "The cardiac conduction system transfers action potentials through Purkinje fibers at up to 4 meters per second—faster than any other muscle tissue in the human body.",
+      "Fractional Flow Reserve (FFR) cutoffs below 0.80 indicate hemodynamically significant coronary stenosis that mandates revascularization over medical therapy alone.",
+      "The Frank-Starling mechanism dictates that increased ventricular end-diastolic volume stretches cardiac sarcomeres to optimal actin-myosin overlap, amplifying stroke volume."
+    ];
+  }
+  if (g.includes('ai') || g.includes('machine learning') || g.includes('data')) {
+    return [
+      "Transformer self-attention computes query-key matrix dot products with quadratic O(N²) memory complexity, which FlashAttention mitigates by tiling GPU SRAM IO.",
+      "Residual connections (ResNets) solve the vanishing gradient problem by enabling gradient vectors to skip directly across layers during backpropagation.",
+      "Quantizing 16-bit floating-point LLM weights to 4-bit NormalFloat (NF4) reduces VRAM consumption by 70% with negligible perplexity degradation."
+    ];
+  }
+  if (g.includes('entrepreneur') || g.includes('startup') || g.includes('business')) {
+    return [
+      "Startups that maintain a CAC-to-LTV payback window under 12 months require up to 60% less venture dilution to achieve positive operating cash flows.",
+      "Net Burn Runway under 6 months triggers a critical fundraising hazard zone where investor term-sheet leverage and valuation multiples decline by over 40%.",
+      "Validating problem severity via 20 qualitative customer interviews before writing code eliminates 75% of early product-market fit failure risks."
+    ];
+  }
+  return [
+    `Specialists in ${goal} who benchmark milestones against verified production standards shorten career gap transition velocity by up to 65%.`,
+    `Structured milestone deliberate practice produces 3.4x higher concept retention than passive theoretical reading.`,
+    `Evaluating edge scenarios and error failure boundaries is the single highest predictor of professional hiring clearance in ${goal}.`
+  ];
+}
+
 // ==========================================
-// COURSE MODIFICATION & PRE-POPULATION FIX
+// COURSE MODIFICATION & PRE-POPULATION
 // ==========================================
 window.openProfileModifier = function() {
   const s = window.currentStudent;
 
-  // Pre-fill inputs with the user's ACTUAL saved data so nothing disappears
   if (s) {
     document.getElementById('prof-name-input').value = s.name || '';
     document.getElementById('prof-level-input').value = s.academic_level || '';
@@ -180,18 +260,15 @@ window.openProfileModifier = function() {
     document.getElementById('prof-github-input').value = s.github || '';
   }
 
-  // Set step heading and back button text to return to dashboard
   document.getElementById('profiler-step-heading').textContent = "Update Career Target & Knowledge";
   document.getElementById('profiler-back-label').textContent = "Back to Dashboard";
 
-  // Display Profiler view
   document.getElementById('auth-view').style.display = 'flex';
   document.getElementById('app-view').style.display = 'none';
   showAuthStep('profiler');
 };
 
 window.handleProfilerBackButton = function() {
-  // If the user already has a student session, return to dashboard instead of signing out
   if (window.currentStudent && window.currentStudent.career_goal) {
     document.getElementById('auth-view').style.display = 'none';
     document.getElementById('app-view').style.display = 'flex';
@@ -199,7 +276,6 @@ window.handleProfilerBackButton = function() {
     document.getElementById('btn-floating-tutor').style.display = 'flex';
     updateDashboardUI();
   } else {
-    // If not logged in, go back to register tab
     showAuthStep('register');
   }
 };
@@ -217,7 +293,6 @@ window.submitSignIn = async function() {
     btn.textContent = "Checking Profile...";
   }
 
-  // 1. Query Supabase via server route
   try {
     const res = await fetch('/api/auth', {
       method: 'POST',
@@ -236,7 +311,6 @@ window.submitSignIn = async function() {
     console.warn("Server auth lookup error:", err.message);
   }
 
-  // 2. Check localStorage
   const localData = localStorage.getItem('alignx_student_active');
   if (localData) {
     try {
@@ -343,6 +417,7 @@ window.submitProfilerForm = async function() {
 
     localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
     enterDashboard();
+    cycleFunFact(true);
   } catch (err) {
     console.warn("Using smart fallback curriculum:", err.message);
     window.currentStudent = {
@@ -365,6 +440,7 @@ window.submitProfilerForm = async function() {
 
     localStorage.setItem('alignx_student_active', JSON.stringify(window.currentStudent));
     enterDashboard();
+    cycleFunFact(true);
   } finally {
     if (btn) {
       btn.disabled = false;
@@ -447,6 +523,7 @@ window.addEventListener('DOMContentLoaded', () => {
         window.currentStudent = parsed;
         recalculateMetrics();
         enterDashboard();
+        cycleFunFact(false);
       } else {
         showAuthGateway();
       }
@@ -457,7 +534,13 @@ window.addEventListener('DOMContentLoaded', () => {
     showAuthGateway();
   }
 
-  setInterval(cycleFunFact, 8000);
+  // Auto-refresh dynamic fact periodically
+  setInterval(() => {
+    if (window.currentStudent && document.getElementById('app-view')?.style.display !== 'none') {
+      cycleFunFact(false);
+    }
+  }, 16000);
+
   window.addEventListener('resize', renderRadar);
 
   document.addEventListener('click', (e) => {
@@ -1414,16 +1497,6 @@ window.fetchGitHubRepos = async function() {
     c.innerHTML = '<div class="text-rose-500 p-3">Error connecting to GitHub API.</div>';
   }
 };
-
-function cycleFunFact() {
-  const facts = [
-    "Personalized academic architectures reduce career transition time by up to 65%.",
-    "Relational databases use B+ Trees because wide fanouts match physical storage disk page sizes.",
-    "Git was written by Linus Torvalds in roughly 10 days to maintain the Linux kernel codebase."
-  ];
-  const el = document.getElementById('cs-fun-fact-text');
-  if (el) el.textContent = facts[Math.floor(Math.random() * facts.length)];
-}
 
 function initPointerGlow() {
   const canvas = document.getElementById('glow-spotlight-canvas');
