@@ -1,6 +1,6 @@
 /**
  * Align-X Academic Engine
- * Backlog Telemetry + Daily/Weekly AI Challenges + Randomized MCQs & Riddles
+ * Zeroed-Out Unstarted Backlogs Baseline + Fully Restored GitHub Telemetry Scanner
  */
 
 const SUPABASE_URL = "https://eydgvjsgkqjyqjkkedi.supabase.co";
@@ -19,9 +19,8 @@ if (window.supabase && typeof window.supabase.createClient === 'function') {
 let activePhaseIdx = 0;
 window.currentStudent = null;
 window.pendingRegistrationEmail = "";
-let currentMCQMode = 'general'; // 'general', 'daily', or 'weekly'
+let currentMCQMode = 'general';
 
-// Fisher-Yates Shuffle Algorithm to guarantee true randomization of options & answer indexes
 function shuffleOptionsAndFixAnswer(options, correctIdx) {
   const indexed = options.map((opt, i) => ({ opt, isCorrect: i === correctIdx }));
   for (let i = indexed.length - 1; i > 0; i--) {
@@ -34,7 +33,6 @@ function shuffleOptionsAndFixAnswer(options, correctIdx) {
   };
 }
 
-// Fallback curriculum
 function generateFallbackCurriculum(goal, knowledge) {
   return {
     radar: {
@@ -78,7 +76,6 @@ function generateFallbackCurriculum(goal, knowledge) {
 
 let mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [], activeQuestion: null };
 
-// MULTI-PROFILE STORAGE MANAGER
 function getAllSavedProfiles() {
   try {
     const raw = localStorage.getItem('alignx_profiles_store');
@@ -158,7 +155,6 @@ function updateProfilesDropdownUI() {
   list.innerHTML = html;
 }
 
-// 8 Diverse Logic Riddles (Randomized dynamically across A, B, and C)
 const endlessRiddlesBank = [
   {
     q: "A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much does the ball cost?",
@@ -205,20 +201,6 @@ const endlessRiddlesBank = [
     ],
     correct: 0,
     explanation: "Step-by-step arithmetic: 5 - 3 = 2L. Place 2L in 3L jug. Refill 5L, pour 1L to fill 3L jug, leaving exactly 4L."
-  },
-  {
-    q: "What can travel around the entire globe while remaining confined to a single corner?",
-    category: "Wordplay Logic",
-    options: ["The Equator", "A Postage Stamp", "A Compass Needle"],
-    correct: 1,
-    explanation: "A postage stamp stays fixed to the corner of an envelope as it travels across continents."
-  },
-  {
-    q: "A doctor gives you three pills and tells you to take one every half hour. How long will the pills last?",
-    category: "Temporal Sequence",
-    options: ["90 minutes", "60 minutes", "30 minutes"],
-    correct: 1,
-    explanation: "You take Pill 1 at minute 0, Pill 2 at minute 30, and Pill 3 at minute 60 (total duration = 60 minutes)."
   }
 ];
 
@@ -229,7 +211,6 @@ let riddleSession = {
   activeRiddle: null
 };
 
-// DYNAMIC AI FACT CONTROLLER
 let isFactLoading = false;
 
 window.cycleFunFact = async function(manualClick = false) {
@@ -281,7 +262,6 @@ window.cycleFunFact = async function(manualClick = false) {
   }
 };
 
-// PROFILE MODIFIER PRE-POPULATION
 window.openProfileModifier = function() {
   const s = window.currentStudent;
 
@@ -314,7 +294,6 @@ window.handleProfilerBackButton = function() {
   }
 };
 
-// AUTH & PROFILER CONTROLLERS
 window.submitSignIn = async function() {
   const emailInput = document.getElementById('signin-email');
   const email = emailInput ? emailInput.value.trim() : "";
@@ -366,7 +345,6 @@ window.submitSignIn = async function() {
   showAuthStep('profiler');
 };
 
-// GEMINI PROFILER SYNTHESIS
 window.submitProfilerForm = async function() {
   const btn = document.getElementById('btn-submit-ai-profiler');
   if (btn) {
@@ -425,6 +403,7 @@ window.submitProfilerForm = async function() {
       normalizedPhases = fallback.phases;
     }
 
+    // STRICT BASELINE: Unstarted course starts with 0% Backlog, 0% Readiness, 0% Pace
     window.currentStudent = {
       email: payload.email,
       name: payload.name,
@@ -435,7 +414,7 @@ window.submitProfilerForm = async function() {
       github: payload.github,
       readiness: 0,
       curriculum_mastery: 0,
-      concept_deficits: 100,
+      concept_deficits: 0, // Set explicitly to 0%
       target_pace: 0,
       radar: aiData.radar || fallback.radar,
       phases: normalizedPhases,
@@ -455,7 +434,7 @@ window.submitProfilerForm = async function() {
     enterDashboard();
     cycleFunFact(true);
   } catch (err) {
-    console.warn("Using comprehensive fallback curriculum:", err.message);
+    console.warn("Using fallback curriculum:", err.message);
     window.currentStudent = {
       email: payload.email,
       name: payload.name,
@@ -466,7 +445,7 @@ window.submitProfilerForm = async function() {
       github: payload.github,
       readiness: 0,
       curriculum_mastery: 0,
-      concept_deficits: 100,
+      concept_deficits: 0, // Set explicitly to 0%
       target_pace: 0,
       radar: fallback.radar,
       phases: fallback.phases,
@@ -487,7 +466,6 @@ window.submitProfilerForm = async function() {
   }
 };
 
-// MODAL CONTROLLERS
 window.openModal = function(id) {
   const el = document.getElementById(id);
   if (el) el.style.display = 'flex';
@@ -531,7 +509,6 @@ window.handleLogout = function() {
   showAuthGateway();
 };
 
-// APP LIFECYCLE
 window.addEventListener('DOMContentLoaded', () => {
   const savedTheme = localStorage.getItem('alignx_accent') || 'purple';
   setAccentTheme(savedTheme);
@@ -600,7 +577,7 @@ function enterDashboard() {
   updateDashboardUI();
 }
 
-// METRICS RECALCULATION (Tracks Active Backlogs cleanly)
+// METRICS RECALCULATION (Backlog initialized to 0% when unstarted)
 function recalculateMetrics() {
   if (!window.currentStudent) return;
   let total = 0, completed = 0;
@@ -616,7 +593,14 @@ function recalculateMetrics() {
   const mastery = Math.round(completionRatio * 100);
 
   window.currentStudent.curriculum_mastery = mastery;
-  window.currentStudent.concept_deficits = Math.max(0, 100 - mastery);
+  
+  // Backlog is 0% when unstarted, scaling proportionally once started
+  if (completed === 0) {
+    window.currentStudent.concept_deficits = 0;
+  } else {
+    window.currentStudent.concept_deficits = Math.max(0, 100 - mastery);
+  }
+
   window.currentStudent.readiness = Math.round(completionRatio * 100);
 
   const quizFactor = Math.min(25, (mcqSession.correct || 0) * 5);
@@ -643,6 +627,7 @@ function updateDashboardUI() {
   const backlogsCount = totalMilestones - completedMilestones;
 
   const roleEl = document.getElementById('nav-current-role');
+  const ghEl = document.getElementById('nav-github-label');
   const uNameEl = document.getElementById('nav-user-name');
   const dNameEl = document.getElementById('drawer-user-name');
   const termEl = document.getElementById('nav-academic-term');
@@ -650,11 +635,20 @@ function updateDashboardUI() {
   const backlogBadge = document.getElementById('sidebar-backlog-badge');
 
   if (roleEl) roleEl.textContent = s.career_goal || 'Goal Unset';
+  
+  // RESTORED GITHUB USERNAME IN NAVBAR & SCANNER
+  const ghUsername = s.github ? `@${s.github}` : '@student';
+  if (ghEl) ghEl.textContent = ghUsername;
+  const scanInput = document.getElementById('in-github-scan');
+  if (scanInput && !scanInput.value && s.github) {
+    scanInput.value = s.github;
+  }
+
   if (uNameEl) uNameEl.textContent = s.name || 'Student Scholar';
   if (dNameEl) dNameEl.textContent = s.name || 'Student Scholar';
   if (termEl) termEl.textContent = s.academic_level || 'Education Profile';
   if (goalEl) goalEl.textContent = s.career_goal || 'Target Goal';
-  if (backlogBadge) backlogBadge.textContent = `${backlogsCount} Left`;
+  if (backlogBadge) backlogBadge.textContent = `${completedMilestones === 0 ? 0 : backlogsCount} Pending`;
 
   const initials = (s.name || 'ST').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   const initEl = document.getElementById('nav-avatar-initials');
@@ -666,9 +660,10 @@ function updateDashboardUI() {
   document.getElementById('meter-current-val').innerHTML = `${s.curriculum_mastery}% <span class="text-xs font-normal theme-text-sub">/100%</span>`;
   document.getElementById('meter-current-sub').textContent = `${completedMilestones} of ${totalMilestones} verified`;
 
-  // Dial 2: Active Backlogs
-  document.getElementById('meter-gap-val').innerHTML = `${s.concept_deficits}% <span class="text-xs font-normal theme-text-sub">backlogs</span>`;
-  document.getElementById('meter-gap-sub').textContent = `${backlogsCount} syllabus items pending`;
+  // Dial 2: Active Backlogs (0% When unstarted)
+  const backlogDisplay = s.concept_deficits !== undefined ? s.concept_deficits : 0;
+  document.getElementById('meter-gap-val').innerHTML = `${backlogDisplay}% <span class="text-xs font-normal theme-text-sub">backlogs</span>`;
+  document.getElementById('meter-gap-sub').textContent = completedMilestones === 0 ? 'Course unstarted' : `${backlogsCount} topics pending`;
 
   // Dial 3: Career Readiness
   document.getElementById('meter-readiness-val').innerHTML = `${s.readiness}% <span class="text-xs font-normal theme-text-sub">score</span>`;
@@ -679,12 +674,12 @@ function updateDashboardUI() {
   document.getElementById('meter-time-sub').textContent = s.target_pace === 0 ? 'Sprint unstarted' : 'Active velocity';
 
   document.getElementById('label-ring-1').textContent = `${s.curriculum_mastery}%`;
-  document.getElementById('label-ring-2').textContent = `${s.concept_deficits}%`;
+  document.getElementById('label-ring-2').textContent = `${backlogDisplay}%`;
   document.getElementById('label-ring-3').textContent = `${s.readiness}%`;
   document.getElementById('label-ring-4').textContent = `${s.target_pace}%`;
 
   updateRadialMeter('dial-ring-1', s.curriculum_mastery);
-  updateRadialMeter('dial-ring-2', s.concept_deficits);
+  updateRadialMeter('dial-ring-2', backlogDisplay);
   updateRadialMeter('dial-ring-3', s.readiness);
   updateRadialMeter('dial-ring-4', s.target_pace);
 
@@ -710,7 +705,6 @@ function updateRadialMeter(circleId, percentage) {
   circle.style.strokeDashoffset = circumference - (clamped / 100) * circumference;
 }
 
-// RENDER ALL PHASES INTO DROPDOWN MENU
 function renderDynamicPhasesDropdown() {
   const menuWeeks = document.getElementById('menu-weeks');
   if (!menuWeeks || !window.currentStudent) return;
@@ -730,7 +724,6 @@ function renderDynamicPhasesDropdown() {
   menuWeeks.innerHTML = html;
 }
 
-// STUDY PLAN MODULES
 window.changeStudyPlanPhase = function(phaseIdx) {
   activePhaseIdx = phaseIdx;
   const lbl = document.getElementById('active-week-label');
@@ -780,7 +773,6 @@ function renderStudyPlanModules() {
   });
 }
 
-// ROADMAP MODAL
 function renderRoadmapModal() {
   const container = document.getElementById('roadmap-phases-container');
   if (!container || !window.currentStudent) return;
@@ -822,7 +814,6 @@ function renderRoadmapModal() {
   });
 }
 
-// MILESTONE TOGGLE
 async function toggleMilestoneState(mId) {
   (window.currentStudent.phases || []).forEach(phase => {
     (phase.milestones || []).forEach(m => {
@@ -849,7 +840,6 @@ async function toggleMilestoneState(mId) {
   updateDashboardUI();
 }
 
-// RADAR MATRIX VISUALIZER
 function renderRadar() {
   const canvas = document.getElementById('competency-radar-canvas');
   if (!canvas || !window.currentStudent) return;
@@ -892,7 +882,6 @@ function renderRadar() {
     ctx.fillText(cats[i], cx + (radius + 24) * Math.cos(a), cy + (radius + 12) * Math.sin(a));
   }
 
-  // Benchmark
   ctx.beginPath();
   for (let i = 0; i < n; i++) {
     const a = (Math.PI * 2 / n) * i - Math.PI / 2;
@@ -907,7 +896,6 @@ function renderRadar() {
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // Candidate
   ctx.beginPath();
   for (let i = 0; i < n; i++) {
     const a = (Math.PI * 2 / n) * i - Math.PI / 2;
@@ -928,7 +916,6 @@ function renderRadar() {
   ctx.fill();
 }
 
-// AI TUTOR HANDLER (Strict Out-of-Context Protection)
 window.handleTutorSend = async function(e) {
   if (e && e.preventDefault) e.preventDefault();
   const inEl = document.getElementById('tutor-input');
@@ -996,7 +983,6 @@ window.handleTutorSend = async function(e) {
   box.scrollTop = box.scrollHeight;
 };
 
-// NOTES GENERATOR
 function generateMilestoneSpecificReadingGuide(title, desc, goal) {
   return {
     theory: `Detailed breakdown of underlying principles, authoritative standards, and structural equations for "${title}".`,
@@ -1072,7 +1058,7 @@ window.openNotesModal = function() {
   openModal('modal-notes');
 };
 
-// ACTIVE BACKLOGS MANAGER MODAL (Formerly Gap Analyzer)
+// ACTIVE BACKLOGS MANAGER MODAL
 window.openGapModal = function() {
   const s = window.currentStudent;
   const container = document.getElementById('gap-analysis-container');
@@ -1080,7 +1066,7 @@ window.openGapModal = function() {
 
   const goal = s.career_goal || 'Selected Target Goal';
   const background = s.current_knowledge || 'Educational Baseline';
-  const deficitsPercentage = s.concept_deficits !== undefined ? s.concept_deficits : 100;
+  const deficitsPercentage = s.concept_deficits !== undefined ? s.concept_deficits : 0;
 
   const gapMilestones = [];
   (s.phases || []).forEach((p, pIdx) => {
@@ -1155,7 +1141,6 @@ window.bridgeGap = function(milestoneId) {
   setTimeout(openGapModal, 100);
 };
 
-// ENDLESS RIDDLES STUDIO (Option Randomization across A, B, and C)
 window.startEndlessRiddleSession = function() {
   riddleSession = {
     currentIdx: Math.floor(Math.random() * endlessRiddlesBank.length),
@@ -1172,7 +1157,6 @@ function renderCurrentRiddle() {
   riddleSession.answered = false;
   const rawRiddle = endlessRiddlesBank[riddleSession.currentIdx % endlessRiddlesBank.length];
 
-  // Randomize the riddle options so the answer is NOT always A or B
   const { shuffledOptions, newCorrectIdx } = shuffleOptionsAndFixAnswer(rawRiddle.options, rawRiddle.correct);
 
   riddleSession.activeRiddle = {
@@ -1229,7 +1213,7 @@ function handleRiddleChoice(chosenIdx, riddle) {
     if (isCorrect) {
       riddleSession.score += 10;
       document.getElementById('riddle-score').textContent = riddleSession.score;
-      fb.className = "p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-medium";
+      fb.className = "p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-medium";
       fb.innerHTML = `<strong>✓ Spot On!</strong> ${escapeHtml(riddle.explanation)}`;
 
       if (window.currentStudent) {
@@ -1237,7 +1221,7 @@ function handleRiddleChoice(chosenIdx, riddle) {
         updateDashboardUI();
       }
     } else {
-      fb.className = "p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-medium";
+      fb.className = "p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-medium";
       fb.innerHTML = `<strong>✕ Not quite!</strong> ${escapeHtml(riddle.explanation)}`;
     }
   }
@@ -1250,9 +1234,6 @@ window.nextRiddle = function() {
   renderCurrentRiddle();
 };
 
-// ==========================================================
-// GOAL-SPECIFIC ENDLESS AI MCQ STUDIO (With Shuffled Options)
-// ==========================================
 window.startEndlessMCQSession = function(mode = 'general') {
   currentMCQMode = mode;
   mcqSession = { total: 0, correct: 0, wrong: 0, answeredCurrent: false, incorrectReview: [], activeQuestion: null };
@@ -1319,7 +1300,6 @@ window.generateNextMCQ = async function() {
     const aiMCQ = await res.json();
     if (aiMCQ.error || !aiMCQ.options) throw new Error(aiMCQ.error || 'Malformed question');
 
-    // RANDOMIZE OPTIONS & CORRECT INDEX SO ANSWER IS NOT ALWAYS OPTION A
     const { shuffledOptions, newCorrectIdx } = shuffleOptionsAndFixAnswer(aiMCQ.options, aiMCQ.correct !== undefined ? aiMCQ.correct : 0);
 
     mcqSession.activeQuestion = {
@@ -1330,8 +1310,18 @@ window.generateNextMCQ = async function() {
 
     renderMCQQuestion(mcqSession.activeQuestion);
   } catch (err) {
-    console.warn("AI MCQ synthesis fallback engaged:", err.message);
-    const fallbackQuestion = generateOfflineGoalMCQ(goal, currentTopic, mcqSession.total);
+    console.warn("AI MCQ fallback engaged:", err.message);
+    const fallbackQuestion = {
+      q: `For a specialist in ${goal}, which core principle is critical when mastering ${currentTopic}?`,
+      topic: currentTopic,
+      options: [
+        `Systematically identify underlying dependencies, reduce variance, and document edge cases.`,
+        `Bypass baseline testing protocols to deploy directly to production.`,
+        `Rely exclusively on subjective intuition rather than verified performance telemetry.`
+      ],
+      correct: 0,
+      explanation: `Disciplined execution in ${goal} requires verifying constraints, measuring baseline performance, and documenting edge scenarios.`
+    };
     
     const { shuffledOptions, newCorrectIdx } = shuffleOptionsAndFixAnswer(fallbackQuestion.options, fallbackQuestion.correct);
     
@@ -1365,61 +1355,6 @@ function renderMCQQuestion(qObj) {
   });
 }
 
-function generateOfflineGoalMCQ(goal, topic, count) {
-  const g = (goal || '').toLowerCase();
-  
-  if (g.includes('cardio') || g.includes('medic') || g.includes('doctor')) {
-    const bank = [
-      {
-        q: "Which ion channel conductance phase of the cardiac myocyte action potential is responsible for the rapid, transient Phase 1 repolarization?",
-        topic: "Cardiac Electrophysiology",
-        options: [
-          "Inactivation of fast inward Na+ channels with transient outward K+ (I_to) activation.",
-          "Opening of L-type Ca2+ slow inward channels.",
-          "Delayed rectifier K+ (I_Kr) repolarizing outflow."
-        ],
-        correct: 0,
-        explanation: "Phase 1 repolarization is driven by the rapid inactivation of Phase 0 fast Na+ channels combined with the activation of transient outward K+ currents (I_to)."
-      },
-      {
-        q: "In Wiggers pressure-volume loops, acute aortic valve regurgitation causes which primary hemodynamic variation?",
-        topic: "Hemodynamics & Valvular Mechanics",
-        options: [
-          "Widened pulse pressure with steep diastolic runoff into the left ventricle, eliminating true isovolumetric relaxation.",
-          "Isolated elevation of peak systolic aortic pressure without changes in end-diastolic volume.",
-          "Premature closure of the tricuspid valve during early isovolumetric contraction."
-        ],
-        correct: 0,
-        explanation: "Aortic regurgitation leaks blood retrograde from the aorta into the left ventricle during diastole, widening pulse pressure and preventing a true isovolumetric relaxation phase."
-      },
-      {
-        q: "In 12-Lead ECG interpretation, persistent ST-segment elevation in leads V1-V4 indicates infarction of which anatomical territory?",
-        topic: "Clinical ECG Interpretation",
-        options: [
-          "Anteroseptal myocardial infarction (Left Anterior Descending Artery).",
-          "Inferior wall myocardial infarction (Right Coronary Artery).",
-          "Posterior wall infarction (Left Circumflex Artery)."
-        ],
-        correct: 0,
-        explanation: "Leads V1-V4 look directly at the anterior and septal walls of the left ventricle, perfused by the Left Anterior Descending (LAD) coronary artery."
-      }
-    ];
-    return bank[count % bank.length];
-  }
-
-  return {
-    q: `For a specialist in ${goal}, which core principle is critical when executing ${topic}?`,
-    topic: topic,
-    options: [
-      `Systematically identify underlying dependencies, reduce variance, and document edge cases.`,
-      `Bypass baseline testing protocols to deploy directly to production.`,
-      `Rely exclusively on subjective intuition rather than verified performance telemetry.`
-    ],
-    correct: 0,
-    explanation: `Disciplined execution in ${goal} requires verifying constraints, measuring baseline performance, and documenting edge scenarios.`
-  };
-}
-
 function handleMCQChoice(selectedIdx, qObj) {
   if (mcqSession.answeredCurrent) return;
   mcqSession.answeredCurrent = true;
@@ -1445,7 +1380,7 @@ function handleMCQChoice(selectedIdx, qObj) {
     if (isCorrect) {
       mcqSession.correct++;
       document.getElementById('mcq-correct-counter').textContent = mcqSession.correct;
-      fb.className = "p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-medium";
+      fb.className = "p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-medium";
       fb.innerHTML = `<strong>✓ Correct!</strong> ${escapeHtml(qObj.explanation)}`;
       
       if (window.currentStudent) {
@@ -1455,7 +1390,7 @@ function handleMCQChoice(selectedIdx, qObj) {
     } else {
       mcqSession.wrong++;
       document.getElementById('mcq-wrong-counter').textContent = mcqSession.wrong;
-      fb.className = "p-3 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs font-medium";
+      fb.className = "p-3.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs font-medium";
       fb.innerHTML = `<strong>✕ Incorrect.</strong> You picked ${String.fromCharCode(65 + selectedIdx)}.<br><br><strong>Key Concept:</strong> ${escapeHtml(qObj.explanation)}`;
       mcqSession.incorrectReview.push({
         question: qObj.q,
@@ -1495,6 +1430,50 @@ window.finishMCQSession = function() {
   openModal('modal-scorecard');
 };
 
+// FULL GITHUB TELEMETRY SCANNER
+window.fetchGitHubRepos = async function() {
+  const u = (document.getElementById('in-github-scan').value || window.currentStudent?.github || '').trim();
+  const c = document.getElementById('github-repos-container');
+  if (!u) {
+    if (c) c.innerHTML = '<div class="p-3 text-rose-400">Please enter a GitHub username to scan.</div>';
+    return;
+  }
+
+  if (c) c.innerHTML = '<div class="p-3 theme-text-sub">Querying GitHub API...</div>';
+  try {
+    const res = await fetch(`https://api.github.com/users/${u}/repos?sort=updated&per_page=6`);
+    const data = await res.json();
+
+    if (!Array.isArray(data)) {
+      if (c) c.innerHTML = `<div class="p-3 text-rose-500">User @${escapeHtml(u)} not found or rate limited.</div>`;
+      return;
+    }
+
+    if (c) {
+      c.innerHTML = data.map(r => `
+        <a href="${r.html_url}" target="_blank" rel="noopener noreferrer" class="p-3 rounded-xl theme-card-inner hover:border-purple-400 transition flex justify-between items-center text-xs group block">
+          <div class="flex items-center gap-2">
+            <span class="text-base group-hover:scale-110 transition">📦</span>
+            <div>
+              <div class="font-bold theme-text-title group-hover:text-purple-500 transition flex items-center gap-1.5">
+                <span>${escapeHtml(r.name)}</span>
+                <svg class="w-3 h-3 theme-text-sub" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              </div>
+              <div class="text-[10px] theme-text-sub truncate max-w-[240px]">${escapeHtml(r.description || 'Public repository')}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <span class="dynamic-accent-text font-mono text-[10px] font-bold">${escapeHtml(r.language || 'Code')}</span>
+            <span class="text-[10px] text-amber-500">★ ${r.stargazers_count}</span>
+          </div>
+        </a>
+      `).join('');
+    }
+  } catch(e) {
+    if (c) c.innerHTML = '<div class="text-rose-500 p-3">Error connecting to GitHub API.</div>';
+  }
+};
+
 function initPointerGlow() {
   const canvas = document.getElementById('glow-spotlight-canvas');
   if (!canvas) return;
@@ -1521,7 +1500,6 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
-// THEME SWITCHER
 window.setAccentTheme = function(themeName) {
   document.documentElement.setAttribute('data-theme', themeName);
   localStorage.setItem('alignx_accent', themeName);
