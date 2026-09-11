@@ -21,10 +21,17 @@
   <!-- ======================================================== -->
   <main id="auth-view" class="relative z-40 w-full max-w-lg my-auto px-4 py-8 flex flex-col items-center">
     
+    <!-- Branding Header with Custom Logo -->
     <div class="text-center mb-6 space-y-2">
-      <div class="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 items-center justify-center font-black text-white text-xl shadow-lg shadow-purple-500/20">✕</div>
+      <div class="inline-flex w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-fuchsia-500 items-center justify-center p-2.5 shadow-xl shadow-purple-500/25 border border-white/20">
+        <svg class="w-full h-full text-white" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+          <path d="M12 12L36 36M36 12L12 36" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="24" cy="24" r="5" fill="currentColor"/>
+          <path d="M4 24H12M36 24H44M24 4V12M24 36V44" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 2"/>
+        </svg>
+      </div>
       <h1 class="text-2xl font-extrabold theme-text-title tracking-tight">Align-X Academy</h1>
-      <p class="text-xs theme-text-sub max-w-xs">Adaptive academic career architecture for students from any educational background.</p>
+      <p class="text-xs theme-text-sub max-w-xs">Adaptive academic career architecture for candidates from any educational background.</p>
     </div>
 
     <div class="w-full study-card rounded-3xl p-6 shadow-2xl space-y-5">
@@ -105,7 +112,7 @@
           </div>
         </div>
 
-        <button type="button" id="btn-submit-ai-profiler" onclick="submitProfilerForm()" class="btn-brand w-full py-3 rounded-xl font-bold text-xs shadow-md cursor-pointer flex items-center justify-center gap-2">
+        <button type="submit" id="btn-submit-ai-profiler" onclick="submitProfilerForm()" class="btn-brand w-full py-3 rounded-xl font-bold text-xs shadow-md cursor-pointer flex items-center justify-center gap-2">
           <span>✨ Synthesize Custom Architecture via Gemini →</span>
         </button>
       </div>
@@ -140,9 +147,16 @@
           <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </button>
 
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center font-black text-white text-sm shadow-md">✕</div>
-          <span class="text-sm font-extrabold tracking-tight theme-text-title hidden sm:inline">Align-X</span>
+        <!-- New Vector Icon Logo -->
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-fuchsia-500 flex items-center justify-center p-1.5 shadow-md shadow-purple-500/20 border border-white/20">
+            <svg class="w-full h-full text-white" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+              <path d="M12 12L36 36M36 12L12 36" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="24" cy="24" r="5" fill="currentColor"/>
+              <path d="M4 24H12M36 24H44M24 4V12M24 36V44" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 2"/>
+            </svg>
+          </div>
+          <span class="text-sm font-black tracking-tight theme-text-title hidden sm:inline">Align-X</span>
         </div>
 
         <div class="relative pl-2" id="dropdown-track-wrapper">
@@ -238,13 +252,13 @@
       <button type="button" onclick="cycleFunFact()" class="shrink-0 text-xs px-3 py-1.5 rounded-lg border border-white/10 theme-text-title font-mono hover:bg-white/5 transition cursor-pointer">↻ Next Fact</button>
     </section>
 
-    <!-- 4 Telemetry Dials -->
+    <!-- 4 Telemetry Dials: Dynamic Readiness & Dynamic Sprint Pace -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
       <div class="study-card p-5 rounded-2xl flex items-center justify-between">
         <div>
           <div class="text-[10px] font-mono theme-text-sub font-bold mb-1">CURRICULUM MASTERY</div>
           <div class="text-3xl font-extrabold font-mono theme-text-title" id="meter-current-val">0% <span class="text-xs font-normal theme-text-sub">/100%</span></div>
-          <div class="text-[11px] theme-text-sub mt-1">Verified competencies</div>
+          <div class="text-[11px] theme-text-sub mt-1" id="meter-current-sub">0 of 0 verified</div>
         </div>
         <div class="relative w-14 h-14 flex items-center justify-center">
           <svg class="w-14 h-14 transform -rotate-90" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" stroke="var(--meter-bg-track)" stroke-width="5" fill="none"/><circle id="dial-ring-1" cx="32" cy="32" r="26" stroke="var(--accent-main)" stroke-width="5" fill="none" stroke-dasharray="163.36" stroke-dashoffset="163.36"/></svg>
@@ -252,7 +266,6 @@
         </div>
       </div>
 
-      <!-- Clicking CONCEPT DEFICITS opens the Gap Analyzer -->
       <div onclick="openGapModal()" class="study-card p-5 rounded-2xl flex items-center justify-between cursor-pointer hover:border-red-500/50 transition">
         <div>
           <div class="text-[10px] font-mono text-red-500 font-bold mb-1 flex items-center gap-1.5">
@@ -260,7 +273,7 @@
             <span class="underline text-[9px] font-normal text-red-400">Inspect Gap →</span>
           </div>
           <div class="text-3xl font-extrabold font-mono text-red-500" id="meter-gap-val">100% <span class="text-xs font-normal theme-text-sub">untested</span></div>
-          <div class="text-[11px] theme-text-sub mt-1">Syllabus topics left</div>
+          <div class="text-[11px] theme-text-sub mt-1" id="meter-gap-sub">All topics remaining</div>
         </div>
         <div class="relative w-14 h-14 flex items-center justify-center">
           <svg class="w-14 h-14 transform -rotate-90" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" stroke="var(--meter-bg-track)" stroke-width="5" fill="none"/><circle id="dial-ring-2" cx="32" cy="32" r="26" stroke="#EF4444" stroke-width="5" fill="none" stroke-dasharray="163.36" stroke-dashoffset="0"/></svg>
@@ -268,27 +281,29 @@
         </div>
       </div>
 
+      <!-- Career Readiness: Starts strictly at 0% when unstarted -->
       <div class="study-card p-5 rounded-2xl flex items-center justify-between">
         <div>
           <div class="text-[10px] font-mono theme-text-sub font-bold mb-1">CAREER READINESS</div>
-          <div class="text-3xl font-extrabold font-mono theme-text-title" id="meter-readiness-val">25% <span class="text-xs font-normal theme-text-sub">score</span></div>
-          <div class="text-[11px] theme-text-sub mt-1">Hiring benchmark</div>
+          <div class="text-3xl font-extrabold font-mono theme-text-title" id="meter-readiness-val">0% <span class="text-xs font-normal theme-text-sub">score</span></div>
+          <div class="text-[11px] theme-text-sub mt-1" id="meter-readiness-sub">Hiring benchmark</div>
         </div>
         <div class="relative w-14 h-14 flex items-center justify-center">
-          <svg class="w-14 h-14 transform -rotate-90" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" stroke="var(--meter-bg-track)" stroke-width="5" fill="none"/><circle id="dial-ring-3" cx="32" cy="32" r="26" stroke="var(--accent-main)" stroke-width="5" fill="none" stroke-dasharray="163.36" stroke-dashoffset="122.52"/></svg>
-          <span class="absolute text-[10px] font-mono font-bold dynamic-accent-text" id="label-ring-3">25%</span>
+          <svg class="w-14 h-14 transform -rotate-90" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" stroke="var(--meter-bg-track)" stroke-width="5" fill="none"/><circle id="dial-ring-3" cx="32" cy="32" r="26" stroke="var(--accent-main)" stroke-width="5" fill="none" stroke-dasharray="163.36" stroke-dashoffset="163.36"/></svg>
+          <span class="absolute text-[10px] font-mono font-bold dynamic-accent-text" id="label-ring-3">0%</span>
         </div>
       </div>
 
+      <!-- Study Sprint Pace: Dynamic velocity score that adapts with user progress -->
       <div class="study-card p-5 rounded-2xl flex items-center justify-between">
         <div>
           <div class="text-[10px] font-mono theme-text-sub font-bold mb-1">STUDY SPRINT PACE</div>
-          <div class="text-3xl font-extrabold font-mono theme-text-title" id="meter-time-val">75% <span class="text-xs font-normal theme-text-sub">pace</span></div>
-          <div class="text-[11px] theme-text-sub mt-1">Target timeline pace</div>
+          <div class="text-3xl font-extrabold font-mono theme-text-title" id="meter-time-val">0% <span class="text-xs font-normal theme-text-sub">pace</span></div>
+          <div class="text-[11px] theme-text-sub mt-1" id="meter-time-sub">Sprint inactive</div>
         </div>
         <div class="relative w-14 h-14 flex items-center justify-center">
-          <svg class="w-14 h-14 transform -rotate-90" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" stroke="var(--meter-bg-track)" stroke-width="5" fill="none"/><circle id="dial-ring-4" cx="32" cy="32" r="26" stroke="var(--accent-main)" stroke-width="5" fill="none" stroke-dasharray="163.36" stroke-dashoffset="40.84"/></svg>
-          <span class="absolute text-[10px] font-mono font-bold dynamic-accent-text" id="label-ring-4">75%</span>
+          <svg class="w-14 h-14 transform -rotate-90" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" stroke="var(--meter-bg-track)" stroke-width="5" fill="none"/><circle id="dial-ring-4" cx="32" cy="32" r="26" stroke="var(--accent-main)" stroke-width="5" fill="none" stroke-dasharray="163.36" stroke-dashoffset="163.36"/></svg>
+          <span class="absolute text-[10px] font-mono font-bold dynamic-accent-text" id="label-ring-4">0%</span>
         </div>
       </div>
     </section>
@@ -340,6 +355,7 @@
               <span class="text-xs font-bold tracking-wide">Start Learning</span>
             </div>
 
+            <!-- Tailored Endless MCQ Studio Button -->
             <div onclick="startEndlessMCQSession()" class="action-card action-card-purple">
               <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -381,7 +397,7 @@
             <div id="xp-progress-bar" class="bg-gradient-to-r from-[var(--accent-main)] to-amber-500 h-full transition-all duration-500" style="width: 0%;"></div>
           </div>
           <div class="flex items-center justify-between text-[11px] theme-text-sub pt-0.5">
-            <span>Solve quizzes or complete roadmap modules to earn XP</span>
+            <span>Solve endless quizzes or complete roadmap modules to earn XP</span>
             <button type="button" onclick="openModal('modal-achievements')" class="text-amber-500 underline font-bold cursor-pointer">Achievements</button>
           </div>
         </div>
@@ -403,12 +419,18 @@
     <span>AI Tutor</span>
   </button>
 
-  <!-- Navigation Drawer with Career Gap Deficits Item -->
+  <!-- Navigation Drawer -->
   <aside id="nav-drawer" class="fixed inset-y-0 left-0 w-80 max-w-[85vw] dropdown-menu-pane border-r backdrop-blur-2xl z-[120] transform -translate-x-full transition-transform duration-300 flex flex-col justify-between p-6 shadow-2xl">
     <div class="space-y-6">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
         <div class="flex items-center gap-2.5">
-          <div class="w-8 h-8 rounded-xl bg-purple-600 text-white flex items-center justify-center font-bold text-base">🎓</div>
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-fuchsia-500 flex items-center justify-center p-1.5 shadow-md shadow-purple-500/20 border border-white/20">
+            <svg class="w-full h-full text-white" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+              <path d="M12 12L36 36M36 12L12 36" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="24" cy="24" r="5" fill="currentColor"/>
+              <path d="M4 24H12M36 24H44M24 4V12M24 36V44" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 2"/>
+            </svg>
+          </div>
           <span class="font-extrabold text-sm theme-text-title">Align-X Menu</span>
         </div>
         <button type="button" onclick="toggleNavSidebar()" class="theme-text-sub hover:text-white p-1 text-sm cursor-pointer">✕</button>
@@ -425,7 +447,6 @@
           <span class="text-[10px] font-mono dynamic-accent-text font-bold">Phased</span>
         </button>
 
-        <!-- NEW: Career Gap & Deficits Analyzer in Sidebar -->
         <button type="button" onclick="openGapModal(); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 hover:bg-rose-500/20 transition cursor-pointer">
           <span class="flex items-center gap-2.5"><span>⚠️</span> <span>Career Gap & Deficits Analyzer</span></span>
           <span class="text-[10px] font-mono text-rose-400 font-bold">Actionable</span>
@@ -463,7 +484,7 @@
   <!-- MODALS                                                   -->
   <!-- ======================================================== -->
 
-  <!-- NEW MODAL: Career Gap & Deficits Analyzer -->
+  <!-- Career Gap & Deficits Modal -->
   <div id="modal-gaps" style="display: none;" class="fixed inset-0 z-[150] bg-black/80 backdrop-blur-md items-center justify-center p-4">
     <div class="study-card rounded-3xl max-w-3xl w-full p-6 md:p-8 space-y-5 shadow-2xl max-h-[85vh] flex flex-col">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
@@ -475,26 +496,11 @@
         </div>
         <button type="button" onclick="closeModal('modal-gaps')" class="theme-text-sub hover:text-white cursor-pointer">✕</button>
       </div>
-
       <div class="flex-1 overflow-y-auto space-y-4 pr-1" id="gap-analysis-container"></div>
     </div>
   </div>
 
-  <div id="modal-capabilities" style="display: none;" class="fixed inset-0 z-[150] bg-black/80 backdrop-blur-md items-center justify-center p-4">
-    <div class="study-card rounded-3xl max-w-2xl w-full p-6 space-y-4 shadow-2xl">
-      <div class="flex items-center justify-between pb-3 border-b border-white/10">
-        <div>
-          <h3 class="text-sm font-bold theme-text-title flex items-center gap-2"><span>🎯</span> <span>Student Capabilities & Domain Matrix</span></h3>
-          <p class="text-xs theme-text-sub">Conceptual depth across Core Domains (Student vs Benchmark)</p>
-        </div>
-        <button type="button" onclick="closeModal('modal-capabilities')" class="theme-text-sub hover:text-white cursor-pointer">✕</button>
-      </div>
-      <div class="relative w-full h-[320px] flex items-center justify-center">
-        <canvas id="competency-radar-canvas" width="420" height="300"></canvas>
-      </div>
-    </div>
-  </div>
-
+  <!-- Phased Roadmap Modal -->
   <div id="modal-roadmap" style="display: none;" class="fixed inset-0 z-[150] bg-black/80 backdrop-blur-md items-center justify-center p-4">
     <div class="study-card rounded-3xl max-w-3xl w-full p-6 md:p-8 space-y-5 shadow-2xl max-h-[85vh] flex flex-col">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
@@ -508,6 +514,7 @@
     </div>
   </div>
 
+  <!-- Endless MCQ Studio Modal (Goal Specific) -->
   <div id="modal-mcq" style="display: none;" class="fixed inset-0 z-[150] bg-black/80 backdrop-blur-md items-center justify-center p-4">
     <div class="study-card rounded-3xl max-w-2xl w-full p-6 space-y-5 shadow-2xl relative">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
@@ -515,9 +522,9 @@
           <div class="flex items-center gap-2">
             <span class="text-base">📝</span>
             <h3 class="text-sm font-bold theme-text-title">Endless Adaptive MCQ Studio</h3>
-            <span id="mcq-badge-track" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded theme-card-inner dynamic-accent-text">Target Track</span>
+            <span id="mcq-badge-track" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded theme-card-inner dynamic-accent-text">Target Goal</span>
           </div>
-          <p class="text-xs theme-text-sub mt-0.5">Continuous challenges adapted to your syllabus</p>
+          <p class="text-xs theme-text-sub mt-0.5" id="mcq-subtext">Continuous AI challenge generator adapted to your specific field</p>
         </div>
         <div class="flex items-center gap-3 font-mono text-xs font-bold">
           <div class="text-emerald-500">✓ <span id="mcq-correct-counter">0</span></div>
@@ -537,6 +544,21 @@
           <button type="button" onclick="finishMCQSession()" class="px-3.5 py-1.5 rounded-xl border border-white/10 theme-text-sub hover:text-white text-xs font-semibold cursor-pointer">Finish & Review</button>
           <button type="button" id="btn-next-mcq" onclick="generateNextMCQ()" class="btn-brand px-5 py-2 rounded-xl text-xs font-bold cursor-pointer" style="display: none;">Next Challenge →</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-capabilities" style="display: none;" class="fixed inset-0 z-[150] bg-black/80 backdrop-blur-md items-center justify-center p-4">
+    <div class="study-card rounded-3xl max-w-2xl w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between pb-3 border-b border-white/10">
+        <div>
+          <h3 class="text-sm font-bold theme-text-title flex items-center gap-2"><span>🎯</span> <span>Student Capabilities & Domain Matrix</span></h3>
+          <p class="text-xs theme-text-sub">Conceptual depth across Core Domains (Student vs Benchmark)</p>
+        </div>
+        <button type="button" onclick="closeModal('modal-capabilities')" class="theme-text-sub hover:text-white cursor-pointer">✕</button>
+      </div>
+      <div class="relative w-full h-[320px] flex items-center justify-center">
+        <canvas id="competency-radar-canvas" width="420" height="300"></canvas>
       </div>
     </div>
   </div>
@@ -569,7 +591,7 @@
         <button type="button" onclick="closeModal('modal-github')" class="theme-text-sub hover:text-white cursor-pointer">✕</button>
       </div>
       <div class="flex gap-2">
-        <input type="text" id="in-github-scan" placeholder="GitHub username" value="adityarp2008" class="flex-1 theme-card-inner rounded-xl px-3 py-2 text-xs theme-text-title font-mono focus:outline-none">
+        <input type="text" id="in-github-scan" placeholder="GitHub username" value="" class="flex-1 theme-card-inner rounded-xl px-3 py-2 text-xs theme-text-title font-mono focus:outline-none">
         <button type="button" onclick="fetchGitHubRepos()" class="btn-brand px-4 py-2 rounded-xl text-xs font-bold cursor-pointer">Scan</button>
       </div>
       <div id="github-repos-container" class="max-h-64 overflow-y-auto space-y-2 text-xs pr-1"></div>
@@ -620,15 +642,23 @@
   <!-- AI Tutor Drawer -->
   <div id="drawer-ai-tutor" class="fixed right-0 top-0 bottom-0 w-full sm:w-[400px] dropdown-menu-pane border-l backdrop-blur-2xl z-[130] transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
     <div class="p-4 border-b border-white/10 flex items-center justify-between bg-purple-500/10">
-      <h3 class="text-xs font-bold theme-text-title flex items-center gap-2">
-        <span>🤖 Align-X AI Tutor (Gemini)</span>
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-      </h3>
+      <div class="flex items-center gap-2">
+        <div class="w-6 h-6 rounded-lg bg-gradient-to-tr from-purple-600 via-indigo-600 to-fuchsia-500 flex items-center justify-center p-1">
+          <svg class="w-full h-full text-white" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+            <path d="M12 12L36 36M36 12L12 36" stroke-width="5" stroke-linecap="round"/>
+            <circle cx="24" cy="24" r="5" fill="currentColor"/>
+          </svg>
+        </div>
+        <h3 class="text-xs font-bold theme-text-title flex items-center gap-1.5">
+          <span>Align-X AI Tutor (Gemini)</span>
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        </h3>
+      </div>
       <button type="button" onclick="toggleTutorChat()" class="theme-text-sub hover:text-white cursor-pointer">✕</button>
     </div>
     <div id="tutor-chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 text-xs">
-      <div class="p-3 rounded-xl theme-card-inner theme-text-title">
-        🎓 Hello! I am your Align-X AI Tutor, powered by Google Gemini. Ask me anything about your roadmap, career goals, or technical concepts.
+      <div class="p-3 rounded-xl theme-card-inner theme-text-title leading-relaxed">
+        🎓 Hello! I am your Align-X AI Tutor, powered by Google Gemini. Ask me any question about your curriculum, technical concepts, or clinical cases.
       </div>
     </div>
     <form onsubmit="event.preventDefault(); handleTutorSend(event); return false;" class="p-3 border-t border-white/10 flex gap-2 theme-card-inner">
@@ -637,7 +667,6 @@
     </form>
   </div>
 
-  <!-- INLINE CONTROLLER -->
   <script>
     function showAuthStep(step) {
       var fIn = document.getElementById('form-signin');
