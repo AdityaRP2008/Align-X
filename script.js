@@ -183,8 +183,6 @@ window.cycleFunFact = async function(manualClick = false) {
 
   isFactLoading = true;
   if (btn) btn.classList.add('opacity-50');
-
-  // Fade animation
   factEl.style.opacity = '0.4';
 
   try {
@@ -205,7 +203,6 @@ window.cycleFunFact = async function(manualClick = false) {
       throw new Error("Empty response");
     }
   } catch (err) {
-    // Intelligent fallback tailored to the goal
     const fallbacks = getFallbackFacts(goal);
     factEl.textContent = fallbacks[Math.floor(Math.random() * fallbacks.length)];
   } finally {
