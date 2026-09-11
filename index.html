@@ -76,7 +76,6 @@
       <div id="form-profiler-integrated" style="display: none;" class="space-y-3.5 text-xs">
         <div class="border-b border-white/10 pb-2 flex items-center justify-between">
           <span class="font-bold text-xs dynamic-accent-text" id="profiler-step-heading">Configure Career Target</span>
-          <!-- Dynamic Back Button that goes to Dashboard if logged in, or Register if not -->
           <button type="button" onclick="handleProfilerBackButton()" class="text-[11px] theme-text-sub hover:underline cursor-pointer flex items-center gap-1">
             <span>←</span> <span id="profiler-back-label">Back</span>
           </button>
@@ -118,6 +117,9 @@
           <span>✨ Synthesize Custom Architecture via Gemini →</span>
         </button>
       </div>
+
+      <!-- Status Feedback -->
+      <div id="auth-status-msg" style="display: none;" class="p-3 rounded-xl text-center text-xs font-semibold"></div>
 
       <!-- Accent Theme Palette -->
       <div class="pt-3 border-t border-white/10 flex items-center justify-between text-[11px] theme-text-sub">
@@ -233,21 +235,23 @@
       </div>
     </header>
 
-    <!-- Insight Capsule -->
+    <!-- AI Generated Dynamic Fact Capsule -->
     <section class="p-3.5 rounded-2xl study-card flex items-center justify-between gap-3 text-xs bg-gradient-to-r from-white/[0.03] via-transparent to-transparent relative z-10">
       <div class="flex items-center gap-3">
         <span class="text-sm">💡</span>
         <div>
           <div class="flex items-center gap-2">
-            <span class="text-[10px] font-mono uppercase font-bold tracking-wider dynamic-accent-text">INSIGHT OF THE MOMENT</span>
-            <span class="text-[9px] theme-text-sub font-mono">• auto-refreshes</span>
+            <span class="text-[10px] font-mono uppercase font-bold tracking-wider dynamic-accent-text">AI INDUSTRY INSIGHT</span>
+            <span class="text-[9px] theme-text-sub font-mono" id="cs-fact-role-tag">• tailored for your target goal</span>
           </div>
-          <p id="cs-fun-fact-text" class="theme-text-title text-xs mt-0.5 font-medium">
-            Personalized academic architectures accelerate career readiness by matching targeted project milestones.
+          <p id="cs-fun-fact-text" class="theme-text-title text-xs mt-0.5 font-medium leading-relaxed">
+            Synthesizing domain-specific insight with Gemini...
           </p>
         </div>
       </div>
-      <button type="button" onclick="cycleFunFact()" class="shrink-0 text-xs px-3 py-1.5 rounded-lg border border-white/10 theme-text-title font-mono hover:bg-white/5 transition cursor-pointer">↻ Next Fact</button>
+      <button type="button" id="btn-next-fact" onclick="cycleFunFact(true)" class="shrink-0 text-xs px-3 py-1.5 rounded-lg border border-white/10 theme-text-title font-mono hover:bg-white/5 transition cursor-pointer">
+        ↻ Next Insight
+      </button>
     </section>
 
     <!-- 4 Telemetry Dials -->
@@ -283,7 +287,7 @@
         <div>
           <div class="text-[10px] font-mono theme-text-sub font-bold mb-1">CAREER READINESS</div>
           <div class="text-3xl font-extrabold font-mono theme-text-title" id="meter-readiness-val">0% <span class="text-xs font-normal theme-text-sub">score</span></div>
-          <div class="text-[11px] theme-text-sub mt-1" id="meter-readiness-sub">Hiring benchmark</div>
+          <div class="text-[11px] theme-text-sub mt-1" id="meter-readiness-sub">Course unstarted</div>
         </div>
         <div class="relative w-14 h-14 flex items-center justify-center">
           <svg class="w-14 h-14 transform -rotate-90" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" stroke="var(--meter-bg-track)" stroke-width="5" fill="none"/><circle id="dial-ring-3" cx="32" cy="32" r="26" stroke="var(--accent-main)" stroke-width="5" fill="none" stroke-dasharray="163.36" stroke-dashoffset="163.36"/></svg>
@@ -295,7 +299,7 @@
         <div>
           <div class="text-[10px] font-mono theme-text-sub font-bold mb-1">STUDY SPRINT PACE</div>
           <div class="text-3xl font-extrabold font-mono theme-text-title" id="meter-time-val">0% <span class="text-xs font-normal theme-text-sub">pace</span></div>
-          <div class="text-[11px] theme-text-sub mt-1" id="meter-time-sub">Sprint inactive</div>
+          <div class="text-[11px] theme-text-sub mt-1" id="meter-time-sub">Sprint unstarted</div>
         </div>
         <div class="relative w-14 h-14 flex items-center justify-center">
           <svg class="w-14 h-14 transform -rotate-90" viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" stroke="var(--meter-bg-track)" stroke-width="5" fill="none"/><circle id="dial-ring-4" cx="32" cy="32" r="26" stroke="var(--accent-main)" stroke-width="5" fill="none" stroke-dasharray="163.36" stroke-dashoffset="163.36"/></svg>
@@ -414,7 +418,7 @@
     <span>AI Tutor</span>
   </button>
 
-  <!-- Navigation Drawer with Career Gap Deficits Item -->
+  <!-- Navigation Drawer -->
   <aside id="nav-drawer" class="fixed inset-y-0 left-0 w-80 max-w-[85vw] dropdown-menu-pane border-r backdrop-blur-2xl z-[120] transform -translate-x-full transition-transform duration-300 flex flex-col justify-between p-6 shadow-2xl">
     <div class="space-y-6">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
@@ -456,7 +460,6 @@
           <span class="text-[10px] font-mono text-emerald-500 font-bold">Continuous</span>
         </button>
 
-        <!-- Dynamic Endless Riddle Trigger -->
         <button type="button" onclick="startEndlessRiddleSession(); toggleNavSidebar();" class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white/5 theme-text-title transition cursor-pointer">
           <span class="flex items-center gap-2.5"><span>🧩</span> <span>Mind Activation Riddle Studio</span></span>
           <span class="text-[10px] font-mono dynamic-accent-text font-bold">Endless</span>
@@ -543,7 +546,7 @@
     </div>
   </div>
 
-  <!-- NEW: DYNAMIC ENDLESS RIDDLE STUDIO MODAL -->
+  <!-- Endless Riddle Studio Modal -->
   <div id="modal-puzzle" style="display: none;" class="fixed inset-0 z-[150] bg-black/80 backdrop-blur-md items-center justify-center p-4">
     <div class="study-card rounded-3xl max-w-xl w-full p-6 space-y-5 shadow-2xl">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
